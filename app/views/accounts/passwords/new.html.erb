@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forgot Password</title>
+  <style>
+      /* Set the background image for the whole section */
+      .forgot-password-section {
+          background-image: url('https://images.pexels.com/photos/40784/drops-of-water-water-nature-liquid-40784.jpeg');
+          background-size: cover;
+          background-position: center;
+          height: 100vh; /* Full viewport height */
+          display: flex;
+          align-items: center;
+          justify-content: center;
+      }
+
+      /* Center the form container */
+      .forgot-password-form-container {
+          background-color: rgba(255, 255, 255, 0.9); /* Light skin background with slight transparency */
+          padding: 2rem;
+          border-radius: 8px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+          width: 100%;
+          max-width: 400px; /* Set a max width for the form */
+          text-align: center;
+      }
+
+      /* Style form groups */
+      .form-group {
+          margin-bottom: 1rem;
+      }
+
+      /* Style form labels and inputs */
+      .form-group label {
+          display: block;
+          margin-bottom: 0.5rem;
+      }
+
+      .form-group input {
+          width: 100%;
+          padding: 0.75rem;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+      }
+
+      /* Style submit button */
+      .btn-submit {
+          background-color: #007bff;
+          color: white;
+          border: none;
+          padding: 0.75rem 1.5rem;
+          border-radius: 4px;
+          cursor: pointer;
+      }
+
+      .btn-submit:hover {
+          background-color: #0056b3;
+      }
+
+      /* Style error messages */
+      .error {
+          color: red;
+          font-size: 0.875rem;
+      }
+  </style>
+</head>
+<body>
+<section class="forgot-password-section">
+  <div class="forgot-password-form-container">
+    <h2>Forgot your password?</h2>
+    <p>Enter your email to reset your password.</p>
+
+    <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f| %>
+      <%= render "accounts/shared/error_messages", resource: resource %>
+
+      <div class="form-group">
+        <%= f.label :email %>
+        <%= f.email_field :email, autofocus: true, autocomplete: "email", placeholder: 'Email' %>
+        <% if resource.errors[:email].present? %>
+          <div class="error"><%= resource.errors[:email].first %></div>
+        <% end %>
+      </div>
+
+      <div>
+        <%= f.submit "Change my password", class: 'btn-submit' %>
+      </div>
+
+      <p><a href="<%= new_account_session_path %>">Back to Log In</a></p>
+    <% end %>
+
+  </div>
+</section>
+</body>
+</html>

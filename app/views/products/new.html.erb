@@ -1,0 +1,84 @@
+<div class="custom-header">
+  <h1>New Product</h1>
+</div>
+
+
+
+  <!-- Buttons to toggle between forms -->
+  <div style="margin-bottom: 20px; text-align: center; width: 100%;">
+    <button id="createBtn" onclick="toggleForms('create')" style="margin-right: 10px;">Create Product</button>
+    <button id="importBtn" onclick="toggleForms('import')">Import Products</button>
+  </div>
+
+  <!-- Forms container with white background -->
+  <div style="background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px
+    rgba(0, 0, 0, 0.1); width: 100%; max-width: 600px; margin-top: 30px">
+
+    <!-- Create Product Form -->
+    <div id="createForm" class="form-container" style="display: block; text-align: center">
+      <%= form_with model: @product, local: true do |form| %>
+        <% if @product.errors.any? %>
+          <div id="error_explanation" style="color: red;">
+            <h2><%= pluralize(@product.errors.count, "error") %> prohibited this product from being saved:</h2>
+            <ul>
+              <% @product.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+          <%= form.label :name, "Name", style: "font-weight: bold; margin-right: 10px;" %>
+          <%= form.text_field :name, id: 'product_name' %>
+        </div>
+
+        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+          <%= form.label :prices, "Price", style: "font-weight: bold; margin-right: 10px;" %>
+          <%= form.number_field :prices, step: :any, id: 'product_price' %>
+        </div>
+
+        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+          <%= form.label :product_type, "Product Type", style: "font-weight: bold; margin-right: 10px;" %>
+          <%= form.select :product_type, options_for_select(@categories), {}, id: 'product_type' %>
+        </div>
+
+        <div style="margin-top: 20px; text-align: center;">
+          <%= form.submit 'Create Product', style: 'background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; border: none; cursor: pointer;' %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Import Products Form -->
+    <div id="importForm" class="form-container" style="display: none; text-align: center;">
+      <%= form_with url: import_products_path, local: true, multipart: true do |form| %>
+        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+          <%= form.label :file, "Upload ODS File", style: "font-weight: bold; margin-right: 10px;" %>
+          <%= form.file_field :file, id: 'product_file' %>
+        </div>
+
+        <div style="margin-top: 20px; text-align: center;">
+          <%= form.submit 'Import Products', style: 'background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; border: none; cursor: pointer;' %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+<div class="custom-footer" style ="margin-top: 520px">
+  <h1>This is a test product</h1>
+</div>
+
+<script>
+    function toggleForms(formType) {
+        const createForm = document.getElementById('createForm');
+        const importForm = document.getElementById('importForm');
+
+        if (formType === 'create') {
+            createForm.style.display = 'block';
+            importForm.style.display = 'none';
+        } else {
+            createForm.style.display = 'none';
+            importForm.style.display = 'block';
+        }
+    }
+</script>

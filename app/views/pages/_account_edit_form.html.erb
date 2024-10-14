@@ -1,0 +1,50 @@
+<div class="d-flex justify-content-center align-items-center min-vh-100 py-5">
+  <div class="w-100 app-color" style="max-width: 600px;">
+    <h2> Account Customizer</h2>
+    <%= form_with model: account, url: account_path(account), method: :patch, remote: true, class: "needs-validation", novalidate: true do |form| %>
+
+      <% if account.errors.any? %>
+        <div id="error_explanation" class="alert alert-danger">
+          <h2><%= pluralize(account.errors.count, "error") %> prohibited this account from being saved:</h2>
+          <ul>
+            <% account.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="mb-3">
+        <label for="username" class="form-label"><strong>Username</strong></label>
+        <%= form.text_field :username, class: "form-control", id: "username", required: true %>
+        <div class="invalid-feedback">Please provide a valid username.</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="email" class="form-label"><strong>Email</strong></label>
+        <%= form.email_field :email, class: "form-control", id: "email", required: true %>
+        <div class="invalid-feedback">Please provide a valid email address.</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="phonenumber" class="form-label"><strong>Phone Number</strong></label>
+        <%= form.text_field :phonenumber, class: "form-control", id: "phonenumber" %>
+      </div>
+
+      <div class="mb-3">
+        <label for="address" class="form-label"><strong>Address</strong></label>
+        <%= form.text_field :address, class: "form-control", id: "address" %>
+      </div>
+
+      <div class="mb-3">
+        <label for="gender" class="form-label"><strong>Gender</strong></label>
+        <%= form.select :gender, options_for_select(['none', 'male', 'female', 'other'], account.gender), {}, class: "form-select", id: "gender" %>
+      </div>
+
+      <div class="text-center">
+        <%= form.submit 'Save Changes', class: "btn btn-success px-4 py-2" %>
+      </div>
+
+    <% end %>
+  </div>
+</div>

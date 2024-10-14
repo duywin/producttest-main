@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Shop</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+      .text-success {
+          color: green !important;
+      }
+
+      .text-danger {
+          color: red !important;
+      }
+
+      .product-box {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: space-between;
+      }
+
+      .product-image {
+          width: 100px; /* Increased size for better product visibility */
+          height: 100px; /* Keep the image square */
+          object-fit: cover; /* Ensure the image fits nicely */
+          margin-bottom: 10px;
+          align-self: center;
+      }
+
+      .scroll-panel {
+          padding: 10px;
+          overflow-y: auto;
+          max-height: 500px; /* Adjust for a better scrollable area */
+          width: 100%; /* Ensure the panel takes full width */
+      }
+
+      .product-name,
+      .product-price {
+          margin: 5px 0; /* Space above and below text */
+          color: green;
+      }
+
+      .buy-button {
+          margin-top: 10px; /* Space above button */
+          padding: 5px 10px; /* Padding inside button */
+          background-color: #007bff; /* Button background color */
+          color: white; /* Button text color */
+          border: none; /* Remove border */
+          border-radius: 5px; /* Rounded corners */
+          cursor: pointer; /* Pointer cursor on hover */
+      }
+
+      .buy-button:hover {
+          background-color: #0056b3; /* Darker shade on hover */
+      }
+
+      .cart-icon {
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          font-size: 24px;
+      }
+
+      .badge {
+          padding-left: 9px;
+          padding-right: 9px;
+          border-radius: 9px;
+          background-color: #c67605;
+          color: #fff;
+          font-size: 12px;
+      }
+
+      #lblCartCount {
+          background: #ff0000;
+          padding: 0 5px;
+          vertical-align: top;
+          margin-left: -10px;
+      }
+  </style>
+</head>
+<body>
+<div class="jumbotron text-center app-color py-4">
+  <h1>Shearwater </h1>
+</div>
+
+<nav class="navbar navbar-expand-lg navbar-light app-color topnav" style="margin-top: -10px">
+  <div class="container-fluid">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <ul class="navbar-nav w-100 justify-content-around">
+        <li class="nav-item flex-fill">
+          <a class="nav-link" href="<%= users_home_path %>">Home</a>
+        </li>
+        <li class="nav-item active flex-fill">
+          <a class="nav-link" href="<%= shop_path %>">Shop</a>
+        </li>
+        <li class="nav-item flex-fill">
+          <a class="nav-link" href="<%= about_us_path %>">About Us</a>
+        </li>
+        <li class="nav-item flex-fill">
+          <% if @account %>
+            <a class="nav-link" href="<%= my_account_path %>">My account</a>
+          <% else %>
+            <a class="nav-link" href="<%= new_account_session_path %>">Sign In</a>
+          <% end %>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container my-5">
+  <h2 class="text-center text-primary fw-bold">Shearwater Shop</h2>
+
+  <div class="d-flex justify-content-center align-items-center my-3">
+    <%= form_with url: shop_path, method: :get, local: true, html: { id: "filter-form", class: "d-flex" } do %>
+      <%= text_field_tag :search, params[:search], placeholder: "Enter product name", class: "form-control me-2" %>
+      <%= submit_tag 'Search', class: "btn btn-primary" %>
+    <% end %>
+    <div class="ms-3">
+      <%= link_to shop_cart_path do %>
+        <i class="fa fa-shopping-cart fa-2x"></i>
+        <span class="badge bg-warning" id="lblCartCount"><%= @cart_item_count || 0 %></span>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-3">
+      <!-- Sorting by Type -->
+      <div class="mb-3">
+        <label for="type-sort" class="form-label fw-bold">Type:</label>
+        <%= form_with url: shop_path, method: :get, local: true, html: { id: "type-filter-form" } do %>
+          <select id="type-sort" name="product_type" class="form-select">
+            <option value="">Select Type</option>
+            <% Product.pluck(:product_type).uniq.each do |type| %>
+              <option value="<%= type %>" <%= 'selected' if type == params[:product_type] %>><%= type %></option>
+            <% end %>
+          </select>
+          <button type="submit" class="btn btn-secondary mt-2">Filter</button>
+        <% end %>
+      </div>
+
+      <!-- Sorting by Price -->
+      <div>
+        <%= form_with url: shop_path, method: :get, local: true, html: { id: "price-filter-form" } do %>
+          <div class="mb-2">
+            <label for="price-min" class="form-label fw-bold">Min Price:</label>
+            <input type="number" id="price-min" name="price_min" value="<%= params[:price_min] %>" placeholder="Lowest price" class="form-control">
+          </div>
+
+          <div class="mb-3">
+            <label for="price-max" class="form-label fw-bold">Max Price:</label>
+            <input type="number" id="price-max" name="price_max" value="<%= params[:price_max] %>" placeholder="Highest price" class="form-control">
+          </div>
+
+          <button type="submit" class="btn btn-secondary">Filter</button>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="col-md-9">
+      <div class="scroll-panel" id="product-scroll-panel" data-page="1" style="overflow-y: auto; max-height: 400px;">
+        <div class="row" id="product-container">
+          <% @products.each do |product| %>
+            <div class="col-md-4 mb-4">
+              <div class="card h-100 product-box">
+                <img src="<%= product.picture %>" alt="<%= product.name %>" class="card-img-top product-image">
+                <div class="card-body text-center">
+                  <h5 class="product-name"><%= product.name %></h5>
+                  <!-- Price color logic: Green for normal, Red for anomaly -->
+                  <p class="product-price <%= product.price_status == 'anomaly' ? 'text-danger' : 'text-success' %>">
+                    $<%= product.current_price %>
+                  </p>
+                  <% if product.stock > 0 %>
+                    <button class="btn btn-primary buy-button" onclick="update_cart_ui(<%= @cart.id %>, <%= product.id %>)">Buy</button>
+                  <% else %>
+                    <p class="text-danger">Sold Out</p>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+    <!-- Loader for lazy loading -->
+    <div id="loading-spinner" class="text-center" style="display: none;">
+      <p>Loading...</p>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Footer -->
+<footer class="app-color text-center py-4" style=" margin-top: 100px">
+  <p>&copy; Your satisfaction is our priority</p>
+</footer>
+
+<script>
+    function combineFormData() {
+        const searchInput = document.querySelector('input[name="search"]');
+        const typeSelect = document.querySelector('select[name="product_type"]');
+        const priceMinInput = document.querySelector('input[name="price_min"]');
+        const priceMaxInput = document.querySelector('input[name="price_max"]');
+
+        let queryParams = new URLSearchParams();
+
+        if (searchInput && searchInput.value) {
+            queryParams.set('search', searchInput.value);
+        }
+        if (typeSelect && typeSelect.value) {
+            queryParams.set('product_type', typeSelect.value);
+        }
+        if (priceMinInput && priceMinInput.value) {
+            queryParams.set('price_min', priceMinInput.value);
+        }
+        if (priceMaxInput && priceMaxInput.value) {
+            queryParams.set('price_max', priceMaxInput.value);
+        }
+
+        return queryParams.toString();
+    }
+
+    // Function to handle form submissions
+    function handleFilterFormSubmit(event) {
+        event.preventDefault();
+
+        // Combine all form data
+        const combinedQueryParams = combineFormData();
+
+        // Fetch updated products using AJAX
+        fetch(`${event.target.action}?${combinedQueryParams}`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+            .then(response => response.text())
+            .then(html => {
+                // Parse the HTML response to extract the product listings
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newProducts = doc.getElementById('product-container').innerHTML; // Get only the product listings
+                document.getElementById('product-container').innerHTML = newProducts; // Update the product container
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    let cartCount = <%= @cart_item_count || 0 %>;
+
+    function update_cart_ui(cartId, productId) {
+        fetch(`/cart_items`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                cart_id: cartId,
+                product_id: productId,
+                quantity: 1 // Default quantity
+            })
+        })
+            .then(response => {
+                if (response.ok) {
+                    cartCount++; // Increment cartCount on successful addition
+                    let cartCountElem = document.getElementById('lblCartCount');
+                    cartCountElem.innerText = cartCount; // Update UI
+                }
+            })
+            .catch(error => console.error('Error adding cart item:', error));
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        let scrollPanel = document.getElementById('product-scroll-panel');
+        let loadingSpinner = document.getElementById('loading-spinner');
+        let currentPage = 1;
+        let isLoading = false; // Prevent multiple requests
+        let allProductsLoaded = false; // Flag to stop loading when no more products
+
+        scrollPanel.addEventListener('scroll', function () {
+            let nearBottom = scrollPanel.scrollTop + scrollPanel.clientHeight >= scrollPanel.scrollHeight - 10;
+            if (nearBottom && !isLoading && !allProductsLoaded) {
+                isLoading = true;
+                loadingSpinner.style.display = 'block'; // Show the loading spinner
+                loadMoreProducts();
+            }
+        });
+
+        function loadMoreProducts() {
+            currentPage++; // Increment the page number
+            let queryParams = combineFormData(); // Include any existing filters
+
+            fetch(`/shop?page=${currentPage}&${queryParams}`, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newProducts = doc.getElementById('product-container').innerHTML;
+
+                    if (newProducts.trim()) {
+                        // Append new products
+                        document.getElementById('product-container').insertAdjacentHTML('beforeend', newProducts);
+                    } else {
+                        // No more products to load, set the flag
+                        allProductsLoaded = true;
+                    }
+                    loadingSpinner.style.display = 'none'; // Hide the loading spinner
+                    isLoading = false; // Allow new scroll events
+                })
+                .catch(error => {
+                    console.error('Error loading more products:', error);
+                    loadingSpinner.style.display = 'none'; // Hide spinner on error
+                    isLoading = false; // Allow new scroll events
+                });
+        }
+    });
+    document.getElementById('type-filter-form').addEventListener('submit', handleFilterFormSubmit);
+    document.getElementById('price-filter-form').addEventListener('submit', handleFilterFormSubmit);
+    document.getElementById('filter-form').addEventListener('submit', handleFilterFormSubmit);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,120 @@
+<head>
+  <title>Cart Items Details</title>
+  <style>
+      * {
+          box-sizing: border-box;
+      }
+
+      html, body {
+          width: 100%;
+          height: 100%;
+          margin: 0;
+          background-color: #ADD8E6; /* Light blue color */
+          font-family: 'Roboto', sans-serif;
+      }
+
+      .shopping-cart {
+          width: 750px;
+          margin: 80px auto;
+          background: rgba(255, 255, 255, 0.9); /* Slightly transparent white background */
+          box-shadow: 1px 2px 3px 0px rgba(0,0,0,0.10);
+          border-radius: 6px;
+          display: flex;
+          flex-direction: column;
+          padding: 20px;
+      }
+
+      .title {
+          height: 60px;
+          border-bottom: 1px solid #E1E8EE;
+          padding: 20px 30px;
+          color: #5E6977;
+          font-size: 18px;
+          font-weight: 400;
+      }
+
+      .item {
+          padding: 20px 30px;
+          display: flex;
+          border-bottom: 1px solid #E1E8EE;
+          justify-content: space-between; /* Distribute space between children */
+      }
+
+      .image {
+          margin-right: 20px;
+      }
+
+      .image img {
+          width: 50px; /* Increased width */
+          height: 50px; /* Increased height */
+          object-fit: cover; /* Ensure the image covers the area */
+      }
+
+      .description {
+          padding-top: 10px;
+          flex-grow: 1;
+          text-align: left; /* Align text to the left */
+      }
+
+      .total-price {
+          font-size: 16px;
+          color: #43484D;
+      }
+
+      .back-button {
+          margin-top: 20px;
+          padding: 10px 15px;
+          font-size: 16px;
+          color: white;
+          background-color: #007BFF; /* Bootstrap primary color */
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+      }
+
+      .back-button:hover {
+          background-color: #0056b3; /* Darker shade on hover */
+      }
+
+      @media (max-width: 800px) {
+          .shopping-cart {
+              width: 100%;
+              height: auto;
+              overflow: hidden;
+          }
+          .item {
+              flex-wrap: wrap;
+              justify-content: center;
+          }
+      }
+  </style>
+</head>
+
+<body>
+<div class="shopping-cart">
+  <div class="title">Cart Products</div>
+  <button class="back-button" onclick="window.location.href='http://localhost:3000/carts'">Back to Cart</button>
+  <div class="cart-view">
+    <% if @cart_items.present? %>
+      <% @cart_items.each do |item| %>
+        <div class="item" data-cart-item-id="<%= item.id %>">
+          <div class="image">
+            <img src="<%= item.product.picture %>" alt="<%= item.product.name %>" />
+          </div>
+          <div class="description">
+            <span><%= item.product.name %></span><br>
+            <span>Quantity: <%= item.quantity %></span><br>
+            <span>Price: <%= number_to_currency(item.product.prices.to_f * item.quantity) %></span>
+          </div>
+          <div class="total-price"><%= number_to_currency(item.product.prices.to_f * item.quantity) %></div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <strong>Total:</strong> <span id="cart-total"><%= number_to_currency(@cart.total_price) %></span>
+  </div>
+
+</div>
+</body>

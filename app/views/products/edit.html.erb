@@ -1,0 +1,77 @@
+<div class="jumbotron text-center app-color">
+  <h1>Account management </h1>
+</div>
+
+<div class="my-3 text-start">
+  <%= link_to 'Back to Products', products_path, class: 'btn btn-success' %>
+</div>
+
+<div class="d-flex justify-content-center align-items-center vh-100 app-color p-4 rounded">
+  <div class="w-100" style="max-width: 600px;">
+
+    <%= form_with model: @product, url: product_path(@product), method: :patch, local: true do |form| %>
+      <ul class="list-unstyled">
+        <li class="mb-3 d-flex align-items-center">
+          <strong class="flex-shrink-0 me-3">Name:</strong>
+          <%= form.text_field :name, class: 'form-control flex-grow-1' %>
+        </li>
+        <li class="mb-3 d-flex align-items-center">
+          <strong class="flex-shrink-0 me-3">Price:</strong>
+          <%= form.text_field :prices, class: 'form-control flex-grow-1' %>
+        </li>
+        <li class="mb-3 d-flex align-items-center">
+          <%= form.label :product_type, "Product Type", class: 'fw-bold me-3' %>
+          <%= form.select :product_type, options_for_select(@categories, @product.product_type), {}, id: 'product_type', class: 'form-select flex-grow-1' %>
+        </li>
+        <li class="mb-3 d-flex align-items-center">
+          <strong class="flex-shrink-0 me-3">Description:</strong>
+          <%= form.text_area :desc, class: 'form-control flex-grow-1' %>
+        </li>
+        <li class="mb-3 d-flex align-items-center">
+          <strong class="flex-shrink-0 me-3">Stock:</strong>
+          <%= form.number_field :stock, class: 'form-control flex-grow-1' %>
+        </li>
+        <li class="mb-3 d-flex flex-wrap align-items-start">
+          <strong class="flex-shrink-0 me-3">Picture:</strong>
+          <div class="flex-grow-1">
+            <%= form.text_field :picture, id: 'picture_url', class: 'form-control mb-2' %>
+            <button type="button" id="show_picture" class="btn btn-secondary">Show Picture</button>
+            <div id="picture_container" class="mt-3" style="max-height: 200px; overflow: auto;"></div>
+          </div>
+        </li>
+      </ul>
+
+      <div class="text-center">
+        <%= form.submit 'Save', class: 'btn btn-success' %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<footer class="custom-footer py-4 app-color">
+  <h1 class="text-center">Admin Interface</h1>
+</footer>
+
+<script>
+    $(document).ready(function() {
+        $('#show_picture').on('click', function() {
+            var pictureUrl = $('#picture_url').val();
+            var $container = $('#picture_container');
+
+            // Clear previous content
+            $container.empty();
+
+            if (pictureUrl) {
+                var img = $('<img>', {
+                    src: pictureUrl,
+                    alt: 'Product Picture',
+                    class: 'img-fluid',
+                    css: { 'max-width': '200px', 'max-height': '200px' }
+                });
+                $container.append(img);
+            } else {
+                $container.text('No picture available');
+            }
+        });
+    });
+</script>

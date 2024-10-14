@@ -1,0 +1,135 @@
+<head>
+  <title>Admin Dashboard</title>
+
+  <% if session[:welcome_alert_shown] %>
+    <%= javascript_tag do %>
+      alert('Welcome, <%= @account.username if @account %>!');
+      <% session.delete(:welcome_alert_shown) %> <!-- Clear the session variable -->
+    <% end %>
+  <% end %>
+
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+
+  <style>
+      .top-product-picture {
+          height: 300px;
+          width: 300px;
+          align-self: center;
+      }
+  </style>
+</head>
+
+<body>
+  <div class="jumbotron text-center app-color">
+    <h1>Admin dashboard </h1>
+  </div>
+  <nav class="navbar navbar-expand-lg navbar-light app-color topnav" style="margin-top: -10px">
+    <div class="container-fluid">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <ul class="navbar-nav w-100 justify-content-around">
+          <li class="nav-item active flex-fill">
+            <a class="nav-link" href="<%= adminhomes_path %>">Home</a>
+          </li>
+
+          <li class="nav-item flex-fill">
+            <a class="nav-link" href="<%= products_path %>">Product</a>
+          </li>
+          <li class="nav-item flex-fill">
+            <a class="nav-link" href="<%= categories_path %>">Type</a>
+          </li>
+          <li class="nav-item flex-fill">
+            <a class="nav-link" href="<%= accounts_path %>">Account</a>
+          </li>
+          <li class="nav-item flex-fill">
+            <a class="nav-link" href="<%= carts_path %>"> Sales </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <main class="content py-4">
+    <h2 class="text-center">Admin Dashboard</h2>
+    <div class="text-end">
+    <%= button_to 'Log out', adminlogout_path, method: :delete, class: 'btn btn-danger'%>
+    </div>
+    <div id="category-chart" class="my-4" style="width: 100%; height: 400px;"></div>
+    <p class="text-center">
+      The category with the highest number of products is
+      <strong><%= @highest_category.first %></strong>, containing
+      <strong><%= @highest_category.last %></strong> products.
+    </p>
+  </main>
+
+  <section class="top-product text-center py-4">
+    <% if @top_product %>
+      <h4>Top Product</h4>
+      <p>
+        The most sold product is <strong><%= @top_product.name %></strong>. It has sold a total of
+        <strong><%= @top_product.total_quantity %></strong> units. Below is a preview of the product:
+      </p>
+      <%= image_tag(@top_product.picture, alt: @top_product.name, class: 'top-product-picture') if @top_product.picture.present? %>
+    <% else %>
+      <p>No product has been sold.</p>
+    <% end %>
+  </section>
+
+  <footer class="custom-footer py-4 app-color">
+    <h1 class="text-center">Admin Interface</h1>
+  </footer>
+
+<!-- JavaScript for Category Chart -->
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script src="https://code.highcharts.com/highcharts-3d.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        function fetchCategoryData() {
+            fetch('<%= adminhomes_category_totals_path %>')
+              .then(response => response.json())
+              .then(data => {
+                  Highcharts.chart('category-chart', {
+                      chart: {
+                          type: 'pie',
+                          options3d: {
+                              enabled: true,
+                              alpha: 45,
+                              beta: 0
+                          }
+                      },
+                      title: {
+                          text: 'Category Totals'
+                      },
+                      tooltip: {
+                          pointFormat: '{series.name}: {point.percentage:.1f}%'
+                      },
+                      plotOptions: {
+                          pie: {
+                              allowPointSelect: true,
+                              cursor: 'pointer',
+                              depth: 35,
+                              dataLabels: {
+                                  enabled: true,
+                                  format: '{point.name}',
+                                  style: {
+                                      color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'red'
+                                  },
+                                  connectorColor: 'silver'
+                              }
+                          }
+                      },
+                      series: [{
+                          name: 'Total',
+                          data: data
+                      }]
+                  });
+              });
+        }
+        fetchCategoryData();
+        setInterval(fetchCategoryData, 60000);
+    });
+</script>
+</body>

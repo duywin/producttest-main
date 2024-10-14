@@ -1,0 +1,422 @@
+<head>
+  <title>Shopping cart</title>
+  <style>
+      .button {
+          display: inline-block;
+          font-size: 20px;
+          cursor: pointer;
+          text-align: center;
+          font-weight: bold;
+          text-decoration: none;
+          outline: none;
+          color: #fff;
+          background-color: lightblue;
+          border: none;
+          box-shadow: 0 9px #999;
+      }
+
+      .button:hover {
+          background-color: darkcyan;
+      }
+
+      .button:active {
+          background-color: cyan;
+          transform: translateY(4px);
+      }
+
+      * {
+          box-sizing: border-box;
+      }
+
+      html, body {
+          width: 100%;
+          height: 100%;
+          margin: 0;
+          background-image: url('https://plus.unsplash.com/premium_photo-1692386759833-3acf660742ad?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8aGltYWxheWF8ZW58MHx8MHx8fDA%3D');
+          background-size: cover; /* Cover the entire background */
+          background-position: center; /* Center the image */
+          font-family: 'Roboto', sans-serif;
+      }
+
+      .delete-btn {
+          color: #ff0000; /* Red color for the cross icon */
+          font-size: 50px; /* Size of the icon */
+          cursor: pointer; /* Pointer cursor on hover */
+      }
+
+      .delete-btn:hover {
+          color: #d40000; /* Darker red on hover */
+      }
+
+      .shopping-cart {
+          width: 750px;
+          margin: 80px auto;
+          background: rgba(255, 255, 255, 0.9); /* Slightly transparent white background */
+          box-shadow: 1px 2px 3px 0px rgba(0, 0, 0, 0.10);
+          border-radius: 6px;
+          display: flex;
+          flex-direction: column;
+      }
+
+      .title {
+          height: 60px;
+          border-bottom: 1px solid #E1E8EE;
+          padding: 20px 30px;
+          color: #5E6977;
+          font-size: 18px;
+          font-weight: 400;
+      }
+
+      .item {
+          padding: 20px 30px;
+          display: flex;
+          border-bottom: 1px solid #E1E8EE;
+      }
+
+      .image {
+          margin-right: 20px;
+      }
+
+      .image img {
+          width: 30px; /* Set width to 30px */
+          height: 30px; /* Set height to 30px */
+          object-fit: cover; /* Ensure the image covers the area */
+      }
+
+      .description {
+          padding-top: 10px;
+          margin-right: 20px;
+          flex-grow: 1;
+      }
+
+      .quantity {
+          display: flex;
+          align-items: center;
+          margin-right: 20px;
+      }
+
+      .quantity input {
+          width: 50px; /* Fixed width for quantity input */
+          height: 30px; /* Fixed height for quantity input */
+          text-align: center;
+          font-size: 16px;
+          color: #43484D;
+      }
+
+      .total-price {
+          width: 83px;
+          text-align: center;
+          font-size: 16px;
+          color: #43484D;
+      }
+
+      @media (max-width: 800px) {
+          .shopping-cart {
+              width: 100%;
+              height: auto;
+              overflow: hidden;
+          }
+
+          .item {
+              flex-wrap: wrap;
+              justify-content: center;
+          }
+
+          .image,
+          .quantity,
+          .description {
+              width: 100%;
+              text-align: center;
+              margin: 6px 0;
+          }
+      }
+  </style>
+</head>
+
+<body>
+<!-- Shopping Cart View -->
+<div class="shopping-cart">
+  <div class="title">Your Shopping Cart</div>
+
+  <div class="cart-view">
+    <a href="<%= shop_path %>" class="button" style="margin-right: 10px;">Back</a>
+    <% if @cart_items.present? %>
+      <% @cart_items.each do |item| %>
+        <div class="item" data-cart-item-id="<%= item.id %>" data-stock="<%= item.product.stock %>">
+          <div class="image">
+            <img src="<%= item.product.picture %>" alt="<%= item.product.name %>"/>
+          </div>
+          <div class="description">
+            <span><%= item.product.name %></span>
+          </div>
+          <div class="quantity">
+            <button type="button" class="btn btn-secondary" data-action="decrement" data-id="<%= item.id %>">-</button>
+            <input type="text" name="cart_item[quantity]" value="<%= item.quantity %>" class="form-control quantity-input" data-id="<%= item.id %>" readonly/>
+            <button type="button" class="btn btn-secondary" data-action="increment" data-id="<%= item.id %>">+</button>
+          </div>
+          <div class="total-price">
+            <% if item.price_changed? %> <!-- Show old price if there's a promotion -->
+              <span class="old-price" style="text-decoration: line-through; color: red;">
+                <%= number_to_currency(item.original_price.to_f * item.quantity) %>
+              </span>
+            <% end %>
+            <span class="new-price"><%= number_to_currency(item.price.to_f * item.quantity) %></span>
+          </div>
+          <div class="buttons">
+            <span class="delete-btn" data-id="<%= item.id %>" title="Remove item" style="cursor: pointer; color: #ff0000; font-size: 20px;">&#10006;</span>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="item">
+        <div class="description" style="text-align: center; width: 100%;">
+          <span>Your cart is empty</span>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <% if @cart.present? %>
+    <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <strong>Total:</strong>
+        <span id="old-cart-total" style="text-decoration: line-through; color: red; margin-right: 10px;"></span>
+        <span id="new-cart-total"><%= number_to_currency(@cart.total_price) %></span>
+        <div id="discount-line" style="display: none; margin-top: 10px;">
+          <strong id="discount-message"></strong>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center;">
+        <input type="text" id="promotion-code" placeholder="Enter promo code" style="margin-right: 10px; padding: 5px;"/>
+        <button id="apply-promo-btn" class="button">Apply</button>
+      </div>
+    </div>
+    <div class="text-center" style="margin-top: 20px;">
+      <button id="checkout-btn">Checkout</button>
+    </div>
+  <% end %>
+</div>
+
+<script>
+    function updateTotalPrice(discount = 0) {
+        let total = 0;
+        $('.item').each(function () {
+            const quantity = parseInt($(this).find('.quantity-input').val());
+            const price = parseFloat($(this).find('.total-price').text().replace(/[^0-9.-]+/g, ""));
+            total += quantity * price;
+        });
+        total = total - (total * (discount / 100));
+        $('#cart-total').text(new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD'
+        }).format(total));
+    }
+
+    $(document).ready(function () {
+        $('.quantity button').on('click', function () {
+            const action = $(this).data('action');
+            const itemId = $(this).data('id');
+            const quantityInput = $(`input[data-id="${itemId}"]`);
+            let quantity = parseInt(quantityInput.val());
+            const stock = parseInt($(this).closest('.item').data('stock'));
+
+            if (action === "increment") {
+                if (quantity < stock) {
+                    quantity++;
+                } else {
+                    alert("Exceeding stock amount, please wait for restock");
+                    return; // Exit if exceeding stock
+                }
+            } else if (action === "decrement") {
+                if (quantity > 1) {
+                    quantity--;
+                } else {
+                    $(`.delete-btn[data-id="${itemId}"]`).click();
+                    return; // Exit since delete will handle removal
+                }
+            }
+
+            // Update the cart item quantity via AJAX
+            $.ajax({
+                url: `/cart_items/${itemId}`,
+                method: 'PATCH',
+                headers: {
+                    'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')
+                },
+                data: JSON.stringify({quantity: quantity}),
+                contentType: 'application/json',
+                success: function (data) {
+                    if (data.success) {
+                        quantityInput.val(data.new_quantity);
+                        updateTotalPrice(); // Update total price logic
+                    } else {
+                        alert(data.message);
+                    }
+                }
+            });
+        });
+
+        $('.delete-btn').on('click', function () {
+            const itemId = $(this).data('id');
+
+            $.ajax({
+                url: `/cart_items/${itemId}`,
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (data) {
+                    if (data.success) {
+                        $(`[data-cart-item-id="${itemId}"]`).remove();
+                        updateTotalPrice(); // Update total price after item removal
+                    } else {
+                        alert(data.message);
+                    }
+                }
+            });
+        });
+
+        $('#checkout-btn').on('click', function () {
+            const cartId = <%= @cart.id %>; // Ensure @cart is available in your view
+
+            $.ajax({
+                url: `/carts/${cartId}/checkout`, // Ensure the URL is correctly formed
+                method: 'PATCH',
+                headers: {
+                    'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (response) {
+                    if (response.success) {
+                        alert('Checkout completed successfully.'); // Alert user on success
+                        window.location.href = '<%= delivery_form_path %>'; // Redirect to delivery form
+                    } else {
+                        alert('Error: ' + response.message); // Show error message from the server
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error during checkout', error);
+                    alert('An error occurred during checkout. Please try again.');
+                }
+            });
+        });
+
+
+        // Apply promotion button logic
+        $('#apply-promo-btn').on('click', function () {
+            const promoCode = $('#promotion-code').val();
+            const cartId = <%= @cart.id %>; // Ensure @cart is available in your view
+            const csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+            // Check if the promotion code is for the entire cart or for individual items
+            $.ajax({
+                url: `/promotions/check_type`, // Assuming there's a method to check promo type
+                method: 'POST',
+                headers: {
+                    'X-CSRF-Token': csrfToken
+                },
+                data: {promote_code: promoCode},
+                success: function (response) {
+                    if (response.success) {
+                        if (response.promotion_type === 'cart') {
+                            applyCartPromotion(promoCode, cartId, csrfToken);
+                        } else {
+                            applyItemPromotion(promoCode, cartId, csrfToken);
+                        }
+                    } else {
+                        alert('Invalid promotion code');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert('Error verifying promotion: ' + error);
+                }
+            });
+        });
+
+        function applyCartPromotion(promoCode, cartId, csrfToken) {
+            $.ajax({
+                url: `/carts/${cartId}/apply_cart_promotion`,
+                method: 'POST',
+                headers: {
+                    'X-CSRF-Token': csrfToken
+                },
+                data: {promote_code: promoCode, cart_id: cartId},
+                success: function (response) {
+                    if (response.success) {
+                        const newTotal = response.new_total;
+                        const oldTotal = $('#new-cart-total').text().replace(/[^0-9.-]+/g, ""); // get old total
+
+                        // Update totals in UI
+                        $('#old-cart-total').text(new Intl.NumberFormat('en-US', {
+                            style: 'currency',
+                            currency: 'USD'
+                        }).format(oldTotal));
+                        $('#new-cart-total').text(new Intl.NumberFormat('en-US', {
+                            style: 'currency',
+                            currency: 'USD'
+                        }).format(newTotal));
+                        $('#discount-line').show();
+                        document.getElementById('discount-message').innerText = response.message;
+
+                        alert('Cart promotion applied successfully');
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert('Error applying cart promotion: ' + error);
+                }
+            });
+        }
+
+        function updateItemPrices(updatedPrices) {
+            $('.item').each(function () {
+                const itemId = $(this).data('cart-item-id');
+                const itemPrices = updatedPrices[itemId];
+
+                if (itemPrices) {
+                    const oldPrice = itemPrices.old_price;
+                    const newPrice = itemPrices.new_price;
+
+                    // Populate the old price (with strikethrough) and new price for the item
+                    $(this).find('.old-price').text(new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'USD'
+                    }).format(oldPrice)).show(); // Show the old price
+
+                    $(this).find('.new-price').text(new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'USD'
+                    }).format(newPrice));
+                }
+            });
+            updateTotalPrice(); // Recalculate the total price
+        }
+
+        function applyItemPromotion(promoCode, cartId, csrfToken) {
+            $.ajax({
+                url: `/cart_items/apply_promotion`,
+                method: 'POST',
+                headers: {
+                    'X-CSRF-Token': csrfToken
+                },
+                data: {promote_code: promoCode, cart_id: cartId},
+                success: function (response) {
+                    if (response.success) {
+                        document.getElementById('discount-message').innerText = response.message;
+                        document.getElementById('discount-line').style.display = 'block';
+                        alert('Promotion applied successfully: ' + response.message);
+
+                        // Pass the updated prices (with old and new prices) to updateItemPrices
+                        updateItemPrices(response.updated_prices);
+                    } else {
+                        alert('Failed to apply promotion: ' + response.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert('Error applying promotion: ' + xhr.responseJSON.message || error);
+                }
+            });
+        }
+    });
+</script>
+</body>

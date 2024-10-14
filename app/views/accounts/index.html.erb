@@ -1,0 +1,126 @@
+<div class="jumbotron text-center app-color">
+  <h1>Account management </h1>
+</div>
+
+<nav class="navbar navbar-expand-lg navbar-light app-color topnav" style="margin-top: -10px">
+  <div class="container-fluid">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <ul class="navbar-nav w-100 justify-content-around">
+        <li class="nav-item  flex-fill">
+          <a class="nav-link" href="<%= adminhomes_path %>">Home</a>
+        </li>
+
+        <li class="nav-item flex-fill">
+          <a class="nav-link" href="<%= products_path %>">Product</a>
+        </li>
+        <li class="nav-item flex-fill">
+          <a class="nav-link" href="<%= categories_path %>">Type</a>
+        </li>
+        <li class="nav-item active flex-fill">
+          <a class="nav-link" href="<%= accounts_path %>">Account</a>
+        </li>
+        <li class="nav-item flex-fill">
+          <a class="nav-link" href="<%= carts_path %>"> Sales </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+
+<div class="d-flex justify-content-center gap-3 my-4">
+  <button id="import-accounts-button" class="btn btn-warning text-white">Import Accounts</button>
+</div>
+
+<div id="import-accounts-form" class="my-4 text-center" style="display: none;">
+  <div class="form-box">
+    <h3>Import Accounts</h3>
+    <%= form_with url: import_accounts_path, local: true, html: { multipart: true } do |form| %>
+      <div class="mb-3">
+        <%= form.label :file, "Upload CSV or ODS File" %>
+        <%= form.file_field :file, class: "form-input" %>
+      </div>
+      <%= form.submit 'Import accounts', class: 'btn btn-primary form-submit' %>
+    <% end %>
+  </div>
+</div>
+
+
+<div class="text-center my-4">
+  <%= search_form_for @q, url: accounts_path, method: :get, local: true do |f| %>
+    <%= f.text_field :username_cont, placeholder: "Enter username", class: "form-control w-50 d-inline-block me-2" %>
+    <%= select_tag :created_at_filter, options_for_select([
+                                                            ['Filter by Created date', ''],
+                                                            ['This Week', 'this_week'],
+                                                            ['This Month', 'this_month'],
+                                                            ['Last Month', 'last_month'],
+                                                            ['Last Year', 'last_year']
+                                                          ]), class: 'form-control w-25 d-inline-block me-2' %>
+    <%= f.submit 'Search', class: 'btn btn-primary form-submit' %>
+  <% end %>
+</div>
+
+  <div class="table-responsive">
+    <table class="table table-bordered table-hover">
+      <thead class="table-light">
+      <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <% @accounts.each do |account| %>
+        <tr>
+          <td><%= account.username %></td>
+          <td><%= account.email %></td>
+          <td><%= account.is_admin ? 'Admin' : 'User' %></td>
+          <td class="d-flex gap-3 align-items-center">
+              <%= button_to account_path(account), method: :get,
+                            class: 'btn btn-primary',
+                            style: 'color: white; padding: 10px 20px; border-radius: 5px; border: none; cursor: pointer; background: none; font-size: 20px;',
+                            title: 'View Details' do %>
+                <span>&#128065;</span> <!-- Eye symbol for view -->
+              <% end %>
+
+              <%= button_to edit_account_path(account), method: :get,
+                            class: 'btn btn-primary',
+                            style: 'color: blue; padding: 10px 20px; border-radius: 5px; border: none; cursor: pointer; background: none;font-size: 20px;',
+                            title: 'Edit Account' do %>
+                <span>&#9998;</span> <!-- Pencil symbol for edit -->
+              <% end %>
+
+              <%= button_to account_path(account), method: :delete,
+                            data: { turbo_confirm: "Are you sure?" },
+                            style: 'background: none; padding: 10px 20px; border-radius: 5px; border: none; color: red; cursor: pointer; font-size: 20px;',
+                            title: 'Delete Account' do %>
+                <span>&#10060;</span> <!-- Cross symbol for delete -->
+              <% end %>
+          </td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination d-flex justify-content-center my-4">
+    <%= paginate @accounts, class: 'pagination', previous_label: 'Previous', next_label: 'Next' %>
+  </div>
+
+<footer class="custom-footer py-4 app-color">
+  <h1 class="text-center">Admin Interface</h1>
+</footer>
+
+<script>
+    $(document).ready(function() {
+        $("#import-accounts-button").on("click", function() {
+            $("#import-accounts-form").toggle("fast");
+        });
+    });
+</script>

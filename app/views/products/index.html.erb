@@ -1,0 +1,209 @@
+<div class="jumbotron text-center app-color">
+  <h1>Product management </h1>
+</div>
+
+<nav class="navbar navbar-expand-lg navbar-light app-color topnav" style="margin-top: -10px">
+  <div class="container-fluid">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <ul class="navbar-nav w-100 justify-content-around">
+        <li class="nav-item  flex-fill">
+          <a class="nav-link" href="<%= adminhomes_path %>">Home</a>
+        </li>
+
+        <li class="nav-item active flex-fill">
+          <a class="nav-link" href="<%= products_path %>">Product</a>
+        </li>
+        <li class="nav-item flex-fill">
+          <a class="nav-link" href="<%= categories_path %>">Type</a>
+        </li>
+        <li class="nav-item flex-fill">
+          <a class="nav-link" href="<%= accounts_path %>">Account</a>
+        </li>
+        <li class="nav-item flex-fill">
+          <a class="nav-link" href="<%= carts_path %>"> Sales </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Search Form -->
+<div class="d-flex justify-content-center mb-4">
+  <%= search_form_for @q, method: :get, local: true, class: 'd-flex' do |f| %>
+    <%= f.search_field :name_cont, placeholder: "Enter product name...", class: 'form-control me-2', style: 'width: 300px;' %>
+    <%= f.submit "Search", class: 'btn btn-primary' %>
+  <% end %>
+</div>
+
+<div class="d-flex justify-content-center mb-4">
+  <%= link_to 'Create Promotion', new_promotion_path, class: 'btn btn-success mx-2 shadow-button' %>
+  <%= link_to 'Create Product', new_product_path, class: 'btn btn-info mx-2 shadow-button' %>
+  <button id="toggle-export-form" class="btn btn-warning shadow-button">Export Report</button>
+</div>
+
+
+<!-- Hidden Export Form -->
+<div id="export-form-container" class="my-4 text-center" style="display: none;">
+  <div class="form-box app">
+    <h3>Export Report</h3>
+    <%= form_with url: export_report_path, method: :post, local: true do |f| %>
+      <div class="mb-3">
+        <%= f.label :report_type, "Select Report Type" %>
+        <%= f.select :report_type, [['Weekly Report', 'weekly'], ['Monthly Report', 'monthly']], {}, class: 'form-input' %>
+      </div>
+      <%= f.submit "Export", class: 'btn btn-primary form-submit' %>
+    <% end %>
+  </div>
+</div>
+
+<div class="table-responsive text-center">
+  <h3>Products List</h3>
+  <table class="table table-striped table-hover">
+    <thead class="table-dark">
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">Price</th>
+      <th scope="col">Type</th>
+      <th scope="col">Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% @products.each do |product| %>
+      <tr>
+        <td><%= product.name %></td>
+        <td><%= number_to_currency(product.prices) %></td>
+        <td><%= product.product_type %></td>
+        <td>
+          <div class="d-flex gap-2">
+            <%= button_to product_path(product), method: :get,
+                          class: 'btn btn-primary',
+                          title: 'View Details',
+                          style: 'background: none; border: none; color: blue; cursor: pointer; font-size: 20px;' do %>
+              <span>&#128065;</span> <!-- Eye symbol for view -->
+            <% end %>
+
+            <%= button_to edit_product_path(product), method: :get,
+                          class: 'btn btn-primary',
+                          title: 'Edit Product',
+                          style: 'background: none; border: none; color: green; cursor: pointer; font-size: 20px;' do %>
+              <span>&#9998;</span> <!-- Pencil symbol for edit -->
+            <% end %>
+
+            <%= button_to product_path(product), method: :delete,
+                          data: { turbo_confirm: "Are you sure?" },
+                          class: 'btn btn-danger',
+                          title: 'Delete Product',
+                          style: 'background: none; border: none; color: red; cursor: pointer; font-size: 20px;' do %>
+              <span>&#10060;</span> <!-- X symbol for delete -->
+            <% end %>
+          </div>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+
+  <!-- Pagination Links for Products -->
+  <div class="d-flex justify-content-center">
+    <%= paginate @products, class: 'pagination', previous_label: 'Previous', next_label: 'Next' %>
+  </div>
+</div>
+
+<!-- Promotions Table -->
+<div class="table-responsive mt-5 text-center">
+  <h3>Promotions List</h3>
+  <table class="table table-striped table-hover">
+    <thead class="table-dark">
+    <tr>
+      <th scope="col">Promotion Code</th>
+      <th scope="col">Type</th>
+      <th scope="col">Apply Field</th>
+      <th scope="col">End Date</th>
+      <th scope="col">Min Quantity</th>
+      <th scope="col">Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% @promotions.each do |promotion| %>
+      <tr>
+        <td><%= promotion.promote_code %></td>
+        <td><%= promotion.promotion_type.humanize %></td>
+        <td><%= promotion.apply_field %></td>
+        <td><%= promotion.end_date %></td>
+        <td><%= promotion.min_quantity %></td>
+        <td>
+          <div class="d-flex gap-2">
+            <!-- Delete button for the promotion -->
+            <%= button_to promotion_path(promotion), method: :delete,
+                          data: { turbo_confirm: "Are you sure?" },
+                          class: 'btn btn-danger',
+                          style: 'background: none; border: none; color: red; cursor: pointer; font-size: 20px;' do %>
+              <span>&#10060;</span> <!-- X symbol for delete -->
+            <% end %>
+          </div>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+
+  <!-- Pagination Links for Promotions -->
+  <div class="d-flex justify-content-center">
+    <%= paginate @promotions, param_name: :promotion_page, class: 'pagination', previous_label: 'Previous', next_label: 'Next' %>
+  </div>
+</div>
+
+<!-- Merchandise Table -->
+<div class="table-responsive mt-5 text-center">
+  <h3>Merchandise List</h3>
+  <table class="table table-striped table-hover">
+    <thead class="table-dark">
+    <tr>
+      <th scope="col">Product ID</th>
+      <th scope="col">Cut Off Value</th>
+      <th scope="col">Promotion End</th>
+      <th scope="col">Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% @merchandises.each do |merchandise| %>
+      <tr>
+        <td><%= merchandise.product_id %></td>
+        <td><%= number_to_currency(merchandise.cut_off_value) %></td>
+        <td><%= merchandise.promotion_end.present? ? merchandise.promotion_end.strftime("%Y-%m-%d") : 'N/A' %></td>
+        <td>
+          <div class="d-flex gap-2">
+            <!-- Delete button for the merchandise -->
+            <%= button_to merchandise_path(merchandise), method: :delete,
+                          data: { turbo_confirm: "Are you sure?" },
+                          class: 'btn btn-danger',
+                          style: 'background: none; border: none; color: red; cursor: pointer; font-size: 20px;' do %>
+              <span>&#10060;</span> <!-- X symbol for delete -->
+            <% end %>
+          </div>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+
+  <div class="d-flex justify-content-center">
+    <%= paginate @merchandises, param_name: :merchant_page, class: 'pagination', previous_label: 'Previous', next_label: 'Next' %>
+  </div>
+</div>
+
+<footer class="custom-footer py-4 app-color">
+  <h1 class="text-center">Admin Interface</h1>
+</footer>
+
+<script>
+    $(document).ready(function() {
+        $('#toggle-export-form').on("click", function() {
+            $("#export-form-container").toggle("fast");
+        });
+    });
+</script>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sale Management</title>
+  <style>
+
+      table {
+          width: 100%;
+          border-collapse: collapse;
+      }
+
+      th, td {
+          padding: 15px;
+          text-align: left;
+          border-bottom: 1px solid #ddd;
+      }
+
+      .sort-by-status {
+          margin: 20px 0;
+          text-align: center;
+      }
+  </style>
+</head>
+<body>
+<div class="jumbotron text-center app-color">
+  <h1>Sales management </h1>
+</div>
+
+<nav class="navbar navbar-expand-lg navbar-light app-color topnav" style="margin-top: -10px">
+  <div class="container-fluid">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <ul class="navbar-nav w-100 justify-content-around">
+        <li class="nav-item  flex-fill">
+          <a class="nav-link" href="<%= adminhomes_path %>">Home</a>
+        </li>
+
+        <li class="nav-item flex-fill">
+          <a class="nav-link" href="<%= products_path %>">Product</a>
+        </li>
+        <li class="nav-item flex-fill">
+          <a class="nav-link" href="<%= categories_path %>">Type</a>
+        </li>
+        <li class="nav-item flex-fill">
+          <a class="nav-link" href="<%= accounts_path %>">Account</a>
+        </li>
+        <li class="nav-item active flex-fill">
+          <a class="nav-link" href="<%= carts_path %>"> Sales </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container my-4">
+  <div class="sort-by-status">
+    <%= form_with url: carts_path, method: :get, local: true, class: 'form-inline' do %>
+      <label for="status" class="form-label fw-bold text-primary me-2">Delivery Status</label>
+      <%= select_tag :status, options_for_select([['All', ''], ['Pending', 'pending'], ['Delivering', 'delivering'], ['Delivered', 'delivered'], ['Canceled', 'canceled']], params[:status]), prompt: 'Select Status', class: 'form-select', onchange: 'this.form.submit();', id: 'status' %>
+    <% end %>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-bordered table-hover">
+      <thead class="table-light">
+      <tr>
+        <th>Username</th>
+        <th>Total</th>
+        <th>Address</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <% @carts.each do |cart| %>
+        <tr>
+          <td><%= cart.account&.username || 'N/A' %></td>
+          <td><%= number_to_currency(cart.total_price) %></td>
+          <td><%= cart.address.presence || 'N/A' %></td>
+          <td><%= cart.status.presence || 'N/A' %></td>
+          <td>
+            <div class="d-flex gap-2 align-items-center">
+              <%= button_to cart_path(cart.id), method: :get,
+                            class: 'btn',
+                            title: 'View Details' do %>
+                <span>&#128065;</span>
+              <% end %>
+              <%= button_to edit_cart_path(cart), method: :get,
+                            class: 'btn btn-primary',
+                            title: 'Edit cart' do %>
+                <span>&#9998;</span>
+              <% end %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+
+
+  <div class="d-flex justify-content-center mt-4">
+    <%= paginate @carts, class: 'pagination', previous_label: 'Previous', next_label: 'Next' %>
+  </div>
+</div>
+
+<footer class="custom-footer py-4 app-color">
+  <h1 class="text-center">Admin Interface</h1>
+</footer>
+
+</body>
+</html>
