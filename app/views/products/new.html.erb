@@ -2,8 +2,6 @@
   <h1>New Product</h1>
 </div>
 
-
-
   <!-- Buttons to toggle between forms -->
   <div style="margin-bottom: 20px; text-align: center; width: 100%;">
     <button id="createBtn" onclick="toggleForms('create')" style="margin-right: 10px;">Create Product</button>
@@ -68,17 +66,4 @@
   <h1>This is a test product</h1>
 </div>
 
-<script>
-    function toggleForms(formType) {
-        const createForm = document.getElementById('createForm');
-        const importForm = document.getElementById('importForm');
-
-        if (formType === 'create') {
-            createForm.style.display = 'block';
-            importForm.style.display = 'none';
-        } else {
-            createForm.style.display = 'none';
-            importForm.style.display = 'block';
-        }
-    }
-</script>
+<%= javascript_include_tag 'views/product/create_toggle' %>

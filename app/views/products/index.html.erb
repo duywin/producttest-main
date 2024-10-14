@@ -200,10 +200,4 @@
   <h1 class="text-center">Admin Interface</h1>
 </footer>
 
-<script>
-    $(document).ready(function() {
-        $('#toggle-export-form').on("click", function() {
-            $("#export-form-container").toggle("fast");
-        });
-    });
-</script>
+<%= javascript_include_tag 'views/product/index_toggle' %>

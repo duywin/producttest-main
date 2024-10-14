@@ -117,10 +117,4 @@
   <h1 class="text-center">Admin Interface</h1>
 </footer>
 
-<script>
-    $(document).ready(function() {
-        $("#import-accounts-button").on("click", function() {
-            $("#import-accounts-form").toggle("fast");
-        });
-    });
-</script>
+<%= javascript_include_tag 'views/account/index_toggle' %>

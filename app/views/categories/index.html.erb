@@ -104,15 +104,5 @@
   <h1 class="text-center">Admin Interface</h1>
 </footer>
 
-<!-- Toggle Form JavaScript -->
-<script>
-    $(document).ready(function() {
-        $("#create-category-button").click(function() {
-            $("#create-category-form").toggleClass("d-none");
-        });
+<%= javascript_include_tag 'views/category/index_toggle' %>
 
-        $("#import-categories-button").click(function() {
-            $("#import-categories-form").toggleClass("d-none");
-        });
-    });
-</script>

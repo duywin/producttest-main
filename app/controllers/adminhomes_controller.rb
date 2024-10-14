@@ -14,7 +14,6 @@ class AdminhomesController < ApplicationController
     # Call the new method to find the top product
     @top_product = find_top_product
 
-    # Convert the data to a format suitable for JavaScript
     @category_totals_js = @category_totals.map { |name, total| [name, total] }.to_json
   end
 
