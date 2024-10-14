@@ -5,6 +5,18 @@ class CartsController < ApplicationController
     @carts = @carts.where(status: params[:status]) if params[:status].present?
   end
 
+  def edit
+    @cart = Cart.find(params[:id])
+  end
+
+  def update
+    if @cart.update(cart_params)
+      redirect_to carts_path, notice: 'Cart was successfully updated.'
+    else
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
   def show
     @cart = Cart.find(params[:id])
     @cart_items = @cart ? CartItem.includes(:product).where(cart_id: @cart.id) : []

@@ -13,34 +13,30 @@ class ProductsController < ApplicationController
   end
   def index
     @q = Product.ransack(params[:q])
-    @products = @q.result.page(params[:page]).per(10)  # Kaminari pagination with 10 items per page
+    @products = @q.result.page(params[:page]).per(10)
     @promotions = Promotion.all.page(params[:promotion_page]).per(5)
     @merchandises = Merchandise.all.page(params[:merchant_page]).per(5)
   end
 
   def export_report
     report_type = params[:report_type]
-    exporter = PromotionReportExporter.new
-
-    # Determine which report to export
-    case report_type
-    when 'weekly'
-      filename = exporter.export_weekly_report
-    when 'monthly'
-      filename = exporter.export_monthly_report
-    else
-      redirect_to products_path, alert: "Invalid report type."
-      return
-    end
-
-    if filename
-      send_file "#{filename}.xlsx", type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", disposition: 'attachment'
+    filename = case report_type
+               when 'weekly'
+                 PromotionReportExporter.export_weekly_report
+               when 'monthly'
+                 PromotionReportExporter.export_monthly_report
+               else
+                 redirect_to products_path, alert: "Invalid report type."
+                 return
+               end
+    # Ensure the file exists before sending it
+    file_path = Rails.root.join("tmp", filename)
+    if File.exist?(file_path)
+      send_file file_path, type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", disposition: 'attachment'
     else
       redirect_to products_path, alert: "Failed to export the report."
     end
   end
-
-
 
   def show
     @promotions = Promotion.joins(:promote_products).where(promote_products: { product_id: @product.id })

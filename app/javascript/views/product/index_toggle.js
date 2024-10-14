@@ -1,5 +1,6 @@
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('toggle-export-form').addEventListener('click', function() {
-        document.getElementById('export-form-container').classList.toggle('fast');
+$(document).ready(function() {
+    // Toggle the export form when the button is clicked
+    $('#toggle-export-form').click(function() {
+        $('#export-form-container').toggle();
     });
 });
