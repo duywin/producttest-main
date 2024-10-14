@@ -1,0 +1,77 @@
+!!!
+%html{:lang => "en"}
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %meta{:charset => "UTF-8"}/
+    %meta{:content => "width=device-width, initial-scale=1.0", :name => "viewport"}/
+    %title Sale Management
+    :css
+      table {
+          width: 100%;
+          border-collapse: collapse;
+      }
+
+      th, td {
+          padding: 15px;
+          text-align: left;
+          border-bottom: 1px solid #ddd;
+      }
+
+      .sort-by-status {
+          margin: 20px 0;
+          text-align: center;
+      }
+  %body
+    .jumbotron.text-center.app-color
+      %h1 Sales management
+    %nav.navbar.navbar-expand-lg.navbar-light.app-color.topnav{:style => "margin-top: -10px"}
+      .container-fluid
+        %button.navbar-toggler{"aria-controls" => "navbarNavDropdown", "aria-expanded" => "false", "aria-label" => "Toggle navigation", "data-bs-target" => "#navbarNavDropdown", "data-bs-toggle" => "collapse", :type => "button"}
+          %span.navbar-toggler-icon
+        #navbarNavDropdown.collapse.navbar-collapse
+          %ul.navbar-nav.w-100.justify-content-around
+            %li.nav-item.flex-fill
+              %a.nav-link{:href => adminhomes_path} Home
+            %li.nav-item.flex-fill
+              %a.nav-link{:href => products_path} Product
+            %li.nav-item.flex-fill
+              %a.nav-link{:href => categories_path} Type
+            %li.nav-item.flex-fill
+              %a.nav-link{:href => accounts_path} Account
+            %li.nav-item.active.flex-fill
+              %a.nav-link{:href => carts_path} Sales
+    .container.my-4
+      .sort-by-status
+        = form_with url: carts_path, method: :get, local: true, class: 'form-inline' do
+          %label.form-label.fw-bold.text-primary.me-2{:for => "status"} Delivery Status
+          = select_tag :status, options_for_select([['All', ''], ['Pending', 'pending'], ['Delivering', 'delivering'], ['Delivered', 'delivered'], ['Canceled', 'canceled']], params[:status]), prompt: 'Select Status', class: 'form-select', onchange: 'this.form.submit();', id: 'status'
+      .table-responsive
+        %table.table.table-bordered.table-hover
+          %thead.table-light
+            %tr
+              %th Username
+              %th Total
+              %th Address
+              %th Status
+              %th Actions
+          %tbody
+            - @carts.each do |cart|
+              %tr
+                %td= cart.account&.username || 'N/A'
+                %td= number_to_currency(cart.total_price)
+                %td= cart.address.presence || 'N/A'
+                %td= cart.status.presence || 'N/A'
+                %td
+                  .d-flex.gap-2.align-items-center
+                    = button_to cart_path(cart.id), method: :get, |
+                      class: 'btn',                               |
+                      title: 'View Details' do                    |
+                      %span 👁
+                    = button_to edit_cart_path(cart), method: :get, |
+                      class: 'btn btn-primary',                     |
+                      title: 'Edit cart' do                         |
+                      %span ✎
+      .d-flex.justify-content-center.mt-4
+        = paginate @carts, class: 'pagination', previous_label: 'Previous', next_label: 'Next'
+    %footer.custom-footer.py-4.app-color
+      %h1.text-center Admin Interface

@@ -1,0 +1,65 @@
+.jumbotron.text-center.app-color
+  %h1 Category management
+%nav.navbar.navbar-expand-lg.navbar-light.app-color.topnav{:style => "margin-top: -10px"}
+  .container-fluid
+    %button.navbar-toggler{"aria-controls" => "navbarNavDropdown", "aria-expanded" => "false", "aria-label" => "Toggle navigation", "data-bs-target" => "#navbarNavDropdown", "data-bs-toggle" => "collapse", :type => "button"}
+      %span.navbar-toggler-icon
+    #navbarNavDropdown.collapse.navbar-collapse
+      %ul.navbar-nav.w-100.justify-content-around
+        %li.nav-item.flex-fill
+          %a.nav-link{:href => adminhomes_path} Home
+        %li.nav-item.flex-fill
+          %a.nav-link{:href => products_path} Product
+        %li.nav-item.active.flex-fill
+          %a.nav-link{:href => categories_path} Type
+        %li.nav-item.flex-fill
+          %a.nav-link{:href => accounts_path} Account
+        %li.nav-item.flex-fill
+          %a.nav-link{:href => carts_path} Sales
+/ Action Buttons
+.d-flex.justify-content-center.mb-4.gap-3
+  %button#create-category-button.btn.btn-success Create Category
+  %button#import-categories-button.btn.btn-warning Import Categories
+  = button_to 'Refresh Totals', refreshtotal_categories_path, method: :post, class: 'btn btn-info'
+/ Create Category Form
+#create-category-form.d-none.text-center
+  .form-box.bg-light.p-4.shadow.rounded
+    %h3 Create New Category
+    = form_for(@category) do |f|
+      .mb-3
+        = f.label :name, "Category Name"
+        = f.text_field :name, placeholder: "Enter category name", class: "form-control"
+      = f.submit 'Create', class: 'btn btn-primary'
+/ Import Categories Form
+#import-categories-form.d-none.mt-4.text-center
+  .form-box.bg-light.p-4.shadow.rounded
+    %h3 Import Categories
+    = form_with url: import_categories_path, local: true, html: { multipart: true } do |form|
+      .mb-3
+        = form.label :file, "Upload CSV or ODS File"
+        = form.file_field :file, class: "form-control"
+      = form.submit 'Import Categories', class: 'btn btn-primary'
+/ Categories Table
+.table-responsive.mt-4
+  %table.table.table-striped.table-hover
+    %thead.table-dark
+      %tr
+        %th{:scope => "col"} Name
+        %th{:scope => "col"} Total
+        %th{:scope => "col"} Actions
+    %tbody
+      - @categories.each do |category|
+        %tr
+          %td= category.name
+          %td= category.total
+          %td
+            = button_to category_path(category), method: :delete,                                       |
+              data: { turbo_confirm: "Are you sure?" },                                                 |
+              style: 'background: none; border: none; color: red; cursor: pointer; font-size: 20px;' do |
+              %span ❌
+/ Pagination
+.d-flex.justify-content-center.mt-4
+  = paginate @categories, class: 'pagination'
+%footer.custom-footer.py-4.app-color{:style => "margin-top: 250px"}
+  %h1.text-center Admin Interface
+= javascript_include_tag 'views/category/index_toggle'

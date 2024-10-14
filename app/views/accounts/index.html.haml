@@ -1,0 +1,77 @@
+.jumbotron.text-center.app-color
+  %h1 Account management
+%nav.navbar.navbar-expand-lg.navbar-light.app-color.topnav{:style => "margin-top: -10px"}
+  .container-fluid
+    %button.navbar-toggler{"aria-controls" => "navbarNavDropdown", "aria-expanded" => "false", "aria-label" => "Toggle navigation", "data-bs-target" => "#navbarNavDropdown", "data-bs-toggle" => "collapse", :type => "button"}
+      %span.navbar-toggler-icon
+    #navbarNavDropdown.collapse.navbar-collapse
+      %ul.navbar-nav.w-100.justify-content-around
+        %li.nav-item.flex-fill
+          %a.nav-link{:href => adminhomes_path} Home
+        %li.nav-item.flex-fill
+          %a.nav-link{:href => products_path} Product
+        %li.nav-item.flex-fill
+          %a.nav-link{:href => categories_path} Type
+        %li.nav-item.active.flex-fill
+          %a.nav-link{:href => accounts_path} Account
+        %li.nav-item.flex-fill
+          %a.nav-link{:href => carts_path} Sales
+.d-flex.justify-content-center.gap-3.my-4
+  %button#import-accounts-button.btn.btn-warning.text-white Import Accounts
+#import-accounts-form.my-4.text-center{:style => "display: none;"}
+  .form-box
+    %h3 Import Accounts
+    = form_with url: import_accounts_path, local: true, html: { multipart: true } do |form|
+      .mb-3
+        = form.label :file, "Upload CSV or ODS File"
+        = form.file_field :file, class: "form-input"
+      = form.submit 'Import accounts', class: 'btn btn-primary form-submit'
+.text-center.my-4
+  = search_form_for @q, url: accounts_path, method: :get, local: true do |f|
+    = f.text_field :username_cont, placeholder: "Enter username", class: "form-control w-50 d-inline-block me-2"
+    = select_tag :created_at_filter, options_for_select([ |
+        ['Filter by Created date', ''],                   |
+        ['This Week', 'this_week'],                       |
+        ['This Month', 'this_month'],                     |
+        ['Last Month', 'last_month'],                     |
+        ['Last Year', 'last_year']                        |
+      ]), class: 'form-control w-25 d-inline-block me-2'  |
+    = f.submit 'Search', class: 'btn btn-primary form-submit'
+.table-responsive
+  %table.table.table-bordered.table-hover
+    %thead.table-light
+      %tr
+        %th Username
+        %th Email
+        %th Status
+        %th Actions
+    %tbody
+      - @accounts.each do |account|
+        %tr
+          %td= account.username
+          %td= account.email
+          %td= account.is_admin ? 'Admin' : 'User'
+          %td.d-flex.gap-3.align-items-center
+            = button_to account_path(account), method: :get,                                                                                    |
+              class: 'btn btn-primary',                                                                                                         |
+              style: 'color: white; padding: 10px 20px; border-radius: 5px; border: none; cursor: pointer; background: none; font-size: 20px;', |
+              title: 'View Details' do                                                                                                          |
+              %span 👁
+              / Eye symbol for view
+            = button_to edit_account_path(account), method: :get,                                                                             |
+              class: 'btn btn-primary',                                                                                                       |
+              style: 'color: blue; padding: 10px 20px; border-radius: 5px; border: none; cursor: pointer; background: none;font-size: 20px;', |
+              title: 'Edit Account' do                                                                                                        |
+              %span ✎
+              / Pencil symbol for edit
+            = button_to account_path(account), method: :delete,                                                                               |
+              data: { turbo_confirm: "Are you sure?" },                                                                                       |
+              style: 'background: none; padding: 10px 20px; border-radius: 5px; border: none; color: red; cursor: pointer; font-size: 20px;', |
+              title: 'Delete Account' do                                                                                                      |
+              %span ❌
+              / Cross symbol for delete
+.pagination.d-flex.justify-content-center.my-4
+  = paginate @accounts, class: 'pagination', previous_label: 'Previous', next_label: 'Next'
+%footer.custom-footer.py-4.app-color
+  %h1.text-center Admin Interface
+= javascript_include_tag 'views/account/index_toggle'

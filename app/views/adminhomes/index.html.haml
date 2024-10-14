@@ -1,0 +1,108 @@
+%head
+  %title Admin Dashboard
+  - if session[:welcome_alert_shown]
+    = javascript_tag do
+      alert('Welcome, #{@account.username if @account}!');
+      - session.delete(:welcome_alert_shown)
+      / Clear the session variable
+  = csrf_meta_tags
+  = csp_meta_tag
+  :css
+    .top-product-picture {
+        height: 300px;
+        width: 300px;
+        align-self: center;
+    }
+%body
+  .jumbotron.text-center.app-color
+    %h1 Admin dashboard
+  %nav.navbar.navbar-expand-lg.navbar-light.app-color.topnav{:style => "margin-top: -10px"}
+    .container-fluid
+      %button.navbar-toggler{"aria-controls" => "navbarNavDropdown", "aria-expanded" => "false", "aria-label" => "Toggle navigation", "data-bs-target" => "#navbarNavDropdown", "data-bs-toggle" => "collapse", :type => "button"}
+        %span.navbar-toggler-icon
+      #navbarNavDropdown.collapse.navbar-collapse
+        %ul.navbar-nav.w-100.justify-content-around
+          %li.nav-item.active.flex-fill
+            %a.nav-link{:href => adminhomes_path} Home
+          %li.nav-item.flex-fill
+            %a.nav-link{:href => products_path} Product
+          %li.nav-item.flex-fill
+            %a.nav-link{:href => categories_path} Type
+          %li.nav-item.flex-fill
+            %a.nav-link{:href => accounts_path} Account
+          %li.nav-item.flex-fill
+            %a.nav-link{:href => carts_path} Sales
+  %main.content.py-4
+    %h2.text-center Admin Dashboard
+    .text-end
+      = button_to 'Log out', adminlogout_path, method: :delete, class: 'btn btn-danger'
+    #category-chart.my-4{:style => "width: 100%; height: 400px;"}
+    %p.text-center
+      The category with the highest number of products is
+      = succeed "," do
+        %strong= @highest_category.first
+      %strong= @highest_category.last
+      products.
+  %section.top-product.text-center.py-4
+    - if @top_product
+      %h4 Top Product
+      %p
+        The most sold product is
+        = succeed "." do
+          %strong= @top_product.name
+        %strong= @top_product.total_quantity
+        units. Below is a preview of the product:
+      = image_tag(@top_product.picture, alt: @top_product.name, class: 'top-product-picture') if @top_product.picture.present?
+    - else
+      %p No product has been sold.
+  %footer.custom-footer.py-4.app-color
+    %h1.text-center Admin Interface
+  / JavaScript for Category Chart
+  %script{:src => "https://code.highcharts.com/highcharts.js"}
+  %script{:src => "https://code.highcharts.com/highcharts-3d.js"}
+  :javascript
+    document.addEventListener('DOMContentLoaded', function () {
+        function fetchCategoryData() {
+            fetch('#{adminhomes_category_totals_path}')
+                .then(response => response.json())
+                .then(data => {
+                    Highcharts.chart('category-chart', {
+                        chart: {
+                            type: 'pie',
+                            options3d: {
+                                enabled: true,
+                                alpha: 45,
+                                beta: 0
+                            }
+                        },
+                        title: {
+                            text: 'Category Totals'
+                        },
+                        tooltip: {
+                            pointFormat: '{series.name}: {point.percentage:.1f}%'
+                        },
+                        plotOptions: {
+                            pie: {
+                                allowPointSelect: true,
+                                cursor: 'pointer',
+                                depth: 35,
+                                dataLabels: {
+                                    enabled: true,
+                                    format: '{point.name}',
+                                    style: {
+                                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'red'
+                                    },
+                                    connectorColor: 'silver'
+                                }
+                            }
+                        },
+                        series: [{
+                            name: 'Total',
+                            data: data
+                        }]
+                    });
+                });
+        }
+        fetchCategoryData();
+        setInterval(fetchCategoryData, 60000);
+    });

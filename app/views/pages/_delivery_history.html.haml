@@ -1,0 +1,30 @@
+:css
+  .status-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      margin-bottom: 20px;
+  }
+
+  .table-container {
+      margin-top: 20px;
+  }
+.table-container
+  %table
+    %thead
+      %tr
+        %th Total Price
+        %th Quantity
+        %th Address
+        %th Status
+        %th Date order
+        %th Date receive
+    %tbody
+      - @carts.each do |cart|
+        %tr
+          %td= number_to_currency(cart.total_price)
+          %td= cart.quantity
+          %td= cart.address
+          %td= cart.status
+          %td= cart.created_at
+          %td= cart.deliver_day.present? ? cart.deliver_day : "Not yet"

@@ -1,0 +1,43 @@
+.custom-header
+  %h1 Edit Account Details
+%div{:style => "margin-top: 20px; margin-bottom: 20px; text-align: left;"}
+  = link_to 'Back to Accounts', accounts_path, style: 'background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; border: none;'
+%br/
+%div{:style => "display: flex; justify-content: center; align-items: center; min-height: calc(100vh - 160px); background-color: lightblue; padding: 20px; border-radius: 10px;"}
+  %div{:style => "width: 100%; max-width: 600px;"}
+    %h2 Edit Account Details
+    = form_with model: @account, url: account_path(@account), method: :patch, local: true do |form|
+      - if @account.errors.any?
+        #error_explanation{:style => "color: red;"}
+          %h2
+            = pluralize(@account.errors.count, "error")
+            prohibited this account from being saved:
+          %ul
+            - @account.errors.full_messages.each do |message|
+              %li= message
+      %ul.account-details-list{:style => "list-style-type: none; padding: 0;"}
+        %li{:style => "margin-bottom: 10px; display: flex; align-items: center;"}
+          %strong{:style => "flex-basis: 30%;"} Username:
+          = form.text_field :username, style: 'flex-grow: 1; width: 100%;'
+        %li{:style => "margin-bottom: 10px; display: flex; align-items: center;"}
+          %strong{:style => "flex-basis: 30%;"} Password:
+          = form.password_field :password, style: 'flex-grow: 1; width: 100%;'
+        %li{:style => "margin-bottom: 10px; display: flex; align-items: center;"}
+          %strong{:style => "flex-basis: 30%;"} Email:
+          = form.email_field :email, style: 'flex-grow: 1; width: 100%;'
+        %li{:style => "margin-bottom: 10px; display: flex; align-items: center;"}
+          %strong{:style => "flex-basis: 30%;"} Phone Number:
+          = form.text_field :phonenumber, style: 'flex-grow: 1; width: 100%;'
+        %li{:style => "margin-bottom: 10px; display: flex; align-items: center;"}
+          %strong{:style => "flex-basis: 30%;"} Address:
+          = form.text_field :address, style: 'flex-grow: 1; width: 100%;'
+        %li{:style => "margin-bottom: 10px; display: flex; align-items: center;"}
+          %strong{:style => "flex-basis: 30%;"} Gender:
+          = form.select :gender, options_for_select(['none', 'male', 'female', 'other'], @account.gender), {}, style: 'flex-grow: 1; width: 100%;'
+        %li{:style => "margin-bottom: 10px; display: flex; align-items: center;"}
+          %strong{:style => "flex-basis: 30%;"} Admin:
+          = form.check_box :is_admin, style: 'flex-grow: 1;'
+      %div{:style => "text-align: center;"}
+        = form.submit 'Save Changes', style: 'background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; border: none; cursor: pointer;'
+.custom-footer
+  %h1 This is a test account

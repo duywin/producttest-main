@@ -63,10 +63,14 @@
     <orderEntry type="library" scope="PROVIDED" name="diff-lcs (v1.5.1, RVM: ruby-3.2.2 [shearwater-newest-version]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="drb (v2.2.1, RVM: ruby-3.2.2 [shearwater-newest-version]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="erubi (v1.13.0, RVM: ruby-3.2.2 [shearwater-newest-version]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="erubis (v2.7.0, RVM: ruby-3.2.2 [shearwater-newest-version]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="ffi (v1.17.0, RVM: ruby-3.2.2 [shearwater-newest-version]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="font-awesome-rails (v4.7.0.8, RVM: ruby-3.2.2 [shearwater-newest-version]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="globalid (v1.2.1, RVM: ruby-3.2.2 [shearwater-newest-version]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="haml (v6.3.0, RVM: ruby-3.2.2 [shearwater-newest-version]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="haml-rails (v2.1.0, RVM: ruby-3.2.2 [shearwater-newest-version]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="highcharts-rails (v6.0.0, RVM: ruby-3.2.2 [shearwater-newest-version]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="html2haml (v2.3.0, RVM: ruby-3.2.2 [shearwater-newest-version]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="htmlentities (v4.3.4, RVM: ruby-3.2.2 [shearwater-newest-version]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="i18n (v1.14.6, RVM: ruby-3.2.2 [shearwater-newest-version]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="image_processing (v1.13.0, RVM: ruby-3.2.2 [shearwater-newest-version]) [gem]" level="application" />
@@ -127,13 +131,16 @@
     <orderEntry type="library" scope="PROVIDED" name="rspec-support (v3.13.1, RVM: ruby-3.2.2 [shearwater-newest-version]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="ruby-vips (v2.2.2, RVM: ruby-3.2.2 [shearwater-newest-version]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="ruby2_keywords (v0.0.5, RVM: ruby-3.2.2 [shearwater-newest-version]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="ruby_parser (v3.21.1, RVM: ruby-3.2.2 [shearwater-newest-version]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rubyzip (v2.3.2, RVM: ruby-3.2.2 [shearwater-newest-version]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="selenium-webdriver (v4.25.0, RVM: ruby-3.2.2 [shearwater-newest-version]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="sexp_processor (v4.17.2, RVM: ruby-3.2.2 [shearwater-newest-version]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="sinatra (v3.2.0, RVM: ruby-3.2.2 [shearwater-newest-version]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="sprockets (v4.2.1, RVM: ruby-3.2.2 [shearwater-newest-version]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="sprockets-rails (v3.5.2, RVM: ruby-3.2.2 [shearwater-newest-version]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="stimulus-rails (v1.3.4, RVM: ruby-3.2.2 [shearwater-newest-version]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="stringio (v3.1.1, RVM: ruby-3.2.2 [shearwater-newest-version]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="temple (v0.10.3, RVM: ruby-3.2.2 [shearwater-newest-version]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="thor (v1.3.2, RVM: ruby-3.2.2 [shearwater-newest-version]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="tilt (v2.4.0, RVM: ruby-3.2.2 [shearwater-newest-version]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="timeout (v0.4.1, RVM: ruby-3.2.2 [shearwater-newest-version]) [gem]" level="application" />

@@ -1,0 +1,77 @@
+!!!
+%html{:lang => "en"}
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %title My Account
+    :css
+      .button-container {
+          display: flex;
+          gap: 10px;
+      }
+      #account-edit-form {
+          display: none;
+      }
+      #delivery-history-container {
+          display: none;
+      }
+  %body
+    .jumbotron.text-center.app-color
+      %h1 Shearwater
+    %nav.navbar.navbar-expand-lg.navbar-light.app-color.topnav{:style => "margin-top: -10px"}
+      .container-fluid
+        %button.navbar-toggler{"aria-controls" => "navbarNavDropdown", "aria-expanded" => "false", "aria-label" => "Toggle navigation", "data-bs-target" => "#navbarNavDropdown", "data-bs-toggle" => "collapse", :type => "button"}
+          %span.navbar-toggler-icon
+        #navbarNavDropdown.collapse.navbar-collapse
+          %ul.navbar-nav.w-100.justify-content-around
+            %li.nav-item.flex-fill
+              %a.nav-link{:href => users_home_path} Home
+            %li.nav-item.flex-fill
+              %a.nav-link{:href => shop_path} Shop
+            %li.nav-item.flex-fill
+              %a.nav-link{:href => about_us_path} About Us
+            %li.nav-item.active.flex-fill
+              %a.nav-link{:href => my_account_path} My Account
+    .content
+      %h1 Account Overview
+      .button-container
+        %button#show-account-management.btn.btn-primary Account Management
+        %button#show-delivery-history.btn.btn-primary Delivery History
+        = button_to 'Log Out', logout_path, method: :delete, class: 'btn btn-danger', data: { confirm: "Are you sure you want to log out?" }
+      #account-management-container
+        #account-details
+          = render 'account_details', account: @account, edit_mode: @edit_mode
+        #account-edit-form
+          = render 'account_edit_form', account: @account
+      #delivery-history-container
+        = render partial: 'delivery_history', account: @account, cart: @cart
+    / Footer
+    .custom-footer
+      %p © Your satisfaction is our priority
+    :javascript
+      $(document).ready(function() {
+          // Cache jQuery selectors
+          const $accountDetails = $('#account-details');
+          const $accountEditForm = $('#account-edit-form');
+          const $deliveryHistoryContainer = $('#delivery-history-container');
+
+          // Event for editing account details
+          $('#edit-button').click(function() {
+              $accountDetails.hide();
+              $accountEditForm.show();
+              $deliveryHistoryContainer.hide();
+          });
+
+          // Event for showing account management
+          $('#show-account-management').click(function() {
+              $accountDetails.show();
+              $accountEditForm.hide();
+              $deliveryHistoryContainer.hide();
+          });
+
+          // Event for showing delivery history
+          $('#show-delivery-history').click(function() {
+              $deliveryHistoryContainer.show();
+              $accountDetails.hide();
+              $accountEditForm.hide();
+          });
+      });

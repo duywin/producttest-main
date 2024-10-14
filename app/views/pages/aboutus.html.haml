@@ -1,0 +1,52 @@
+!!!
+%html{:lang => "en"}
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %title About us
+    %link{:href => "https://www.w3schools.com/w3css/4/w3.css", :rel => "stylesheet"}/
+  %body
+    .jumbotron.text-center.app-color
+      %h1 Shearwater
+    %nav.navbar.navbar-expand-lg.navbar-light.app-color.topnav{:style => "margin-top: -10px"}
+      .container-fluid
+        %button.navbar-toggler{"aria-controls" => "navbarNavDropdown", "aria-expanded" => "false", "aria-label" => "Toggle navigation", "data-bs-target" => "#navbarNavDropdown", "data-bs-toggle" => "collapse", :type => "button"}
+          %span.navbar-toggler-icon
+        #navbarNavDropdown.collapse.navbar-collapse
+          %ul.navbar-nav.w-100.justify-content-around
+            %li.nav-item.flex-fill
+              %a.nav-link{:href => users_home_path} Home
+            %li.nav-item.flex-fill
+              %a.nav-link{:href => shop_path} Shop
+            %li.nav-item.active.flex-fill
+              %a.nav-link{:href => about_us_path} About Us
+            %li.nav-item.flex-fill
+              - if @account
+                %a.nav-link{:href => my_account_path} My account
+              - else
+                %a.nav-link{:href => new_account_session_path} Sign In
+    .content
+      #about.w3-row.w3-padding-64
+        .w3-col.m6.w3-padding-large.w3-hide-small
+          %img.w3-round.w3-image.w3-opacity-min{:alt => "Table Setting", :height => "750", :src => "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROsZqsGIF_baMHxjn8IXFcWUrgAwVIKjN9ZQ&s", :width => "600"}/
+        .w3-col.m6.w3-padding-large
+          %h1.w3-center Bottling the Purest Water from the Heart of the Himalayas
+          %br/
+          %h5.w3-center
+            Extracted from a hidden Himalayan spring, Shearwater's pristine water
+            is nature's rarest gift, now available to you.
+          %p.w3-large
+            High up in the Himalayas, where the world's tallest peaks meet the sky,
+            lies a hidden treasure—an untouched spring that flows with water so pure,
+            it defies modern expectations. For centuries, this spring remained
+            inaccessible, guarded by nature and the extreme altitudes of the
+            mountain range. But now, Shearwater has made it their mission to bring
+            this rarest form of hydration to people around the globe.
+          %p.w3-large.w3-text-grey.w3-hide-medium
+            We take great care to ensure that our collection methods do
+            not harm the surrounding environment. Working with local communities,
+            we have established sustainable practices to maintain the ecosystem.
+            Shearwater is proud to offer a product that reflects both purity and environmental responsibility.
+            Enjoy the freshest water, straight from the Himalayas.
+    / Footer
+    .custom-footer
+      %p © Your satisfaction is our priority

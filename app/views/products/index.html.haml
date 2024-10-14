@@ -1,0 +1,137 @@
+.jumbotron.text-center.app-color
+  %h1 Product management
+%nav.navbar.navbar-expand-lg.navbar-light.app-color.topnav{:style => "margin-top: -10px"}
+  .container-fluid
+    %button.navbar-toggler{"aria-controls" => "navbarNavDropdown", "aria-expanded" => "false", "aria-label" => "Toggle navigation", "data-bs-target" => "#navbarNavDropdown", "data-bs-toggle" => "collapse", :type => "button"}
+      %span.navbar-toggler-icon
+    #navbarNavDropdown.collapse.navbar-collapse
+      %ul.navbar-nav.w-100.justify-content-around
+        %li.nav-item.flex-fill
+          %a.nav-link{:href => adminhomes_path} Home
+        %li.nav-item.active.flex-fill
+          %a.nav-link{:href => products_path} Product
+        %li.nav-item.flex-fill
+          %a.nav-link{:href => categories_path} Type
+        %li.nav-item.flex-fill
+          %a.nav-link{:href => accounts_path} Account
+        %li.nav-item.flex-fill
+          %a.nav-link{:href => carts_path} Sales
+/ Search Form
+.d-flex.justify-content-center.mb-4
+  = search_form_for @q, method: :get, local: true, class: 'd-flex' do |f|
+    = f.search_field :name_cont, placeholder: "Enter product name...", class: 'form-control me-2', style: 'width: 300px;'
+    = f.submit "Search", class: 'btn btn-primary'
+.d-flex.justify-content-center.mb-4
+  = link_to 'Create Promotion', new_promotion_path, class: 'btn btn-success mx-2 shadow-button'
+  = link_to 'Create Product', new_product_path, class: 'btn btn-info mx-2 shadow-button'
+  %button#toggle-export-form.btn.btn-warning.shadow-button Export Report
+/ Hidden Export Form
+#export-form-container.my-4.text-center{:style => "display: none;"}
+  .form-box.app
+    %h3 Export Report
+    = form_with url: export_report_path, method: :post, local: true do |f|
+      .mb-3
+        = f.label :report_type, "Select Report Type"
+        = f.select :report_type, [['Weekly Report', 'weekly'], ['Monthly Report', 'monthly']], {}, class: 'form-input'
+      = f.submit "Export", class: 'btn btn-primary form-submit'
+.table-responsive.text-center
+  %h3 Products List
+  %table.table.table-striped.table-hover
+    %thead.table-dark
+      %tr
+        %th{:scope => "col"} Name
+        %th{:scope => "col"} Price
+        %th{:scope => "col"} Type
+        %th{:scope => "col"} Actions
+    %tbody
+      - @products.each do |product|
+        %tr
+          %td= product.name
+          %td= number_to_currency(product.prices)
+          %td= product.product_type
+          %td
+            .d-flex.gap-2
+              = button_to product_path(product), method: :get,                                             |
+                class: 'btn btn-primary',                                                                  |
+                title: 'View Details',                                                                     |
+                style: 'background: none; border: none; color: blue; cursor: pointer; font-size: 20px;' do |
+                %span 👁
+                / Eye symbol for view
+              = button_to edit_product_path(product), method: :get,                                         |
+                class: 'btn btn-primary',                                                                   |
+                title: 'Edit Product',                                                                      |
+                style: 'background: none; border: none; color: green; cursor: pointer; font-size: 20px;' do |
+                %span ✎
+                / Pencil symbol for edit
+              = button_to product_path(product), method: :delete,                                         |
+                data: { turbo_confirm: "Are you sure?" },                                                 |
+                class: 'btn btn-danger',                                                                  |
+                title: 'Delete Product',                                                                  |
+                style: 'background: none; border: none; color: red; cursor: pointer; font-size: 20px;' do |
+                %span ❌
+                / X symbol for delete
+  / Pagination Links for Products
+  .d-flex.justify-content-center
+    = paginate @products, class: 'pagination', previous_label: 'Previous', next_label: 'Next'
+/ Promotions Table
+.table-responsive.mt-5.text-center
+  %h3 Promotions List
+  %table.table.table-striped.table-hover
+    %thead.table-dark
+      %tr
+        %th{:scope => "col"} Promotion Code
+        %th{:scope => "col"} Type
+        %th{:scope => "col"} Apply Field
+        %th{:scope => "col"} End Date
+        %th{:scope => "col"} Min Quantity
+        %th{:scope => "col"} Action
+    %tbody
+      - @promotions.each do |promotion|
+        %tr
+          %td= promotion.promote_code
+          %td= promotion.promotion_type.humanize
+          %td= promotion.apply_field
+          %td= promotion.end_date
+          %td= promotion.min_quantity
+          %td
+            .d-flex.gap-2
+              / Delete button for the promotion
+              = button_to promotion_path(promotion), method: :delete,                                     |
+                data: { turbo_confirm: "Are you sure?" },                                                 |
+                class: 'btn btn-danger',                                                                  |
+                style: 'background: none; border: none; color: red; cursor: pointer; font-size: 20px;' do |
+                %span ❌
+                / X symbol for delete
+  / Pagination Links for Promotions
+  .d-flex.justify-content-center
+    = paginate @promotions, param_name: :promotion_page, class: 'pagination', previous_label: 'Previous', next_label: 'Next'
+/ Merchandise Table
+.table-responsive.mt-5.text-center
+  %h3 Merchandise List
+  %table.table.table-striped.table-hover
+    %thead.table-dark
+      %tr
+        %th{:scope => "col"} Product ID
+        %th{:scope => "col"} Cut Off Value
+        %th{:scope => "col"} Promotion End
+        %th{:scope => "col"} Action
+    %tbody
+      - @merchandises.each do |merchandise|
+        %tr
+          %td= merchandise.product_id
+          %td= number_to_currency(merchandise.cut_off_value)
+          %td= merchandise.promotion_end.present? ? merchandise.promotion_end.strftime("%Y-%m-%d") : 'N/A'
+          %td
+            .d-flex.gap-2
+              / Delete button for the merchandise
+              = button_to merchandise_path(merchandise), method: :delete,                                 |
+                data: { turbo_confirm: "Are you sure?" },                                                 |
+                class: 'btn btn-danger',                                                                  |
+                style: 'background: none; border: none; color: red; cursor: pointer; font-size: 20px;' do |
+                %span ❌
+                / X symbol for delete
+  .d-flex.justify-content-center
+    = paginate @merchandises, param_name: :merchant_page, class: 'pagination', previous_label: 'Previous', next_label: 'Next'
+%footer.custom-footer.py-4.app-color
+  %h1.text-center Admin Interface
+= javascript_include_tag 'views/product/index_toggle'

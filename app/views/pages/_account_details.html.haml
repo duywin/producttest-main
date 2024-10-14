@@ -1,0 +1,23 @@
+.container.mt-4
+  .row.justify-content-center
+    .col-md-8
+      %table.table.table-bordered.table-striped.app-color
+        %tbody
+          %tr
+            %td.fw-bold.p-3 Username:
+            %td.p-3= account.username.presence || " "
+            %td.fw-bold.p-3 Email:
+            %td.p-3= account.email.presence || " "
+          %tr
+            %td.fw-bold.p-3 Phone Number:
+            %td.p-3= account.phonenumber.presence || " "
+            %td.fw-bold.p-3 Address:
+            %td.p-3= account.address.presence || " "
+          %tr
+            %td.fw-bold.p-3 Gender:
+            %td.p-3= account.gender.presence || " "
+            %td{:colspan => "2"}
+            / Empty cell for better alignment
+  .row.mt-3
+    .col.text-center
+      %button#edit-button.btn.btn-success.px-4.py-2 Edit

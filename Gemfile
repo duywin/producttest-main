@@ -6,6 +6,8 @@ ruby "3.2.2"
 gem "rails", "7.1.4"
 gem 'railties', "7.1.4"
 gem 'highcharts-rails' , "6.0.0"
+gem "haml-rails"
+gem 'html2haml'
 
 
 

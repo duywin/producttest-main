@@ -1,0 +1,50 @@
+.jumbotron.text-center.app-color
+  %h1 Account Management
+.mt-4.mb-4.text-start
+  = link_to 'Back to Products', products_path, class: 'btn btn-success'
+.d-flex.justify-content-center.mt-4
+  %table.table.table-bordered.table-striped.app-color.text-start
+    %tr
+      %td.p-3{:rowspan => "3"}
+        - if @product.picture.present?
+          = image_tag(@product.picture, alt: 'Product Picture', class: 'img-fluid', style: 'max-width: 200px; max-height: 200px;')
+        - else
+          %span No picture available
+      %td.fw-bold.p-3 Name:
+      %td.p-3= @product.name.presence || " "
+      %td.fw-bold.p-3 Price:
+      %td.p-3= number_to_currency(@product.prices).presence || " "
+    %tr
+      %td.fw-bold.p-3 Type:
+      %td.p-3= @product.product_type.presence || " "
+      %td.fw-bold.p-3 Stock:
+      %td.p-3= @product.stock.presence || " "
+    %tr
+      %td.fw-bold.p-3 Description:
+      %td.p-3{:colspan => "3"}= @product.desc.presence || " "
+.mt-4.text-center
+  = link_to 'Edit', edit_product_path(@product), class: 'btn btn-success'
+/ Promotions Table
+.mt-4
+  %h2 Related Promotions
+  - if @promotions.any?
+    %table.table.table-bordered.table-striped
+      %thead
+        %tr
+          %th Promotion Code
+          %th Value
+          %th End Date
+          %th Min Quantity
+          %th Amount
+      %tbody
+        - @promotions.each do |promotion|
+          %tr
+            %td= promotion.promote_code
+            %td= number_to_currency(promotion.value)
+            %td= promotion.end_date.present? ? promotion.end_date.strftime("%B %d, %Y") : "N/A"
+            %td= promotion.min_quantity
+            %td= PromoteProduct.find_by(promotion: promotion, product: @product)&.amount
+  - else
+    %p No promotions available for this product.
+%footer.custom-footer.py-4.app-color
+  %h1.text-center Admin Interface

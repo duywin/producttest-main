@@ -1,0 +1,36 @@
+.d-flex.justify-content-center.align-items-center.min-vh-100.py-5
+  .w-100.app-color{:style => "max-width: 600px;"}
+    %h2 Account Customizer
+    = form_with model: account, url: account_path(account), method: :patch, remote: true, class: "needs-validation", novalidate: true do |form|
+      - if account.errors.any?
+        #error_explanation.alert.alert-danger
+          %h2
+            = pluralize(account.errors.count, "error")
+            prohibited this account from being saved:
+          %ul
+            - account.errors.full_messages.each do |message|
+              %li= message
+      .mb-3
+        %label.form-label{:for => "username"}
+          %strong Username
+        = form.text_field :username, class: "form-control", id: "username", required: true
+        .invalid-feedback Please provide a valid username.
+      .mb-3
+        %label.form-label{:for => "email"}
+          %strong Email
+        = form.email_field :email, class: "form-control", id: "email", required: true
+        .invalid-feedback Please provide a valid email address.
+      .mb-3
+        %label.form-label{:for => "phonenumber"}
+          %strong Phone Number
+        = form.text_field :phonenumber, class: "form-control", id: "phonenumber"
+      .mb-3
+        %label.form-label{:for => "address"}
+          %strong Address
+        = form.text_field :address, class: "form-control", id: "address"
+      .mb-3
+        %label.form-label{:for => "gender"}
+          %strong Gender
+        = form.select :gender, options_for_select(['none', 'male', 'female', 'other'], account.gender), {}, class: "form-select", id: "gender"
+      .text-center
+        = form.submit 'Save Changes', class: "btn btn-success px-4 py-2"
