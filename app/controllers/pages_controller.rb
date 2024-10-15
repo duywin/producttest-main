@@ -16,28 +16,19 @@ class PagesController < ApplicationController
       session[:cart_id] = @cart.id
       @cart_item_count = @cart.cart_items.count
     end
-
-    # Filter by search query
     if params[:search].present?
       @products = @products.where('name LIKE ?', "%#{params[:search]}%")
     end
-
-    # Filter by product type
     if params[:product_type].present?
       @products = @products.where(product_type: params[:product_type])
     end
-
-    # Filter by price range
     if params[:price_min].present?
       @products = @products.where('prices >= ?', params[:price_min].to_f)
     end
     if params[:price_max].present?
       @products = @products.where('prices <= ?', params[:price_max].to_f)
     end
-
-    # Add pagination (6 products per page)
     @products = @products.page(params[:page]).per(6)
-
     respond_to do |format|
       format.html
       format.js

@@ -54,26 +54,17 @@ class ProductsController < ApplicationController
     end
 
     products = []
-
-    # Read the ODS file
     begin
       spreadsheet = Roo::OpenOffice.new(file.path)
-
-      # Assuming the first row is the header
       header = spreadsheet.row(1)
-
-      # Define the default values for the product attributes
       default_values = {
         desc: "No description available.",
         stock: 0,
         picture: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfCIpb4DjTLc26hfSl7YKW6bf07zz38YcyHQ&s"
       }
-
-      # Start from the second row to skip the header
       (2..spreadsheet.last_row).each do |i|
         row = spreadsheet.row(i)
 
-        # Use the header index to find values; if not found, use default values
         name = row[header.index('name')] || default_values[:name]
         product_type = row[header.index('product_type')] || "Default Type"
         prices = row[header.index('prices')] || 0.00
@@ -81,7 +72,6 @@ class ProductsController < ApplicationController
         stock = row[header.index('stock')] || default_values[:stock]
         picture = row[header.index('picture')] || default_values[:picture]
 
-        # Only create the product if a name is present
         if name.present?
           products << Product.new(
             name: name,
@@ -93,18 +83,15 @@ class ProductsController < ApplicationController
           )
         end
       end
-
     rescue => e
       redirect_to products_path, alert: "Error reading file: #{e.message}"
       return
     end
-
     Product.import(products)
     redirect_to products_path, notice: 'Products were successfully imported.'
   end
 
   def create
-    # Set default values for fields not provided
     @product = Product.new(product_params)
     @product.desc ||= "No description available."
     @product.stock ||= 0

@@ -1,4 +1,3 @@
-!!!
 %html{:lang => "en"}
   %head
     %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
@@ -47,31 +46,4 @@
     / Footer
     .custom-footer
       %p © Your satisfaction is our priority
-    :javascript
-      $(document).ready(function() {
-          // Cache jQuery selectors
-          const $accountDetails = $('#account-details');
-          const $accountEditForm = $('#account-edit-form');
-          const $deliveryHistoryContainer = $('#delivery-history-container');
-
-          // Event for editing account details
-          $('#edit-button').click(function() {
-              $accountDetails.hide();
-              $accountEditForm.show();
-              $deliveryHistoryContainer.hide();
-          });
-
-          // Event for showing account management
-          $('#show-account-management').click(function() {
-              $accountDetails.show();
-              $accountEditForm.hide();
-              $deliveryHistoryContainer.hide();
-          });
-
-          // Event for showing delivery history
-          $('#show-delivery-history').click(function() {
-              $deliveryHistoryContainer.show();
-              $accountDetails.hide();
-              $accountEditForm.hide();
-          });
-      });
+    = javascript_include_tag 'views/page/my_account'

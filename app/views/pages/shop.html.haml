@@ -78,204 +78,108 @@
           vertical-align: top;
           margin-left: -10px;
       }
-  %body
-    .jumbotron.text-center.app-color.py-4
-      %h1 Shearwater
-    %nav.navbar.navbar-expand-lg.navbar-light.app-color.topnav{:style => "margin-top: -10px"}
-      .container-fluid
-        %button.navbar-toggler{"aria-controls" => "navbarNavDropdown", "aria-expanded" => "false", "aria-label" => "Toggle navigation", "data-bs-target" => "#navbarNavDropdown", "data-bs-toggle" => "collapse", :type => "button"}
-          %span.navbar-toggler-icon
-        #navbarNavDropdown.collapse.navbar-collapse
-          %ul.navbar-nav.w-100.justify-content-around
-            %li.nav-item.flex-fill
-              %a.nav-link{:href => users_home_path} Home
-            %li.nav-item.active.flex-fill
-              %a.nav-link{:href => shop_path} Shop
-            %li.nav-item.flex-fill
-              %a.nav-link{:href => about_us_path} About Us
-            %li.nav-item.flex-fill
-              - if @account
-                %a.nav-link{:href => my_account_path} My account
-              - else
-                %a.nav-link{:href => new_account_session_path} Sign In
-    .container.my-5
-      %h2.text-center.text-primary.fw-bold Shearwater Shop
-      .d-flex.justify-content-center.align-items-center.my-3
-        = form_with url: shop_path, method: :get, local: true, html: { id: "filter-form", class: "d-flex" } do
-          = text_field_tag :search, params[:search], placeholder: "Enter product name", class: "form-control me-2"
-          = submit_tag 'Search', class: "btn btn-primary"
-        .ms-3
-          = link_to shop_cart_path do
-            %i.fa.fa-shopping-cart.fa-2x
-            %span#lblCartCount.badge.bg-warning= @cart_item_count || 0
-      .row
-        .col-md-3
-          / Sorting by Type
-          .mb-3
-            %label.form-label.fw-bold{:for => "type-sort"} Type:
-            = form_with url: shop_path, method: :get, local: true, html: { id: "type-filter-form" } do
-              %select#type-sort.form-select{:name => "product_type"}
-                %option{:value => ""} Select Type
-                - Product.pluck(:product_type).uniq.each do |type|
-                  %option{:value => type}
-                    'selected' if type == params[:product_type] &gt;#{type}
-              %button.btn.btn-secondary.mt-2{:type => "submit"} Filter
-          / Sorting by Price
-          %div
-            = form_with url: shop_path, method: :get, local: true, html: { id: "price-filter-form" } do
-              .mb-2
-                %label.form-label.fw-bold{:for => "price-min"} Min Price:
-                %input#price-min.form-control{:name => "price_min", :placeholder => "Lowest price", :type => "number", :value => "#{params[:price_min]}"}/
-              .mb-3
-                %label.form-label.fw-bold{:for => "price-max"} Max Price:
-                %input#price-max.form-control{:name => "price_max", :placeholder => "Highest price", :type => "number", :value => "#{params[:price_max]}"}/
-              %button.btn.btn-secondary{:type => "submit"} Filter
-        .col-md-9
-          #product-scroll-panel.scroll-panel{"data-page" => "1", :style => "overflow-y: auto; max-height: 400px;"}
-            #product-container.row
-              - @products.each do |product|
-                .col-md-4.mb-4
-                  .card.h-100.product-box
-                    %img.card-img-top.product-image{:alt => "#{product.name}", :src => "#{product.picture}"}/
-                    .card-body.text-center
-                      %h5.product-name= product.name
-                      / Price color logic: Green for normal, Red for anomaly
-                      %p{:class => "product-price #{product.price_status == 'anomaly' ? 'text-danger' : 'text-success'}"}
-                        $#{product.current_price}
-                      - if product.stock > 0
-                        %button.btn.btn-primary.buy-button{:onclick => "update_cart_ui(#{@cart.id}, #{product.id})"} Buy
-                      - else
-                        %p.text-danger Sold Out
-          / Loader for lazy loading
-          #loading-spinner.text-center{:style => "display: none;"}
-            %p Loading...
-    / Footer
-    %footer.app-color.text-center.py-4{:style => " margin-top: 100px"}
-      %p © Your satisfaction is our priority
-    :javascript
-      function combineFormData() {
-          const searchInput = document.querySelector('input[name="search"]');
-          const typeSelect = document.querySelector('select[name="product_type"]');
-          const priceMinInput = document.querySelector('input[name="price_min"]');
-          const priceMaxInput = document.querySelector('input[name="price_max"]');
+%body
+  .jumbotron.text-center.app-color.py-4
+    %h1 Shearwater
+  %nav.navbar.navbar-expand-lg.navbar-light.app-color.topnav{style: "margin-top: -10px"}
+    .container-fluid
+      %button.navbar-toggler{type: "button", "data-bs-toggle": "collapse", "data-bs-target": "#navbarNavDropdown", "aria-controls": "navbarNavDropdown", "aria-expanded": "false", "aria-label": "Toggle navigation"}
+        %span.navbar-toggler-icon
+      #navbarNavDropdown.collapse.navbar-collapse
+        %ul.navbar-nav.w-100.justify-content-around
+          %li.nav-item.flex-fill
+            = link_to "Home", users_home_path, class: "nav-link"
+          %li.nav-item.active.flex-fill
+            = link_to "Shop", shop_path, class: "nav-link"
+          %li.nav-item.flex-fill
+            = link_to "About Us", about_us_path, class: "nav-link"
+          %li.nav-item.flex-fill
+            - if @account
+              = link_to "My account", my_account_path, class: "nav-link"
+            - else
+              = link_to "Sign In", new_account_session_path, class: "nav-link"
+  .container.my-5
+    %h2.text-center.text-primary.fw-bold Shearwater Shop
+    .d-flex.justify-content-center.align-items-center.my-3
+      = form_with url: shop_path, method: :get, local: true, html: { id: "filter-form", class: "d-flex" } do
+        = text_field_tag :search, params[:search], placeholder: "Enter product name", class: "form-control me-2"
+        = submit_tag 'Search', class: "btn btn-primary"
+      .ms-3
+        = link_to shop_cart_path do
+          %i.fa.fa-shopping-cart.fa-2x
+          %span#lblCartCount.badge.bg-warning{ data: { cart_count: @cart_item_count || 0 } }= @cart_item_count || 0
+    .row
+      .col-md-3
+        / Sorting by Type
+        .mb-3
+          %label.form-label.fw-bold{for: "type-sort"} Type:
+          = form_with url: shop_path, method: :get, local: true, html: { id: "type-filter-form" } do
+            %select#type-sort.form-select{name: "product_type"}
+              %option{value: ""} Select Type
+              - Product.pluck(:product_type).uniq.each do |type|
+                %option{value: type, selected: (type == params[:product_type])}= type
+            %button.btn.btn-secondary.mt-2{type: "submit"} Filter
+        / Sorting by Price
+        %div
+          = form_with url: shop_path, method: :get, local: true, html: { id: "price-filter-form" } do
+            .mb-2
+              %label.form-label.fw-bold{for: "price-min"} Min Price:
+              %input#price-min.form-control{name: "price_min", placeholder: "Lowest price", type: "number", value: params[:price_min]}/
+            .mb-3
+              %label.form-label.fw-bold{for: "price-max"} Max Price:
+              %input#price-max.form-control{name: "price_max", placeholder: "Highest price", type: "number", value: params[:price_max]}/
+            %button.btn.btn-secondary{type: "submit"} Filter
+      .col-md-9
+        #product-scroll-panel.scroll-panel{data: {page: "1"}, style: "overflow-y: auto; max-height: 400px;"}
+          #product-container.row
+            - @products.each do |product|
+              .col-md-4.mb-4
+                .card.h-100.product-box
+                  %img.card-img-top.product-image{alt: product.name, src: product.picture}
+                  .card-body.text-center
+                    %h5.product-name= product.name
+                    / Price color logic: Green for normal, Red for anomaly
+                    %p{class: "product-price #{product.price_status == 'anomaly' ? 'text-danger' : 'text-success'}"}
+                      $#{product.current_price}
+                    - if product.stock > 0
+                      %button.btn.btn-primary.buy-button{onclick: "update_cart_ui(#{@cart.id}, #{product.id})"} Buy
+                    - else
+                      %p.text-danger Sold Out
+        / Loader for lazy loading
+        #loading-spinner.text-center{style: "display: none;"}
+          %p Loading...
+  / Footer
+  %footer.app-color.text-center.py-4{style: "margin-top: 100px"}
+    %p © Your satisfaction is our priority
 
-          let queryParams = new URLSearchParams();
+  = javascript_include_tag 'views/page/lazy_loading', defer: true
+  = javascript_include_tag 'views/page/fliter_panel', defer: true
 
-          if (searchInput && searchInput.value) {
-              queryParams.set('search', searchInput.value);
-          }
-          if (typeSelect && typeSelect.value) {
-              queryParams.set('product_type', typeSelect.value);
-          }
-          if (priceMinInput && priceMinInput.value) {
-              queryParams.set('price_min', priceMinInput.value);
-          }
-          if (priceMaxInput && priceMaxInput.value) {
-              queryParams.set('price_max', priceMaxInput.value);
-          }
+:javascript
+  let cartCount = #{@cart_item_count || 0}; // Server-side interpolation for initial cart count
 
-          return queryParams.toString();
+  function update_cart_ui(cartId, productId) {
+    fetch('/cart_items', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+      },
+      body: JSON.stringify({
+        cart_id: cartId,
+        product_id: productId,
+        quantity: 1
+      })
+    })
+    .then(response => {
+      if (response.ok) {
+        cartCount++;
+        let cartCountElem = document.getElementById('lblCartCount');
+        cartCountElem.innerText = cartCount;
       }
+    })
+    .catch(error => console.error('Error adding cart item:', error));
+  }
 
-      // Function to handle form submissions
-      function handleFilterFormSubmit(event) {
-          event.preventDefault();
 
-          // Combine all form data
-          const combinedQueryParams = combineFormData();
 
-          // Fetch updated products using AJAX
-          fetch(`${event.target.action}?${combinedQueryParams}`, {
-              method: 'GET',
-              headers: {
-                  'X-Requested-With': 'XMLHttpRequest'
-              }
-          })
-              .then(response => response.text())
-              .then(html => {
-                  // Parse the HTML response to extract the product listings
-                  const parser = new DOMParser();
-                  const doc = parser.parseFromString(html, 'text/html');
-                  const newProducts = doc.getElementById('product-container').innerHTML; // Get only the product listings
-                  document.getElementById('product-container').innerHTML = newProducts; // Update the product container
-              })
-              .catch(error => console.error('Error:', error));
-      }
-
-      let cartCount = #{@cart_item_count || 0};
-
-      function update_cart_ui(cartId, productId) {
-          fetch(`/cart_items`, {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-                  'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-              },
-              body: JSON.stringify({
-                  cart_id: cartId,
-                  product_id: productId,
-                  quantity: 1 // Default quantity
-              })
-          })
-              .then(response => {
-                  if (response.ok) {
-                      cartCount++; // Increment cartCount on successful addition
-                      let cartCountElem = document.getElementById('lblCartCount');
-                      cartCountElem.innerText = cartCount; // Update UI
-                  }
-              })
-              .catch(error => console.error('Error adding cart item:', error));
-      }
-
-      document.addEventListener('DOMContentLoaded', function () {
-          let scrollPanel = document.getElementById('product-scroll-panel');
-          let loadingSpinner = document.getElementById('loading-spinner');
-          let currentPage = 1;
-          let isLoading = false; // Prevent multiple requests
-          let allProductsLoaded = false; // Flag to stop loading when no more products
-
-          scrollPanel.addEventListener('scroll', function () {
-              let nearBottom = scrollPanel.scrollTop + scrollPanel.clientHeight >= scrollPanel.scrollHeight - 10;
-              if (nearBottom && !isLoading && !allProductsLoaded) {
-                  isLoading = true;
-                  loadingSpinner.style.display = 'block'; // Show the loading spinner
-                  loadMoreProducts();
-              }
-          });
-
-          function loadMoreProducts() {
-              currentPage++; // Increment the page number
-              let queryParams = combineFormData(); // Include any existing filters
-
-              fetch(`/shop?page=${currentPage}&${queryParams}`, {
-                  method: 'GET',
-                  headers: {
-                      'X-Requested-With': 'XMLHttpRequest'
-                  }
-              })
-                  .then(response => response.text())
-                  .then(html => {
-                      const parser = new DOMParser();
-                      const doc = parser.parseFromString(html, 'text/html');
-                      const newProducts = doc.getElementById('product-container').innerHTML;
-
-                      if (newProducts.trim()) {
-                          // Append new products
-                          document.getElementById('product-container').insertAdjacentHTML('beforeend', newProducts);
-                      } else {
-                          // No more products to load, set the flag
-                          allProductsLoaded = true;
-                      }
-                      loadingSpinner.style.display = 'none'; // Hide the loading spinner
-                      isLoading = false; // Allow new scroll events
-                  })
-                  .catch(error => {
-                      console.error('Error loading more products:', error);
-                      loadingSpinner.style.display = 'none'; // Hide spinner on error
-                      isLoading = false; // Allow new scroll events
-                  });
-          }
-      });
-      document.getElementById('type-filter-form').addEventListener('submit', handleFilterFormSubmit);
-      document.getElementById('price-filter-form').addEventListener('submit', handleFilterFormSubmit);
-      document.getElementById('filter-form').addEventListener('submit', handleFilterFormSubmit);

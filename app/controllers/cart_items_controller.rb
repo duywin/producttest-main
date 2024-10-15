@@ -12,7 +12,6 @@ class CartItemsController < ApplicationController
 
     @cart_item.price = product.current_price
     @cart_item.is_anomaly = product.price_status == 'anomaly'
-
     if @cart_item.save
       render json: { success: true, message: "Item added to cart", cart_count: @cart.cart_items.sum(:quantity) }
     else
@@ -43,7 +42,6 @@ class CartItemsController < ApplicationController
 
   def apply_promotion
     promotion = Promotion.find_by(promote_code: params[:promote_code])
-
     if promotion.nil?
       render json: { success: false, message: 'Promotion not found' }, status: :not_found
       return
