@@ -132,6 +132,7 @@
     }
 %body
   / Shopping Cart View
+%div{"data-cart-id" => "#{@cart.id}"}
   .shopping-cart
     .title Your Shopping Cart
     .cart-view
@@ -172,224 +173,16 @@
           %button#apply-promo-btn.button Apply
       .text-center{:style => "margin-top: 20px;"}
         %button#checkout-btn Checkout
-  :javascript
-    function updateTotalPrice(discount = 0) {
-        let total = 0;
-        $('.item').each(function () {
-            const quantity = parseInt($(this).find('.quantity-input').val());
-            const price = parseFloat($(this).find('.total-price').text().replace(/[^0-9.-]+/g, ""));
-            total += quantity * price;
-        });
-        total = total - (total * (discount / 100));
-        $('#cart-total').text(new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD'
-        }).format(total));
-    }
 
-    $(document).ready(function () {
-        $('.quantity button').on('click', function () {
-            const action = $(this).data('action');
-            const itemId = $(this).data('id');
-            const quantityInput = $(`input[data-id="${itemId}"]`);
-            let quantity = parseInt(quantityInput.val());
-            const stock = parseInt($(this).closest('.item').data('stock'));
+= javascript_include_tag 'views/page/delete_item'
+= javascript_include_tag 'views/page/promotion_handling'
+= javascript_include_tag 'views/page/price_update'
+= javascript_include_tag 'views/page/quantity_adjustment'
+= javascript_include_tag 'views/page/checkout'
 
-            if (action === "increment") {
-                if (quantity < stock) {
-                    quantity++;
-                } else {
-                    alert("Exceeding stock amount, please wait for restock");
-                    return; // Exit if exceeding stock
-                }
-            } else if (action === "decrement") {
-                if (quantity > 1) {
-                    quantity--;
-                } else {
-                    $(`.delete-btn[data-id="${itemId}"]`).click();
-                    return; // Exit since delete will handle removal
-                }
-            }
-
-            // Update the cart item quantity via AJAX
-            $.ajax({
-                url: `/cart_items/${itemId}`,
-                method: 'PATCH',
-                headers: {
-                    'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')
-                },
-                data: JSON.stringify({quantity: quantity}),
-                contentType: 'application/json',
-                success: function (data) {
-                    if (data.success) {
-                        quantityInput.val(data.new_quantity);
-                        updateTotalPrice(); // Update total price logic
-                    } else {
-                        alert(data.message);
-                    }
-                }
-            });
-        });
-
-        $('.delete-btn').on('click', function () {
-            const itemId = $(this).data('id');
-
-            $.ajax({
-                url: `/cart_items/${itemId}`,
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function (data) {
-                    if (data.success) {
-                        $(`[data-cart-item-id="${itemId}"]`).remove();
-                        updateTotalPrice(); // Update total price after item removal
-                    } else {
-                        alert(data.message);
-                    }
-                }
-            });
-        });
-
-        $('#checkout-btn').on('click', function () {
-            const cartId = #{@cart.id}; // Ensure @cart is available in your view
-
-            $.ajax({
-                url: `/carts/${cartId}/checkout`, // Ensure the URL is correctly formed
-                method: 'PATCH',
-                headers: {
-                    'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function (response) {
-                    if (response.success) {
-                        alert('Checkout completed successfully.'); // Alert user on success
-                        window.location.href = '#{delivery_form_path}'; // Redirect to delivery form
-                    } else {
-                        alert('Error: ' + response.message); // Show error message from the server
-                    }
-                },
-                error: function (xhr, status, error) {
-                    console.error('Error during checkout', error);
-                    alert('An error occurred during checkout. Please try again.');
-                }
-            });
-        });
+%form#redirect-form{ action: delivery_form_path, method: 'get' }
+  %input{ type: 'hidden', name: 'cart_id', value: '' }
 
 
-        // Apply promotion button logic
-        $('#apply-promo-btn').on('click', function () {
-            const promoCode = $('#promotion-code').val();
-            const cartId = #{@cart.id}; // Ensure @cart is available in your view
-            const csrfToken = $('meta[name="csrf-token"]').attr('content');
 
-            // Check if the promotion code is for the entire cart or for individual items
-            $.ajax({
-                url: `/promotions/check_type`, // Assuming there's a method to check promo type
-                method: 'POST',
-                headers: {
-                    'X-CSRF-Token': csrfToken
-                },
-                data: {promote_code: promoCode},
-                success: function (response) {
-                    if (response.success) {
-                        if (response.promotion_type === 'cart') {
-                            applyCartPromotion(promoCode, cartId, csrfToken);
-                        } else {
-                            applyItemPromotion(promoCode, cartId, csrfToken);
-                        }
-                    } else {
-                        alert('Invalid promotion code');
-                    }
-                },
-                error: function (xhr, status, error) {
-                    alert('Error verifying promotion: ' + error);
-                }
-            });
-        });
 
-        function applyCartPromotion(promoCode, cartId, csrfToken) {
-            $.ajax({
-                url: `/carts/${cartId}/apply_cart_promotion`,
-                method: 'POST',
-                headers: {
-                    'X-CSRF-Token': csrfToken
-                },
-                data: {promote_code: promoCode, cart_id: cartId},
-                success: function (response) {
-                    if (response.success) {
-                        const newTotal = response.new_total;
-                        const oldTotal = $('#new-cart-total').text().replace(/[^0-9.-]+/g, ""); // get old total
-
-                        // Update totals in UI
-                        $('#old-cart-total').text(new Intl.NumberFormat('en-US', {
-                            style: 'currency',
-                            currency: 'USD'
-                        }).format(oldTotal));
-                        $('#new-cart-total').text(new Intl.NumberFormat('en-US', {
-                            style: 'currency',
-                            currency: 'USD'
-                        }).format(newTotal));
-                        $('#discount-line').show();
-                        document.getElementById('discount-message').innerText = response.message;
-
-                        alert('Cart promotion applied successfully');
-                    } else {
-                        alert(response.message);
-                    }
-                },
-                error: function (xhr, status, error) {
-                    alert('Error applying cart promotion: ' + error);
-                }
-            });
-        }
-
-        function updateItemPrices(updatedPrices) {
-            $('.item').each(function () {
-                const itemId = $(this).data('cart-item-id');
-                const itemPrices = updatedPrices[itemId];
-
-                if (itemPrices) {
-                    const oldPrice = itemPrices.old_price;
-                    const newPrice = itemPrices.new_price;
-
-                    // Populate the old price (with strikethrough) and new price for the item
-                    $(this).find('.old-price').text(new Intl.NumberFormat('en-US', {
-                        style: 'currency',
-                        currency: 'USD'
-                    }).format(oldPrice)).show(); // Show the old price
-
-                    $(this).find('.new-price').text(new Intl.NumberFormat('en-US', {
-                        style: 'currency',
-                        currency: 'USD'
-                    }).format(newPrice));
-                }
-            });
-            updateTotalPrice(); // Recalculate the total price
-        }
-
-        function applyItemPromotion(promoCode, cartId, csrfToken) {
-            $.ajax({
-                url: `/cart_items/apply_promotion`,
-                method: 'POST',
-                headers: {
-                    'X-CSRF-Token': csrfToken
-                },
-                data: {promote_code: promoCode, cart_id: cartId},
-                success: function (response) {
-                    if (response.success) {
-                        document.getElementById('discount-message').innerText = response.message;
-                        document.getElementById('discount-line').style.display = 'block';
-                        alert('Promotion applied successfully: ' + response.message);
-
-                        // Pass the updated prices (with old and new prices) to updateItemPrices
-                        updateItemPrices(response.updated_prices);
-                    } else {
-                        alert('Failed to apply promotion: ' + response.message);
-                    }
-                },
-                error: function (xhr, status, error) {
-                    alert('Error applying promotion: ' + xhr.responseJSON.message || error);
-                }
-            });
-        }
-    });

@@ -33,13 +33,15 @@ class CartsController < ApplicationController
 
   def checkout
     @cart = Cart.find(params[:id])
+
     if @cart.cart_items.any?
       reduce_stock(@cart)
       @cart.update(check_out: true)
       flash[:notice] = 'Checkout completed successfully.'
+
       respond_to do |format|
         format.json { render json: { success: true } }
-        format.html { redirect_to delivery_form_path }
+        format.html { redirect_to delivery_form_path, notice: flash[:notice] }
       end
     else
       respond_to do |format|
@@ -48,6 +50,7 @@ class CartsController < ApplicationController
       end
     end
   end
+
 
   def apply_cart_promotion
     promotion = Promotion.find_by(promote_code: params[:promote_code])
