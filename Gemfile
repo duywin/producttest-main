@@ -8,6 +8,8 @@ gem 'railties', "7.1.4"
 gem 'highcharts-rails' , "6.0.0"
 gem "haml-rails"
 gem 'html2haml'
+gem 'coffee-script'
+gem 'mini_racer'
 
 
 
@@ -73,16 +75,11 @@ group :development, :test do
   gem "debug", platforms: %i[ mri mswin mswin64 mingw x64_mingw ]
   gem 'rspec-rails'
 
+
 end
 
 group :development do
-  # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
-  # Add speed badges [https://github.com/MiniProfiler/rack-mini-profiler]
-  # gem "rack-mini-profiler"
-
-  # Speed up commands on slow machines / big apps [https://github.com/rails/spring]
-  # gem "spring"
 end
 
 group :test do
