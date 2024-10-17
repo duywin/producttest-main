@@ -1,13 +1,9 @@
-= javascript_include_tag 'views/promotion/promotion_merchandise_toggle'
-
 .jumbotron.text-center.app-color
   %h1 Promotion Creation
-/ Toggle Buttons
 .text-center.mt-4
   %button#toggle-promotion.btn.btn-secondary Create Promotion
   %button#toggle-merchandise.btn.btn-secondary Create Merchandise
 #promotion-form.form-box
-  / Added id here
   %h3 Create a New Promotion
   = form_with model: @promotion, url: promotions_path, method: :post, local: true do |form|
     .mb-3
@@ -17,7 +13,6 @@
       = form.label :promotion_type, "Promotion Type"
       = form.select :promotion_type, [['Product', 'product'], ['Category', 'category'], ['Cart', 'cart']], {}, class: "form-input", id: "promotion-type"
     #apply-field-section.mb-3
-      / Apply field will be conditionally shown
       = form.label :apply_field, "Apply Field"
       = form.select :apply_field, [], {}, class: "form-input", id: "apply-field"
     .mb-3
@@ -30,8 +25,8 @@
       = form.label :min_quantity, "Minimum Quantity (optional)"
       = form.number_field :min_quantity, class: "form-input", value: 0
     = form.submit 'Create Promotion', class: 'btn btn-primary form-submit'
+
 #merchandise-form.form-box{:style => "display:none;"}
-  / Added id and set to hide by default
   %h3 Create a New Merchandise
   = form_with model: @merchandise, url: merchandises_path, method: :post, local: true do |form|
     .mb-3
@@ -44,9 +39,12 @@
       = form.label :promotion_end, "Promotion End Date"
       = form.date_field :promotion_end, class: "form-input"
     = form.submit 'Create Merchandise', class: 'btn btn-primary form-submit'
-%footer.custom-footer.py-4.app-color
-  %h1.text-center Admin Interface
 
+/ Embed the JSON data in a script tag
 :javascript
-  window.productsData = #{j Product.all.to_json}
-  window.categoriesData = #{j Category.pluck(:name).uniq.to_json}
+  window.promotionData = {
+    products: #{Product.all.to_json},
+    categories: #{Category.pluck(:name).uniq.to_json}
+  }
+
+= javascript_include_tag 'views/promotion/promotion_merchandise_toggle'
