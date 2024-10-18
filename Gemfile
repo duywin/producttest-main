@@ -37,6 +37,10 @@ gem "jbuilder"
 gem 'jquery-rails', '4.6'
 gem 'ransack'
 gem 'kaminari'
+gem 'elasticsearch', '~> 8.0'
+gem 'elasticsearch-model', '~> 7.0'
+gem 'elasticsearch-rails', '~> 7.0'
+
 
 
 gem 'devise', '~> 4.9', '>= 4.9.3'

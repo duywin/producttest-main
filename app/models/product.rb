@@ -4,6 +4,27 @@ class Product < ApplicationRecord
   paginates_per 10
   has_many :merchandises
 
+  include Elasticsearch::Model
+  include Elasticsearch::Model::Callbacks
+
+  settings index: {
+    analysis: {
+      normalizer: {
+        lowercase_normalizer: {
+          type: 'custom',
+          filter: ['lowercase']
+        }
+      }
+    }
+  }
+    mappings dynamic: false do
+      indexes :id, type: :integer
+      indexes :name, type: 'keyword', normalizer: 'lowercase_normalizer'
+      indexes :product_type, type: :text
+      indexes :prices, type: :float
+    end
+
+
   def current_price
     merchandise = merchandises.where('promotion_end >= ?', Date.today).first
     if merchandise
@@ -18,7 +39,32 @@ class Product < ApplicationRecord
     merchandise ? 'anomaly' : 'normal'
   end
 
+
   def self.ransackable_attributes(auth_object = nil)
     ["name", "prices", "product_type"]
+  end
+
+
+  def self.search(query, filters = {})
+    __elasticsearch__.search(
+      {
+        query: {
+          bool: {
+            must: [
+              {
+                wildcard: {
+                  name: {
+                    value: "*#{query}*",  # SQL-like `LIKE %query%` behavior for name
+                    boost: 1.0,
+                    rewrite: 'constant_score'
+                  }
+                }
+              },
+            ],
+            filter: filters.presence || []  # Apply filters if provided
+          }
+        }
+      }
+    )
   end
 end

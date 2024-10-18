@@ -11,23 +11,32 @@ class AccountsController < ApplicationController
   end
 
   def index
-    @q = Account.ransack(params[:q]) # Initialize Ransack
-    @accounts = @q.result(distinct: true).page(params[:page]) # Apply pagination
-    # Add custom date range filtering
-    case params[:created_at_filter]
-    when 'this_week'
-      @q.created_at_gteq = Time.current.beginning_of_week
-    when 'this_month'
-      @q.created_at_gteq = Time.current.beginning_of_month
-    when 'last_month'
-      @q.created_at_gteq = Time.current.last_month.beginning_of_month
-      @q.created_at_lteq = Time.current.last_month.end_of_month
-    when 'last_year'
-      @q.created_at_gteq = Time.current.last_year.beginning_of_year
-      @q.created_at_lteq = Time.current.last_year.end_of_year
+    # Check for username search query from params
+    query = params[:username_cont].presence
+
+    filters = case params[:created_at_filter]
+              when 'this_week'
+                { created_at_gteq: Time.current.beginning_of_week }
+              when 'this_month'
+                { created_at_gteq: Time.current.beginning_of_month }
+              when 'last_month'
+                { created_at_gteq: Time.current.last_month.beginning_of_month,
+                  created_at_lteq: Time.current.last_month.end_of_month }
+              when 'last_year'
+                { created_at_gteq: Time.current.last_year.beginning_of_year,
+                  created_at_lteq: Time.current.last_year.end_of_year }
+              else
+                {}
+              end
+
+    # Perform the search using Elasticsearch
+    if query.present?
+      @accounts = Account.search(query, filters).records.page(params[:page])
+    else
+      @accounts = Account.all.page(params[:page]).where(filters)
     end
-    @accounts = @q.result(distinct: true).page(params[:page]) # Apply pagination
   end
+
 
 
   def import

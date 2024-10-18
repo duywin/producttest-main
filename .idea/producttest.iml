@@ -53,7 +53,6 @@
     <orderEntry type="library" scope="PROVIDED" name="caxlsx (v3.4.1, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="caxlsx_rails (v0.6.4, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="chronic (v0.10.2, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="coffee-rails (v5.0.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="coffee-script (v2.4.1, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="coffee-script-source (v1.12.2, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="concurrent-ruby (v1.3.4, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
@@ -65,14 +64,22 @@
     <orderEntry type="library" scope="PROVIDED" name="devise-otp (v0.8.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="diff-lcs (v1.5.1, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="drb (v2.2.1, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="elastic-transport (v8.3.5, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="elasticsearch (v8.15.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="elasticsearch-api (v8.15.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="elasticsearch-model (v7.1.1, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="elasticsearch-rails (v7.2.1, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="erubi (v1.13.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="erubis (v2.7.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="execjs (v2.9.1, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="faraday (v2.12.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="faraday-net_http (v3.3.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="ffi (v1.17.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="font-awesome-rails (v4.7.0.8, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="globalid (v1.2.1, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="haml (v6.3.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="haml-rails (v2.1.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="hashie (v5.0.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="highcharts-rails (v6.0.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="html2haml (v2.3.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="htmlentities (v4.3.4, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
@@ -83,6 +90,7 @@
     <orderEntry type="library" scope="PROVIDED" name="irb (v1.14.1, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="jbuilder (v2.13.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="jquery-rails (v4.6.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="json (v2.7.2, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="kaminari (v1.2.2, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="kaminari-actionview (v1.2.2, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="kaminari-activerecord (v1.2.2, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
@@ -98,10 +106,12 @@
     <orderEntry type="library" scope="PROVIDED" name="mini_racer (v0.16.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="minitest (v5.25.1, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="msgpack (v1.7.3, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="multi_json (v1.15.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="mustermann (v3.0.3, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="mutex_m (v0.2.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="mysql2 (v0.5.6, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="net-imap (v0.4.17, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="net-http (v0.4.1, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="net-imap (v0.5.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="net-pop (v0.1.2, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="net-protocol (v0.2.2, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="net-smtp (v0.5.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
@@ -152,6 +162,7 @@
     <orderEntry type="library" scope="PROVIDED" name="timeout (v0.4.1, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="turbo-rails (v2.0.11, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="tzinfo (v2.0.6, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="uri (v0.13.1, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="warden (v1.2.9, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="web-console (v4.2.1, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="webrick (v1.8.2, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />

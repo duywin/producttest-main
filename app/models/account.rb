@@ -1,4 +1,8 @@
+require 'elasticsearch/model'
 class Account < ApplicationRecord
+  include Elasticsearch::Model
+  include Elasticsearch::Model::Callbacks
+
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
 
@@ -8,12 +12,40 @@ class Account < ApplicationRecord
   after_initialize :set_defaults, if: :new_record?
   validate :password_complexity
 
-  def self.ransackable_attributes(auth_object = nil)
-    [ "username", "email", "created_at"]
-
+  settings do
+    mappings dynamic: false do
+      indexes :username, type: 'text', analyzer: 'standard'
+      indexes :email, type: 'keyword'
+      indexes :created_at, type: 'date'
+    end
   end
 
-  private
+  def self.search(query, filters = {})
+    search_definition = {
+      query: {
+        bool: {
+          must: [
+            { match: { username: query } }
+          ],
+          filter: []
+        }
+      }
+    }
+
+    # Add filters if any
+    filters.each do |key, value|
+      case key
+      when :created_at_gteq
+        search_definition[:query][:bool][:filter] << { range: { created_at: { gte: value } } }
+      when :created_at_lteq
+        search_definition[:query][:bool][:filter] << { range: { created_at: { lte: value } } }
+      end
+    end
+
+    __elasticsearch__.search(search_definition)
+  end
+
+private
 
   def password_complexity
     return if password.blank?

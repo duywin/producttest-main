@@ -12,8 +12,12 @@ class ProductsController < ApplicationController
     end
   end
   def index
-    @q = Product.ransack(params[:q])
-    @products = @q.result.page(params[:page]).per(10)
+    query = params[:query].presence
+    if query.present?
+      @products = Product.search(query).records.page(params[:page]).per(10)
+    else
+      @products = Product.all.page(params[:page]).per(10)  # Show all products when no search query
+    end
     @promotions = Promotion.all.page(params[:promotion_page]).per(5)
     @merchandises = Merchandise.all.page(params[:merchant_page]).per(5)
   end

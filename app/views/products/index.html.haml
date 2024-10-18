@@ -16,15 +16,18 @@
           %a.nav-link{:href => accounts_path} Account
         %li.nav-item.flex-fill
           %a.nav-link{:href => carts_path} Sales
+
 / Search Form
 .d-flex.justify-content-center.mb-4
-  = search_form_for @q, method: :get, local: true, class: 'd-flex' do |f|
-    = f.search_field :name_cont, placeholder: "Enter product name...", class: 'form-control me-2', style: 'width: 300px;'
+  = form_with url: products_path, method: :get, local: true, class: 'd-flex' do |f|
+    = f.text_field :query, placeholder: "Enter product name or type...", class: 'form-control me-2', style: 'width: 300px;'
     = f.submit "Search", class: 'btn btn-primary'
+
 .d-flex.justify-content-center.mb-4
   = link_to 'Create Promotion', new_promotion_path, class: 'btn btn-success mx-2 shadow-button'
   = link_to 'Create Product', new_product_path, class: 'btn btn-info mx-2 shadow-button'
   %button#toggle-export-form.btn.btn-warning.shadow-button Export Report
+
 / Hidden Export Form
 #export-form-container.my-4.text-center{:style => "display: none;"}
   .form-box.app
@@ -34,6 +37,7 @@
         = f.label :report_type, "Select Report Type"
         = f.select :report_type, [['Weekly Report', 'weekly'], ['Monthly Report', 'monthly']], {}, class: 'form-input'
       = f.submit "Export", class: 'btn btn-primary form-submit'
+
 .table-responsive.text-center
   %h3 Products List
   %table.table.table-striped.table-hover
@@ -51,28 +55,27 @@
           %td= product.product_type
           %td
             .d-flex.gap-2
-              = button_to product_path(product), method: :get,                                             |
-                class: 'btn btn-primary',                                                                  |
-                title: 'View Details',                                                                     |
-                style: 'background: none; border: none; color: blue; cursor: pointer; font-size: 20px;' do |
+              = button_to product_path(product), method: :get,
+                class: 'btn btn-primary',
+                title: 'View Details',
+                style: 'background: none; border: none; color: blue; cursor: pointer; font-size: 20px;' do
                 %span 👁
-                / Eye symbol for view
-              = button_to edit_product_path(product), method: :get,                                         |
-                class: 'btn btn-primary',                                                                   |
-                title: 'Edit Product',                                                                      |
-                style: 'background: none; border: none; color: green; cursor: pointer; font-size: 20px;' do |
+              = button_to edit_product_path(product), method: :get,
+                class: 'btn btn-primary',
+                title: 'Edit Product',
+                style: 'background: none; border: none; color: green; cursor: pointer; font-size: 20px;' do
                 %span ✎
-                / Pencil symbol for edit
-              = button_to product_path(product), method: :delete,                                         |
-                data: { turbo_confirm: "Are you sure?" },                                                 |
-                class: 'btn btn-danger',                                                                  |
-                title: 'Delete Product',                                                                  |
-                style: 'background: none; border: none; color: red; cursor: pointer; font-size: 20px;' do |
+              = button_to product_path(product), method: :delete,
+                data: { turbo_confirm: "Are you sure?" },
+                class: 'btn btn-danger',
+                title: 'Delete Product',
+                style: 'background: none; border: none; color: red; cursor: pointer; font-size: 20px;' do
                 %span ❌
-                / X symbol for delete
+
   / Pagination Links for Products
   .d-flex.justify-content-center
     = paginate @products, class: 'pagination', previous_label: 'Previous', next_label: 'Next'
+
 / Promotions Table
 .table-responsive.mt-5.text-center
   %h3 Promotions List
@@ -95,16 +98,16 @@
           %td= promotion.min_quantity
           %td
             .d-flex.gap-2
-              / Delete button for the promotion
-              = button_to promotion_path(promotion), method: :delete,                                     |
-                data: { turbo_confirm: "Are you sure?" },                                                 |
-                class: 'btn btn-danger',                                                                  |
-                style: 'background: none; border: none; color: red; cursor: pointer; font-size: 20px;' do |
+              = button_to promotion_path(promotion), method: :delete,
+                data: { turbo_confirm: "Are you sure?" },
+                class: 'btn btn-danger',
+                style: 'background: none; border: none; color: red; cursor: pointer; font-size: 20px;' do
                 %span ❌
-                / X symbol for delete
+
   / Pagination Links for Promotions
   .d-flex.justify-content-center
     = paginate @promotions, param_name: :promotion_page, class: 'pagination', previous_label: 'Previous', next_label: 'Next'
+
 / Merchandise Table
 .table-responsive.mt-5.text-center
   %h3 Merchandise List
@@ -123,15 +126,15 @@
           %td= merchandise.promotion_end.present? ? merchandise.promotion_end.strftime("%Y-%m-%d") : 'N/A'
           %td
             .d-flex.gap-2
-              / Delete button for the merchandise
-              = button_to merchandise_path(merchandise), method: :delete,                                 |
-                data: { turbo_confirm: "Are you sure?" },                                                 |
-                class: 'btn btn-danger',                                                                  |
-                style: 'background: none; border: none; color: red; cursor: pointer; font-size: 20px;' do |
+              = button_to merchandise_path(merchandise), method: :delete,
+                data: { turbo_confirm: "Are you sure?" },
+                class: 'btn btn-danger',
+                style: 'background: none; border: none; color: red; cursor: pointer; font-size: 20px;' do
                 %span ❌
-                / X symbol for delete
+
   .d-flex.justify-content-center
     = paginate @merchandises, param_name: :merchant_page, class: 'pagination', previous_label: 'Previous', next_label: 'Next'
+
 %footer.custom-footer.py-4.app-color
   %h1.text-center Admin Interface
 = javascript_include_tag 'views/product/index_toggle'

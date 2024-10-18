@@ -27,7 +27,7 @@
         = form.file_field :file, class: "form-input"
       = form.submit 'Import accounts', class: 'btn btn-primary form-submit'
 .text-center.my-4
-  = search_form_for @q, url: accounts_path, method: :get, local: true do |f|
+  = form_with url: accounts_path, method: :get, local: true do |f|
     = f.text_field :username_cont, placeholder: "Enter username", class: "form-control w-50 d-inline-block me-2"
     = select_tag :created_at_filter, options_for_select([ |
         ['Filter by Created date', ''],                   |
@@ -52,24 +52,12 @@
           %td= account.email
           %td= account.is_admin ? 'Admin' : 'User'
           %td.d-flex.gap-3.align-items-center
-            = button_to account_path(account), method: :get,                                                                                    |
-              class: 'btn btn-primary',                                                                                                         |
-              style: 'color: white; padding: 10px 20px; border-radius: 5px; border: none; cursor: pointer; background: none; font-size: 20px;', |
-              title: 'View Details' do                                                                                                          |
+            = button_to account_path(account), method: :get, class: 'btn btn-primary', style: 'color: white; padding: 10px 20px; border-radius: 5px; border: none; cursor: pointer; background: none; font-size: 20px;', title: 'View Details' do
               %span 👁
-              / Eye symbol for view
-            = button_to edit_account_path(account), method: :get,                                                                             |
-              class: 'btn btn-primary',                                                                                                       |
-              style: 'color: blue; padding: 10px 20px; border-radius: 5px; border: none; cursor: pointer; background: none;font-size: 20px;', |
-              title: 'Edit Account' do                                                                                                        |
+            = button_to edit_account_path(account), method: :get, class: 'btn btn-primary', style: 'color: blue; padding: 10px 20px; border-radius: 5px; border: none; cursor: pointer; background: none;font-size: 20px;', title: 'Edit Account' do
               %span ✎
-              / Pencil symbol for edit
-            = button_to account_path(account), method: :delete,                                                                               |
-              data: { turbo_confirm: "Are you sure?" },                                                                                       |
-              style: 'background: none; padding: 10px 20px; border-radius: 5px; border: none; color: red; cursor: pointer; font-size: 20px;', |
-              title: 'Delete Account' do                                                                                                      |
+            = button_to account_path(account), method: :delete, data: { turbo_confirm: "Are you sure?" }, style: 'background: none; padding: 10px 20px; border-radius: 5px; border: none; color: red; cursor: pointer; font-size: 20px;', title: 'Delete Account' do
               %span ❌
-              / Cross symbol for delete
 .pagination.d-flex.justify-content-center.my-4
   = paginate @accounts, class: 'pagination', previous_label: 'Previous', next_label: 'Next'
 %footer.custom-footer.py-4.app-color
