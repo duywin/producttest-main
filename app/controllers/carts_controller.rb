@@ -1,5 +1,4 @@
 class CartsController < ApplicationController
-
   def index
     @carts = Cart.includes(:account).where(check_out: true).page(params[:page])
     @carts = @carts.where(status: params[:status]) if params[:status].present?
@@ -10,8 +9,9 @@ class CartsController < ApplicationController
   end
 
   def update
+    @cart = Cart.find(params[:id])
     if @cart.update(cart_params)
-      redirect_to carts_path, notice: 'Cart was successfully updated.'
+      redirect_to carts_path, notice: "Cart was successfully updated."
     else
       render :edit, status: :unprocessable_entity
     end
@@ -25,9 +25,16 @@ class CartsController < ApplicationController
   def update_item
     @cart_item = CartItem.find(params[:id])
     if @cart_item.update(quantity: params[:quantity])
-      render json: { success: true, message: "Quantity updated", new_quantity: @cart_item.quantity }
+      render json: {
+        success: true,
+        message: "Quantity updated",
+        new_quantity: @cart_item.quantity
+      }
     else
-      render json: { success: false, errors: @cart_item.errors.full_messages }, status: :unprocessable_entity
+      render json: {
+        success: false,
+        errors: @cart_item.errors.full_messages
+      }, status: :unprocessable_entity
     end
   end
 
@@ -37,7 +44,7 @@ class CartsController < ApplicationController
     if @cart.cart_items.any?
       reduce_stock(@cart)
       @cart.update(check_out: true)
-      flash[:notice] = 'Checkout completed successfully.'
+      flash[:notice] = "Checkout completed successfully."
 
       respond_to do |format|
         format.json { render json: { success: true } }
@@ -45,26 +52,32 @@ class CartsController < ApplicationController
       end
     else
       respond_to do |format|
-        format.json { render json: { success: false, message: 'Cannot checkout an empty cart.' }, status: :unprocessable_entity }
-        format.html { redirect_to carts_path, alert: 'Cannot checkout an empty cart.' }
+        format.json { render json: { success: false, message: "Cannot checkout an empty cart." }, status: :unprocessable_entity }
+        format.html { redirect_to carts_path, alert: "Cannot checkout an empty cart." }
       end
     end
   end
 
-
   def apply_cart_promotion
     promotion = Promotion.find_by(promote_code: params[:promote_code])
     cart = Cart.find(params[:cart_id])
-    if promotion.nil?
-      render json: { success: false, message: 'Promotion not found' }, status: :not_found
+
+    unless promotion
+      render json: { success: false, message: "Promotion not found" }, status: :not_found
       return
     end
-    if promotion.promotion_type == 'cart'
+
+    if promotion.promotion_type == "cart"
       old_total = cart.total_price
       new_total = apply_cart_discount(promotion, cart)
-      render json: { success: true, new_total: new_total, old_total: old_total, message: 'Cart promotion applied successfully' }
+      render json: {
+        success: true,
+        new_total: new_total,
+        old_total: old_total,
+        message: "Cart promotion applied successfully"
+      }
     else
-      render json: { success: false, message: 'Invalid promotion type for cart' }, status: :unprocessable_entity
+      render json: { success: false, message: "Invalid promotion type for cart" }, status: :unprocessable_entity
     end
   end
 
@@ -86,7 +99,11 @@ class CartsController < ApplicationController
   end
 
   def cart_params
-    params.require(:cart).permit(:username, :check_out, :address, :status, :delivery_day) # Added :status and :delivery_day
+    params.require(:cart).permit(
+      :username,
+      :check_out,
+      :address,
+      :status,
+      :delivery_day)
   end
 end
-

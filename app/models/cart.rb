@@ -4,6 +4,6 @@ class Cart < ApplicationRecord
   belongs_to :account
   paginates_per 10
   def total_price
-    cart_items.includes(:product).sum('cart_items.quantity * products.prices')
+    cart_items.includes(:product).sum("cart_items.quantity * products.prices")
   end
 end

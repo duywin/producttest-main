@@ -32,7 +32,7 @@ class Accounts::PasswordsController < Devise::PasswordsController
       flash[:notice] = "Your password has been successfully updated."
       redirect_to new_account_session_path
     else
-      flash[:alert] = resource.errors.full_messages.join(', ')
+      flash[:alert] = resource.errors.full_messages.join(", ")
       render :edit
     end
   end

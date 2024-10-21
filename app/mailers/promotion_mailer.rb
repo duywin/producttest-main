@@ -1,5 +1,5 @@
 class PromotionMailer < ApplicationMailer
-  default from: 'ad@example.com' # Set your sender email
+  default from: "ad@example.com" # Set your sender email
 
   def monthly_report
     promotions = Promotion.monthly_report
@@ -10,6 +10,6 @@ class PromotionMailer < ApplicationMailer
 
     attachments["#{filename}.xlsx"] = File.read("#{filename}.xlsx")
 
-    mail(to: 'ad@example.com', subject: "Monthly Promotions Report for #{month_name}")
+    mail(to: "ad@example.com", subject: "Monthly Promotions Report for #{month_name}")
   end
 end

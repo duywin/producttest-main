@@ -27,14 +27,14 @@ class PromotionReportExporter
 
       promotions.each do |promotion|
         sheet.add_row [
-                        promotion.promote_code,
-                        promotion.promotion_type,
-                        promotion.apply_field,
-                        promotion.value,
-                        promotion.end_date,
-                        promotion.min_quantity,
-                        promotion.created_at
-                      ]
+          promotion.promote_code,
+          promotion.promotion_type,
+          promotion.apply_field,
+          promotion.value,
+          promotion.end_date,
+          promotion.min_quantity,
+          promotion.created_at
+        ]
       end
     end
 

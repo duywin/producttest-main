@@ -1,10 +1,10 @@
-require 'elasticsearch/model'
+require "elasticsearch/model"
 class Account < ApplicationRecord
   include Elasticsearch::Model
   include Elasticsearch::Model::Callbacks
 
   devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable
+    :recoverable, :rememberable, :validatable
 
   validates :username, presence: true, uniqueness: true
   validates :email, presence: true, uniqueness: true
@@ -14,9 +14,9 @@ class Account < ApplicationRecord
 
   settings do
     mappings dynamic: false do
-      indexes :username, type: 'text', analyzer: 'standard'
-      indexes :email, type: 'keyword'
-      indexes :created_at, type: 'date'
+      indexes :username, type: "text", analyzer: "standard"
+      indexes :email, type: "keyword"
+      indexes :created_at, type: "date"
     end
   end
 
@@ -31,13 +31,12 @@ class Account < ApplicationRecord
     __elasticsearch__.update_document
   end
 
-
   def self.search(query, filters = {})
     search_definition = {
       query: {
         bool: {
           must: [
-            { match: { username: query } }
+            {match: {username: query}}
           ],
           filter: []
         }
@@ -48,30 +47,30 @@ class Account < ApplicationRecord
     filters.each do |key, value|
       case key
       when :created_at_gteq
-        search_definition[:query][:bool][:filter] << { range: { created_at: { gte: value } } }
+        search_definition[:query][:bool][:filter] << {range: {created_at: {gte: value} }}
       when :created_at_lteq
-        search_definition[:query][:bool][:filter] << { range: { created_at: { lte: value } } }
+        search_definition[:query][:bool][:filter] << {range: {created_at: {lte: value} }}
       end
     end
 
     __elasticsearch__.search(search_definition)
   end
 
-private
+  private
 
   def password_complexity
     return if password.blank?
 
     unless password.match(/(?=.*[A-Z])/).present? # At least one uppercase letter
-      errors.add :password, 'must include at least one uppercase letter'
+      errors.add :password, "must include at least one uppercase letter"
     end
 
     unless password.match(/(?=.*\d)/).present? # At least one number
-      errors.add :password, 'must include at least one number'
+      errors.add :password, "must include at least one number"
     end
 
     unless password.match(/(?=.*[\W_])/).present? # At least one symbol
-      errors.add :password, 'must include at least one symbol'
+      errors.add :password, "must include at least one symbol"
     end
   end
 

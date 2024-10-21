@@ -26,7 +26,7 @@
   = link_to 'Edit', edit_product_path(@product), class: 'btn btn-success'
 / Promotions Table
 .mt-4
-  %h2 Related Promotions
+  %h2 Related Coupon
   - if @promotions.any?
     %table.table.table-bordered.table-striped
       %thead
@@ -35,7 +35,6 @@
           %th Value
           %th End Date
           %th Min Quantity
-          %th Amount
       %tbody
         - @promotions.each do |promotion|
           %tr
@@ -43,7 +42,24 @@
             %td= number_to_currency(promotion.value)
             %td= promotion.end_date.present? ? promotion.end_date.strftime("%B %d, %Y") : "N/A"
             %td= promotion.min_quantity
-            %td= PromoteProduct.find_by(promotion: promotion, product: @product)&.amount
+  - else
+    %p No promotions available for this product.
+/ Merchandise Table
+.table-responsive.mt-5.text-center
+  %h2 Merchandise List
+  - if @promotions.any?
+    %table.table.table-striped.table-hover
+      %thead.table-dark
+        %tr
+          %th{:scope => "col"} Discount Price
+          %th{:scope => "col"} Promotion End
+          %th{:scope => "col"} Sold Merchandise
+      %tbody
+        - @merchandises.each do |merchandise|
+          %tr
+            %td= number_to_currency(merchandise.product.prices * (1 - (merchandise.cut_off_value / 100.0)))
+            %td= merchandise.promotion_end.present? ? merchandise.promotion_end.strftime("%Y-%m-%d") : 'N/A'
+            %td= @sold_quantities[merchandise.id] # Display sold merchandise quantity from the hash
   - else
     %p No promotions available for this product.
 %footer.custom-footer.py-4.app-color
