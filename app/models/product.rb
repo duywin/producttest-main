@@ -7,6 +7,7 @@ class Product < ApplicationRecord
   include Elasticsearch::Model
   include Elasticsearch::Model::Callbacks
 
+
   settings index: {
     analysis: {
       normalizer: {
@@ -17,13 +18,25 @@ class Product < ApplicationRecord
       }
     }
   }
-    mappings dynamic: false do
-      indexes :id, type: :integer
-      indexes :name, type: 'keyword', normalizer: 'lowercase_normalizer'
-      indexes :product_type, type: :text
-      indexes :prices, type: :float
-    end
 
+  mappings dynamic: false do
+    indexes :id, type: :integer
+    indexes :name, type: 'keyword', normalizer: 'lowercase_normalizer'
+    indexes :product_type, type: :text
+    indexes :prices, type: :float
+  end
+
+  after_create :index_to_elasticsearch
+  after_update :update_in_elasticsearch
+
+
+  def index_to_elasticsearch
+    __elasticsearch__.index_document
+  end
+
+  def update_in_elasticsearch
+    __elasticsearch__.update_document
+  end
 
   def current_price
     merchandise = merchandises.where('promotion_end >= ?', Date.today).first

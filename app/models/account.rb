@@ -20,6 +20,18 @@ class Account < ApplicationRecord
     end
   end
 
+  after_create :index_to_elasticsearch
+  after_update :update_in_elasticsearch
+
+  def index_to_elasticsearch
+    __elasticsearch__.index_document
+  end
+
+  def update_in_elasticsearch
+    __elasticsearch__.update_document
+  end
+
+
   def self.search(query, filters = {})
     search_definition = {
       query: {

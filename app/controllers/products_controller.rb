@@ -119,10 +119,12 @@ class ProductsController < ApplicationController
     end
   end
 
+
   def destroy
     @product.destroy
-    redirect_to products_path, notice: 'Product was successfully destroyed.'
+    redirect_to products_path, notice: 'Product was successfully destroyed.', status: :see_other
   end
+
 
   private
   def set_product
