@@ -1,7 +1,7 @@
 class CartsController < ApplicationController
   def index
-    @carts = Cart.includes(:account).where(check_out: true).page(params[:page])
-    @carts = @carts.where(status: params[:status]) if params[:status].present?
+    @weeks = Cart.where(check_out: true).pluck(:created_at).map { |date| date.beginning_of_week }.uniq.sort.reverse
+    @carts = Cart.search_carts(params).page(params[:page])
   end
 
   def edit

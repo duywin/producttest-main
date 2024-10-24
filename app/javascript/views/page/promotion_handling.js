@@ -11,7 +11,7 @@ $(document).ready(function () {
             headers: {
                 'X-CSRF-Token': csrfToken
             },
-            data: {promote_code: promoCode},
+            data: { promote_code: promoCode },
             success: function (response) {
                 if (response.success) {
                     if (response.promotion_type === 'cart') {
@@ -37,7 +37,7 @@ function applyCartPromotion(promoCode, cartId, csrfToken) {
         headers: {
             'X-CSRF-Token': csrfToken
         },
-        data: {promote_code: promoCode, cart_id: cartId},
+        data: { promote_code: promoCode, cart_id: cartId },
         success: function (response) {
             if (response.success) {
                 const newTotal = response.new_total;
@@ -52,6 +52,7 @@ function applyCartPromotion(promoCode, cartId, csrfToken) {
                     style: 'currency',
                     currency: 'USD'
                 }).format(newTotal));
+
                 $('#discount-line').show();
                 document.getElementById('discount-message').innerText = response.message;
 
@@ -73,11 +74,12 @@ function applyItemPromotion(promoCode, cartId, csrfToken) {
         headers: {
             'X-CSRF-Token': csrfToken
         },
-        data: {promote_code: promoCode, cart_id: cartId},
+        data: { promote_code: promoCode, cart_id: cartId },
         success: function (response) {
             if (response.success) {
                 document.getElementById('discount-message').innerText = response.message;
                 document.getElementById('discount-line').style.display = 'block';
+
                 alert('Promotion applied successfully: ' + response.message);
 
                 // Pass the updated prices (with old and new prices) to updateItemPrices
@@ -87,7 +89,7 @@ function applyItemPromotion(promoCode, cartId, csrfToken) {
             }
         },
         error: function (xhr, status, error) {
-            alert('Error applying promotion: ' + xhr.responseJSON.message || error);
+            alert('Error applying promotion: ' + (xhr.responseJSON?.message || error));
         }
     });
 }

@@ -26,12 +26,10 @@ $ ->
             products.forEach (product) ->
                 $applyField.append(new Option("#{product.name} (ID: #{product.id})", product.id))
             $('#apply-field-section').show()
-
         else if promotionType == 'category'
             categories.forEach (category) ->
                 $applyField.append(new Option(category, category))
             $('#apply-field-section').show()
-
         else if promotionType == 'cart'
             $('#apply-field-section').hide()  # Hide apply field section for cart promotions
 

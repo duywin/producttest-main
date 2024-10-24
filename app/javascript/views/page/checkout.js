@@ -11,6 +11,7 @@ $(document).ready(function () {
             success: function (response) {
                 if (response.success) {
                     alert('Checkout completed successfully.'); // Alert user on success
+
                     // Update hidden form with necessary cart data, then submit
                     $('#redirect-form input[name="cart_id"]').val(cartId);
                     $('#redirect-form').submit(); // Submit the form to redirect

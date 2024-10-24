@@ -6,14 +6,14 @@ $(document).ready(function () {
         let quantity = parseInt(quantityInput.val());
         const stock = parseInt($(this).closest('.item').data('stock'));
 
-        if (action === "increment") {
+        if (action === 'increment') {
             if (quantity < stock) {
                 quantity++;
             } else {
-                alert("Exceeding stock amount, please wait for restock");
+                alert('Exceeding stock amount, please wait for restock');
                 return; // Exit if exceeding stock
             }
-        } else if (action === "decrement") {
+        } else if (action === 'decrement') {
             if (quantity > 1) {
                 quantity--;
             } else {
@@ -29,7 +29,7 @@ $(document).ready(function () {
             headers: {
                 'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')
             },
-            data: JSON.stringify({quantity: quantity}),
+            data: JSON.stringify({ quantity: quantity }),
             contentType: 'application/json',
             success: function (data) {
                 if (data.success) {

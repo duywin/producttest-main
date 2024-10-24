@@ -8,11 +8,11 @@ $ ->
 
         if pictureUrl
             img = $('<img>',
-                src: pictureUrl
-                alt: 'Product Picture'
-                class: 'img-fluid'
+                src: pictureUrl,
+                alt: 'Product Picture',
+                class: 'img-fluid',
                 css:
-                    'max-width': '200px'
+                    'max-width': '200px',
                     'max-height': '200px'
             )
             $container.append img
