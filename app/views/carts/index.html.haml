@@ -118,28 +118,39 @@
           = link_to week.strftime('%d %b %Y'),
             carts_path(week: week.strftime('%d %b %Y')),
             class: "week-selector #{params[:week] == week.strftime('%d %b %Y') ? 'active' : ''}"
-
       .main-content
         .weekday-header
           - %w(monday tuesday wednesday thursday friday saturday sunday).each do |day|
             = link_to day.capitalize,
-              carts_path(week: params[:week], day: day),
+              carts_path(week: params[:week], day: day, sort: params[:sort], direction: params[:direction]),
               class: "weekday #{params[:day] == day ? 'active' : ''} #{params[:week].present? ? '' : 'disabled'}",
-              onclick: "return #{params[:week].present? ? 'true' : 'false'};" # Disable link if no week is selected
+              onclick: "return #{params[:week].present? ? 'true' : 'false'};"
 
         .table-responsive
           %table.table.table-bordered.table-hover.shadow-sm
             %thead.table-light
               %tr
-                %th Username
-                %th Total
-                %th Address
-                %th Status
+                %th
+                  = link_to carts_path(params.permit(:week, :day).merge(sort: 'account_id', direction: params[:sort] == 'account_id' && params[:direction] == 'asc' ? 'desc' : 'asc')) do
+                    Username
+                    = params[:sort] == 'account_id' ? (params[:direction] == 'asc' ? '↑' : '↓') : '↕'
+                %th
+                  = link_to carts_path(params.permit(:week, :day).merge(sort: 'total_price', direction: params[:sort] == 'total_price' && params[:direction] == 'asc' ? 'desc' : 'asc')) do
+                    Total
+                    = params[:sort] == 'total_price' ? (params[:direction] == 'asc' ? '↑' : '↓') : '↕'
+                %th
+                  = link_to carts_path(params.permit(:week, :day).merge(sort: 'address', direction: params[:sort] == 'address' && params[:direction] == 'asc' ? 'desc' : 'asc')) do
+                    Address
+                    = params[:sort] == 'address' ? (params[:direction] == 'asc' ? '↑' : '↓') : '↕'
+                %th
+                  = link_to carts_path(params.permit(:week, :day).merge(sort: 'status', direction: params[:sort] == 'status' && params[:direction] == 'asc' ? 'desc' : 'asc')) do
+                    Status
+                    = params[:sort] == 'status' ? (params[:direction] == 'asc' ? '↑' : '↓') : '↕'
                 %th Actions
             %tbody
               - @carts.each do |cart|
                 %tr
-                  %td= Account.find_by(id: cart.account_id)&.username || 'N/A'
+                  %td= cart.account&.username || 'N/A'
                   %td= number_to_currency(cart.total_price)
                   %td= cart.address.presence || 'N/A'
                   %td= cart.status.presence || 'N/A'
@@ -155,7 +166,6 @@
                         class: 'btn btn-primary btn-sm',
                         title: 'Edit cart' do
                         %span ✎
-
     %footer.custom-footer.py-4.app-color
       %h1.text-center Admin Interface
 
