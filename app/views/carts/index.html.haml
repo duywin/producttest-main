@@ -81,10 +81,16 @@
           margin-bottom: 8px;
         }
       }
+      .weekday.disabled {
+        pointer-events: none;
+        background: rgba(220, 220, 220, 0.7);
+        color: #999;
+        cursor: not-allowed;
+      }
       @media (max-width: 576px) {
-        .weekday-header {
-          grid-template-columns: repeat(2, 1fr);
-        }
+            .weekday-header {
+              grid-template-columns: repeat(2, 1fr);
+            }
       }
 
   %body
@@ -118,7 +124,8 @@
           - %w(monday tuesday wednesday thursday friday saturday sunday).each do |day|
             = link_to day.capitalize,
               carts_path(week: params[:week], day: day),
-              class: "weekday #{params[:day] == day ? 'active' : ''}"
+              class: "weekday #{params[:day] == day ? 'active' : ''} #{params[:week].present? ? '' : 'disabled'}",
+              onclick: "return #{params[:week].present? ? 'true' : 'false'};" # Disable link if no week is selected
 
         .table-responsive
           %table.table.table-bordered.table-hover.shadow-sm
@@ -132,7 +139,7 @@
             %tbody
               - @carts.each do |cart|
                 %tr
-                  %td= cart.account&.username || 'N/A'
+                  %td= Account.find_by(id: cart.account_id)&.username || 'N/A'
                   %td= number_to_currency(cart.total_price)
                   %td= cart.address.presence || 'N/A'
                   %td= cart.status.presence || 'N/A'
@@ -149,7 +156,30 @@
                         title: 'Edit cart' do
                         %span ✎
 
-        .d-flex.justify-content-center.mt-4
-          = paginate @carts, class: 'pagination', previous_label: 'Previous', next_label: 'Next'
     %footer.custom-footer.py-4.app-color
       %h1.text-center Admin Interface
+
+:coffeescript
+  document.addEventListener 'DOMContentLoaded', ->
+
+  weekSelectors = document.querySelectorAll('.week-selector')
+  weekdayLinks = document.querySelectorAll('.weekday')
+
+  # Function to toggle weekday link activation
+  toggleWeekdayLinks = (enable) ->
+    weekdayLinks.forEach (link) ->
+      if enable
+        link.classList.remove('disabled')
+      else
+        link.classList.add('disabled')
+
+  # Add event listeners to week selectors
+  weekSelectors.forEach (weekSelector) ->
+    weekSelector.addEventListener 'click', ->
+      isActive = @classList.contains('active')
+      toggleWeekdayLinks(isActive)
+
+  # Disable weekdays initially if no week is selected
+  activeWeek = document.querySelector('.week-selector.active')
+  toggleWeekdayLinks(!!activeWeek)
+

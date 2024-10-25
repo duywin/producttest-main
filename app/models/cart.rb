@@ -42,9 +42,7 @@ class Cart < ApplicationRecord
     search_definition = {
       query: {
         bool: {
-          must: [
-            { match: { check_out: true } }
-          ],
+          must: [],
           filter: []
         }
       },
@@ -56,26 +54,32 @@ class Cart < ApplicationRecord
     # Filter by status if provided
     search_definition[:query][:bool][:filter] << { term: { status: params[:status] } } if params[:status].present?
 
-    # Filter by week (deliver_day range) if provided
+    # Filter by week (created_at range) if provided
     if params[:week].present?
       start_of_week = Date.parse(params[:week]).beginning_of_week
       end_of_week = Date.parse(params[:week]).end_of_week
       search_definition[:query][:bool][:filter] << {
-        range: { deliver_day: { gte: start_of_week, lte: end_of_week } }
+        range: { created_at: { gte: start_of_week, lte: end_of_week } }
       }
-    end
 
-    # Filter by day of the week if provided
-    if params[:day].present?
-      search_definition[:query][:bool][:filter] << {
-        script: {
-          script: "doc['created_at'].date.dayOfWeek == #{day_of_week_number(params[:day])}"
+      # Filter by day of the week if provided
+      if params[:day].present?
+        day_of_week = day_of_week_number(params[:day])
+        search_definition[:query][:bool][:filter] << {
+          script: {
+            script: "doc['created_at'].value.dayOfWeek == #{day_of_week}"
+          }
         }
-      }
+      end
+    elsif params[:day].present?
+      # If trying to filter by day without a week, ignore the day filter
+      params[:day] = nil
     end
 
     __elasticsearch__.search(search_definition)
   end
+
+
 
   # Helper method to map day names to Elasticsearch day numbers
   def self.day_of_week_number(day)
