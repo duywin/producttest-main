@@ -10,6 +10,9 @@ gem "haml-rails"
 gem "html2haml"
 gem "coffee-script"
 gem "mini_racer"
+gem 'datatables-rails'
+gem 'jquery-datatables'
+gem 'ajax-datatables-rails'
 
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem "sprockets-rails"
