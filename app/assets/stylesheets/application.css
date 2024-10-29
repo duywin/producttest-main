@@ -10,11 +10,13 @@
  * files in this directory. Styles in this file should be added after the last require_* statement.
  * It is generally better to create a new file per style scope.
  *
+
 *= require_self
 *= require_tree
 
 
 /* Add your custom styles below */
+
 .custom-header {
     background-color: lightblue;
     color: white;
@@ -22,7 +24,7 @@
     text-align: center;
     width: 100%;
     font-family: 'Lucida Handwriting', cursive;
-    margin-top: -40px;
+    margin-top: -10px;
 }
 
 /* Custom Footer */
@@ -214,6 +216,95 @@ button:active {
 
 .shadow-button:hover {
     box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+
+.container-layout {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+}
+.week-navigation {
+    width: 200px;
+    flex-shrink: 0;
+}
+.week-selector {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    background: rgba(173, 216, 230, 0.7);
+    border-radius: 6px;
+    text-decoration: none;
+    color: #333;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+.week-selector:hover {
+    background: rgba(135, 206, 235, 0.9);
+    transform: translateY(-1px);
+}
+.week-selector.active {
+    background: #49c149;
+    color: white;
+    font-weight: 500;
+    border: 1px solid #3da03d;
+}
+.main-content {
+    flex: 1;
+}
+.weekday-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+}
+.weekday {
+    display: block;
+    padding: 12px 8px;
+    background: rgba(173, 216, 230, 0.7);
+    border-radius: 6px;
+    text-decoration: none;
+    color: #333;
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+.weekday:hover {
+    background: rgba(135, 206, 235, 0.9);
+    transform: translateY(-1px);
+}
+.weekday.active {
+    background: #49c149;
+    color: white;
+    font-weight: 500;
+    border: 1px solid #3da03d;
+}
+@media (max-width: 768px) {
+    .container-layout {
+        flex-direction: column;
+    }
+    .week-navigation {
+        width: 100%;
+    }
+    .weekday-header {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+    }
+    .weekday {
+        margin-bottom: 8px;
+    }
+}
+.weekday.disabled {
+    pointer-events: none;
+    background: rgba(220, 220, 220, 0.7);
+    color: #999;
+    cursor: not-allowed;
+}
+@media (max-width: 576px) {
+    .weekday-header {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 

@@ -2,6 +2,12 @@ class CategoriesController < ApplicationController
   before_action :set_category, only: [:destroy]
   before_action :authenticate_admin
 
+
+  # Displays a paginated list of categories.
+  def index
+    @categories = Category.page(params[:page])
+    @category = Category.new
+  end
   # Authenticates the admin by checking if the current account ID is present.
   # Redirects to noindex_path if not authenticated, avoiding redirect loops.
   def authenticate_admin
@@ -48,11 +54,7 @@ class CategoriesController < ApplicationController
     redirect_to categories_path, notice: "Categories were successfully imported."
   end
 
-  # Displays a paginated list of categories.
-  def index
-    @categories = Category.page(params[:page])
-    @category = Category.new
-  end
+
 
   # Initializes a new category.
   def new

@@ -12,26 +12,13 @@ class AccountsController < ApplicationController
   # List accounts with search and filter options
   def index
     query = params[:username_cont].presence
-    filters = case params[:created_at_filter]
-              when "this_week"
-                { created_at_gteq: Time.current.beginning_of_week }
-              when "this_month"
-                { created_at_gteq: Time.current.beginning_of_month }
-              when "last_month"
-                { created_at_gteq: Time.current.last_month.beginning_of_month,
-                  created_at_lteq: Time.current.last_month.end_of_month }
-              when "last_year"
-                { created_at_gteq: Time.current.last_year.beginning_of_year,
-                  created_at_lteq: Time.current.last_year.end_of_year }
-              else
-                {}
-              end
+    created_at_filter = params[:created_at_filter]
 
-    # Perform search with Elasticsearch or return filtered results
+    # Perform search with Elasticsearch, or return all accounts if no query is present
     @accounts = if query.present?
-                  Account.search(query, filters).records.page(params[:page])
+                  Account.search(query, created_at_filter).records.page(params[:page])
                 else
-                  Account.all.page(params[:page]).where(filters)
+                  Account.all.page(params[:page])
                 end
   end
 

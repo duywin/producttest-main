@@ -41,7 +41,7 @@
       = form.submit 'Import Categories', class: 'btn btn-primary'
 / Categories Table
 .table-responsive.mt-4
-  %table.table.table-striped.table-hover
+  %table.table.table-striped.table-hover#categories-table
     %thead.table-dark
       %tr
         %th{:scope => "col"} Name
@@ -57,9 +57,8 @@
               data: { turbo_confirm: "Are you sure?" },                                                 |
               style: 'background: none; border: none; color: red; cursor: pointer; font-size: 20px;' do |
               %span ❌
-/ Pagination
-.d-flex.justify-content-center.mt-4
-  = paginate @categories, class: 'pagination'
+
 %footer.custom-footer.py-4.app-color{:style => "margin-top: 250px"}
   %h1.text-center Admin Interface
 = javascript_include_tag 'views/category/index_toggle'
+= javascript_include_tag 'views/category/datatable_category'

@@ -40,7 +40,7 @@
 
 .table-responsive.text-center
   %h3 Products List
-  %table.table.table-striped.table-hover
+  %table#products-table.table.table-striped.table-hover
     %thead.table-dark
       %tr
         %th{:scope => "col"} Name
@@ -72,14 +72,10 @@
                 style: 'background: none; border: none; color: red; cursor: pointer; font-size: 20px;' do
                 %span ❌
 
-  / Pagination Links for Products
-  .d-flex.justify-content-center
-    = paginate @products, class: 'pagination', previous_label: 'Previous', next_label: 'Next'
-
 / Promotions Table
 .table-responsive.mt-5.text-center
   %h3 Promotions List
-  %table.table.table-striped.table-hover
+  %table#promotions-table.table.table-striped.table-hover
     %thead.table-dark
       %tr
         %th{:scope => "col"} Promotion Code
@@ -104,14 +100,10 @@
                 style: 'background: none; border: none; color: red; cursor: pointer; font-size: 20px;' do
                 %span ❌
 
-  / Pagination Links for Promotions
-  .d-flex.justify-content-center
-    = paginate @promotions, param_name: :promotion_page, class: 'pagination', previous_label: 'Previous', next_label: 'Next'
-
 / Merchandise Table
 .table-responsive.mt-5.text-center
   %h3 Merchandise List
-  %table.table.table-striped.table-hover
+  %table#merchandise-table.table.table-striped.table-hover
     %thead.table-dark
       %tr
         %th{:scope => "col"} Product ID
@@ -132,9 +124,8 @@
                 style: 'background: none; border: none; color: red; cursor: pointer; font-size: 20px;' do
                 %span ❌
 
-  .d-flex.justify-content-center
-    = paginate @merchandises, param_name: :merchant_page, class: 'pagination', previous_label: 'Previous', next_label: 'Next'
 
 %footer.custom-footer.py-4.app-color
   %h1.text-center Admin Interface
 = javascript_include_tag 'views/product/index_toggle'
+= javascript_include_tag 'views/product/datatable_product_etc'

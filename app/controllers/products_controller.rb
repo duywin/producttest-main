@@ -12,9 +12,9 @@ class ProductsController < ApplicationController
   end
 
   def index
-    @products = search_products
-    @promotions = Promotion.all.page(params[:promotion_page]).per(5)
-    @merchandises = Merchandise.all.page(params[:merchant_page]).per(5)
+    @products = search_products.limit(nil)
+    @promotions = Promotion.all
+    @merchandises = Merchandise.all
   end
 
   def export_report

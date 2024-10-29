@@ -95,6 +95,34 @@ class Cart < ApplicationRecord
     end
   end
 
+  # Fetch distinct weeks for carts that have been checked out
+  def self.fetch_weeks_with_checkouts
+    where(check_out: true)
+      .pluck(:created_at)
+      .map { |date| date.beginning_of_week }
+      .uniq
+      .sort
+      .reverse
+  end
+
+  # Apply week filter to the carts
+  def self.apply_week_filter(carts, week_param)
+    return carts unless week_param.present?
+
+    week_start = Date.strptime(week_param, '%d %b %Y')
+    week_end = week_start.end_of_week
+    carts.where(created_at: week_start.beginning_of_day..week_end.end_of_day)
+  end
+
+  # Apply day filter to the carts if a week filter is also applied
+  def self.apply_day_filter(carts, day_param, week_param)
+    return carts unless day_param.present? && week_param.present?
+
+    week_start = Date.strptime(week_param, '%d %b %Y')
+    day_date = week_start.beginning_of_week + %w[monday tuesday wednesday thursday friday saturday sunday].index(day_param.downcase).days
+    carts.where(created_at: day_date.beginning_of_day..day_date.end_of_day)
+  end
+
   def total_price
     cart_items.includes(:product).sum("cart_items.quantity * products.prices")
   end

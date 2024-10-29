@@ -1,41 +1,43 @@
 .custom-header
   %h1 New Product
 / Buttons to toggle between forms
-%div{:style => "margin-bottom: 20px; text-align: center; width: 100%;"}
-  %button#createBtn{:onclick => "toggleForms('create')", :style => "margin-right: 10px;"} Create Product
-  %button#importBtn{:onclick => "toggleForms('import')"} Import Products
-/ Forms container with white background
-%div{:style => "background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px\n    rgba(0, 0, 0, 0.1); width: 100%; max-width: 600px; margin-top: 30px"}
+%div{:style => "text-align: left; margin-top: 30px;"}
+  %button{:onclick => "window.location.href='http://localhost:3000/products'", :class => "shadow-button"} Return
+%div{:style => "margin-bottom: 20px; text-align: center; width: 100%; margin-top: 20px;"}
+  %button#createBtn{:onclick => "toggleForms('create')", :class => "shadow-button", :style => "margin-right: 10px;"} Create Product
+  %button#importBtn{:onclick => "toggleForms('import')", :class => "shadow-button"} Import Products
+/ Forms container with custom styling
+%div.form-box
   / Create Product Form
   #createForm.form-container{:style => "display: block; text-align: center"}
     = form_with model: @product, local: true do |form|
+      %h2 New Product
       - if @product.errors.any?
         #error_explanation{:style => "color: red;"}
-          %h2
-            = pluralize(@product.errors.count, "error")
-            prohibited this product from being saved:
+          %h3= pluralize(@product.errors.count, "error") + " prohibited this product from being saved:"
           %ul
             - @product.errors.full_messages.each do |message|
               %li= message
-      %div{:style => "display: flex; align-items: center; margin-bottom: 10px;"}
-        = form.label :name, "Name", style: "font-weight: bold; margin-right: 10px;"
-        = form.text_field :name, id: 'product_name'
-      %div{:style => "display: flex; align-items: center; margin-bottom: 10px;"}
-        = form.label :prices, "Price", style: "font-weight: bold; margin-right: 10px;"
-        = form.number_field :prices, step: :any, id: 'product_price'
-      %div{:style => "display: flex; align-items: center; margin-bottom: 10px;"}
-        = form.label :product_type, "Product Type", style: "font-weight: bold; margin-right: 10px;"
-        = form.select :product_type, options_for_select(@categories), {}, id: 'product_type'
+      %div.form-input
+        = form.label :name, "Name", class: "form-label"
+        = form.text_field :name, id: 'product_name', class: "form-input"
+      %div.form-input
+        = form.label :prices, "Price", class: "form-label"
+        = form.number_field :prices, step: :any, id: 'product_price', class: "form-input"
+      %div.form-input
+        = form.label :product_type, "Product Type", class: "form-label"
+        = form.select :product_type, options_for_select(@categories), {}, id: 'product_type', class: "form-input"
       %div{:style => "margin-top: 20px; text-align: center;"}
-        = form.submit 'Create Product', style: 'background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; border: none; cursor: pointer;'
+        = form.submit 'Create Product', class: "form-submit shadow-button"
   / Import Products Form
   #importForm.form-container{:style => "display: none; text-align: center;"}
     = form_with url: import_products_path, local: true, multipart: true do |form|
-      %div{:style => "display: flex; align-items: center; margin-bottom: 10px;"}
-        = form.label :file, "Upload ODS File", style: "font-weight: bold; margin-right: 10px;"
-        = form.file_field :file, id: 'product_file'
+      %h2 Import products
+      %div.form-input
+        = form.label :file, "Upload ODS File", class: "form-label"
+        = form.file_field :file, id: 'product_file', class: "form-input"
       %div{:style => "margin-top: 20px; text-align: center;"}
-        = form.submit 'Import Products', style: 'background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; border: none; cursor: pointer;'
-.custom-footer{:style => "margin-top: 520px"}
+        = form.submit 'Import Products', class: "form-submit shadow-button"
+.custom-footer
   %h1 This is a test product
 = javascript_include_tag 'views/product/create_toggle'

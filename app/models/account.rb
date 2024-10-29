@@ -31,30 +31,35 @@ class Account < ApplicationRecord
     __elasticsearch__.update_document
   end
 
-  def self.search(query, filters = {})
+  def self.search(query, created_at_filter = nil)
     search_definition = {
       query: {
         bool: {
-          must: [
-            {match: {username: query}}
+          should: [
+            { match: { username: query } },
+            { match: { email: query } }
           ],
           filter: []
         }
       }
     }
 
-    # Add filters if any
-    filters.each do |key, value|
-      case key
-      when :created_at_gteq
-        search_definition[:query][:bool][:filter] << {range: {created_at: {gte: value} }}
-      when :created_at_lteq
-        search_definition[:query][:bool][:filter] << {range: {created_at: {lte: value} }}
-      end
+    # Apply created_at filter if provided
+    case created_at_filter
+    when "this_week"
+      search_definition[:query][:bool][:filter] << { range: { created_at: { gte: Time.current.beginning_of_week } } }
+    when "this_month"
+      search_definition[:query][:bool][:filter] << { range: { created_at: { gte: Time.current.beginning_of_month } } }
+    when "last_month"
+      search_definition[:query][:bool][:filter] << { range: { created_at: { gte: Time.current.last_month.beginning_of_month, lte: Time.current.last_month.end_of_month } } }
+    when "last_year"
+      search_definition[:query][:bool][:filter] << { range: { created_at: { gte: Time.current.last_year.beginning_of_year, lte: Time.current.last_year.end_of_year } } }
     end
 
     __elasticsearch__.search(search_definition)
   end
+
+
 
   private
 

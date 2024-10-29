@@ -1,33 +1,18 @@
 class CartsController < ApplicationController
   def index
-    @weeks = Cart.where(check_out: true)
-                 .pluck(:created_at)
-                 .map { |date| date.beginning_of_week }
-                 .uniq
-                 .sort
-                 .reverse
-
-    es_results = Cart.search_carts(params).page(params[:page])
+    @weeks = Cart.fetch_weeks_with_checkouts
+    es_results = Cart.search_carts(params)
     cart_ids = es_results.map(&:id)
     @carts = Cart.includes(:account).where(id: cart_ids, check_out: true)
 
-    # Apply week filter if present
-    if params[:week].present?
-      week_start = Date.strptime(params[:week], '%d %b %Y')
-      week_end = week_start.end_of_week
-      @carts = @carts.where(created_at: week_start.beginning_of_day..week_end.end_of_day)
-    end
-
-    # Apply day filter if present
-    if params[:day].present? && params[:week].present?
-      week_start = Date.strptime(params[:week], '%d %b %Y')
-      day_date = week_start.beginning_of_week + %w[monday tuesday wednesday thursday friday saturday sunday].index(params[:day].downcase).days
-      @carts = @carts.where(created_at: day_date.beginning_of_day..day_date.end_of_day)
-    end
+    # Apply filters
+    @carts = Cart.apply_week_filter(@carts, params[:week])
+    @carts = Cart.apply_day_filter(@carts, params[:day], params[:week])
 
     # Apply sorting
     @carts = @carts.order("#{sort_column} #{sort_direction}")
   end
+
   def edit
     @cart = Cart.find(params[:id])
   end
@@ -42,7 +27,7 @@ class CartsController < ApplicationController
   end
 
   def show
-    @cart = Cart.find(params[:id])
+    @cart = Cart.find(params[:id]) #show a
     @cart_items = @cart ? CartItem.includes(:product).where(cart_id: @cart.id) : []
   end
 
