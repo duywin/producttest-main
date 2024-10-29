@@ -4,5 +4,5 @@ $ ->
     responsive: true
     pageLength: 5
     paging: true
-    searching: true
+    searching: false
     ordering: true
