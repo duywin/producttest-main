@@ -48,15 +48,6 @@
         %th{:scope => "col"} Total
         %th{:scope => "col"} Actions
     %tbody
-      - @categories.each do |category|
-        %tr
-          %td= category.name
-          %td= category.total
-          %td
-            = button_to category_path(category), method: :delete,                                       |
-              data: { turbo_confirm: "Are you sure?" },                                                 |
-              style: 'background: none; border: none; color: red; cursor: pointer; font-size: 20px;' do |
-              %span ❌
 
 %footer.custom-footer.py-4.app-color{:style => "margin-top: 250px"}
   %h1.text-center Admin Interface

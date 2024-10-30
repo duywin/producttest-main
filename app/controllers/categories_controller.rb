@@ -5,8 +5,16 @@ class CategoriesController < ApplicationController
 
   # Displays a paginated list of categories.
   def index
-    @categories = Category.page(params[:page])
-    @category = Category.new
+    respond_to do |format|
+      format.html do
+        @categories = Category.page(params[:page])
+        @category = Category.new
+      end
+      format.json do
+        @categories = Category.all
+        render json: { data: @categories.as_json(only: [:name, :total, :id]) }
+      end
+    end
   end
   # Authenticates the admin by checking if the current account ID is present.
   # Redirects to noindex_path if not authenticated, avoiding redirect loops.
