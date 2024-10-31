@@ -11,16 +11,44 @@ class AccountsController < ApplicationController
 
   # List accounts with search and filter options
   def index
+  end
+
+  def render_account_datatable
     query = params[:username_cont].presence
     created_at_filter = params[:created_at_filter]
 
-    # Perform search with Elasticsearch, or return all accounts if no query is present
     @accounts = if query.present?
                   Account.search(query, created_at_filter).records.page(params[:page])
                 else
                   Account.all.page(params[:page])
                 end
+
+    data = @accounts.map do |account|
+      {
+        id: account.id,
+        username: account.username,
+        email: account.email,
+        status: account.is_admin ? 'Admin' : 'User',
+        actions: %(
+        <div class="d-flex gap-3 align-items-center">
+          <a href="/accounts/#{account.id}" class="btn btn-primary" style="color: white;" title="View Details">
+            <span>👁</span>
+          </a>
+          <a href="/accounts/#{account.id}/edit" class="btn btn-primary" style="color: blue;" title="Edit Account">
+            <span>✎</span>
+          </a>
+          <button data-method="delete" data-confirm="Are you sure?" style="background: none; color: red; border: none; cursor: pointer; font-size: 20px;" onclick="deleteAccount(#{account.id})">
+            <span>❌</span>
+          </button>
+        </div>
+      )
+      }
+    end
+
+    render json: { data: data, status: 200 }
   end
+
+
 
   # Import accounts from an uploaded ODS file
   def import

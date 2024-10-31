@@ -49,7 +49,8 @@ Rails.application.routes.draw do
   end
   resources :accounts, only: [:index, :show, :new, :create, :edit, :update, :destroy] do
     collection do
-      post "import"  # Add this line to include the import action
+      post "import"  # Import action already present
+      get "render_account_datatable", to: "accounts#render_account_datatable", as: :render_account_datatable  # Correctly define the route
     end
   end
   resources :categories, only: [:index, :create, :destroy] do

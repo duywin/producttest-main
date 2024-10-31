@@ -1,3 +1,5 @@
+
+= hidden_field_tag 'api_account_datatable', render_account_datatable_accounts_path
 .jumbotron.text-center.app-color
   %h1 Account management
 %nav.navbar.navbar-expand-lg.navbar-light.app-color.topnav{:style => "margin-top: -10px"}
@@ -27,7 +29,7 @@
         = form.file_field :file, class: "form-input"
       = form.submit 'Import accounts', class: 'btn btn-primary form-submit'
 .text-center.my-4
-  = form_with url: accounts_path, method: :get, local: true do |f|
+  = form_with id:'filter_form', url: accounts_path, method: :get, local: true do |f|
     = f.text_field :username_cont, placeholder: "Enter username or email", class: "form-control w-50 d-inline-block me-2"
     = select_tag :created_at_filter, options_for_select([ |
         ['Filter by Created date', ''],                   |
@@ -46,18 +48,7 @@
         %th Status
         %th Actions
     %tbody
-      - @accounts.each do |account|
-        %tr
-          %td= account.username
-          %td= account.email
-          %td= account.is_admin ? 'Admin' : 'User'
-          %td.d-flex.gap-3.align-items-center
-            = button_to account_path(account), method: :get, class: 'btn btn-primary', style: 'color: white; padding: 10px 20px; border-radius: 5px; border: none; cursor: pointer; background: none; font-size: 20px;', title: 'View Details' do
-              %span 👁
-            = button_to edit_account_path(account), method: :get, class: 'btn btn-primary', style: 'color: blue; padding: 10px 20px; border-radius: 5px; border: none; cursor: pointer; background: none;font-size: 20px;', title: 'Edit Account' do
-              %span ✎
-            = button_to account_path(account), method: :delete, data: { turbo_confirm: "Are you sure?" }, style: 'background: none; padding: 10px 20px; border-radius: 5px; border: none; color: red; cursor: pointer; font-size: 20px;', title: 'Delete Account' do
-              %span ❌
+
 
 %footer.custom-footer.py-4.app-color
   %h1.text-center Admin Interface
