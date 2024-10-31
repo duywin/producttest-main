@@ -31,13 +31,13 @@ class AccountsController < ApplicationController
         status: account.is_admin ? 'Admin' : 'User',
         actions: %(
         <div class="d-flex gap-3 align-items-center">
-          <a href="/accounts/#{account.id}" class="btn btn-primary" style="color: white;" title="View Details">
+          <button type="button" onclick="window.location='#{account_path(account)}'" class="btn btn-primary" style="color: white; padding: 10px 20px; border-radius: 5px; border: none; cursor: pointer; background: none; font-size: 20px;" title="View Details">
             <span>👁</span>
-          </a>
-          <a href="/accounts/#{account.id}/edit" class="btn btn-primary" style="color: blue;" title="Edit Account">
+          </button>
+          <button type="button" onclick="window.location='#{edit_account_path(account)}'" class="btn btn-primary" style="color: blue; padding: 10px 20px; border-radius: 5px; border: none; cursor: pointer; background: none; font-size: 20px;" title="Edit Account">
             <span>✎</span>
-          </a>
-          <button data-method="delete" data-confirm="Are you sure?" style="background: none; color: red; border: none; cursor: pointer; font-size: 20px;" onclick="deleteAccount(#{account.id})">
+          </button>
+          <button type="button" data-method="delete" data-confirm="Are you sure?" class="btn btn-danger" style="background: none; padding: 10px 20px; border-radius: 5px; border: none; color: red; cursor: pointer; font-size: 20px;" title="Delete Account" onclick="deleteAccount(#{account.id})">
             <span>❌</span>
           </button>
         </div>
