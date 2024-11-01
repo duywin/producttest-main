@@ -2,6 +2,7 @@ class Cart < ApplicationRecord
   has_many :cart_items, dependent: :destroy
   has_many :products, through: :cart_items
   belongs_to :account
+
   paginates_per 10
 
   include Elasticsearch::Model
@@ -29,101 +30,55 @@ class Cart < ApplicationRecord
   after_create :index_to_elasticsearch
   after_update :update_in_elasticsearch
 
-  def index_to_elasticsearch
-    __elasticsearch__.index_document
+  # Filter and helper methods
+  scope :checked_out, -> { where(check_out: true) }
+  scope :by_week, ->(week_start) { where(created_at: week_start.beginning_of_day..week_start.end_of_week.end_of_day) }
+  scope :by_day, ->(date) { where(created_at: date.beginning_of_day..date.end_of_day) }
+
+  def self.apply_filters(carts, week_param, day_param)
+    return carts unless week_param.present?
+
+    week_start = Date.strptime(week_param, '%d %b %Y')
+    carts = carts.by_week(week_start)
+    carts = carts.by_day(week_start.beginning_of_week + day_of_week_number(day_param)) if day_param.present?
+    carts
   end
 
-  def update_in_elasticsearch
-    __elasticsearch__.update_document
+  def self.fetch_weeks_with_checkouts
+    checked_out.pluck(:created_at).map(&:beginning_of_week).uniq.sort.reverse
   end
 
-  # Elasticsearch search method for filtering and sorting
   def self.search_carts(params)
-    search_definition = {
-      query: {
-        bool: {
-          must: [],
-          filter: []
-        }
-      },
-      sort: [
-        { created_at: { order: params[:sort_order] || 'desc' } }
-      ]
-    }
-
-    # Filter by status if provided
+    search_definition = { query: { bool: { filter: [] } } }
     search_definition[:query][:bool][:filter] << { term: { status: params[:status] } } if params[:status].present?
 
-    # Filter by week (created_at range) if provided
     if params[:week].present?
-      start_of_week = Date.parse(params[:week]).beginning_of_week
-      end_of_week = Date.parse(params[:week]).end_of_week
-      search_definition[:query][:bool][:filter] << {
-        range: { created_at: { gte: start_of_week, lte: end_of_week } }
-      }
+      week_start = Date.strptime(params[:week], '%d %b %Y').beginning_of_week
+      search_definition[:query][:bool][:filter] << { range: { created_at: { gte: week_start, lte: week_start.end_of_week } } }
 
-      # Filter by day of the week if provided
       if params[:day].present?
-        day_of_week = day_of_week_number(params[:day])
-        search_definition[:query][:bool][:filter] << {
-          script: {
-            script: "doc['created_at'].value.dayOfWeek == #{day_of_week}"
-          }
-        }
+        day_of_week = Date::DAYNAMES.index(params[:day].capitalize)
+        search_definition[:query][:bool][:filter] << { script: { script: "doc['created_at'].value.dayOfWeek == #{day_of_week}" } }
       end
-    elsif params[:day].present?
-      # If trying to filter by day without a week, ignore the day filter
-      params[:day] = nil
     end
 
     __elasticsearch__.search(search_definition)
   end
 
-
-
-  # Helper method to map day names to Elasticsearch day numbers
-  def self.day_of_week_number(day)
-    case day.downcase
-    when 'monday' then 1
-    when 'tuesday' then 2
-    when 'wednesday' then 3
-    when 'thursday' then 4
-    when 'friday' then 5
-    when 'saturday' then 6
-    when 'sunday' then 7
-    else nil
-    end
-  end
-
-  # Fetch distinct weeks for carts that have been checked out
-  def self.fetch_weeks_with_checkouts
-    where(check_out: true)
-      .pluck(:created_at)
-      .map { |date| date.beginning_of_week }
-      .uniq
-      .sort
-      .reverse
-  end
-
-  # Apply week filter to the carts
-  def self.apply_week_filter(carts, week_param)
-    return carts unless week_param.present?
-
-    week_start = Date.strptime(week_param, '%d %b %Y')
-    week_end = week_start.end_of_week
-    carts.where(created_at: week_start.beginning_of_day..week_end.end_of_day)
-  end
-
-  # Apply day filter to the carts if a week filter is also applied
-  def self.apply_day_filter(carts, day_param, week_param)
-    return carts unless day_param.present? && week_param.present?
-
-    week_start = Date.strptime(week_param, '%d %b %Y')
-    day_date = week_start.beginning_of_week + %w[monday tuesday wednesday thursday friday saturday sunday].index(day_param.downcase).days
-    carts.where(created_at: day_date.beginning_of_day..day_date.end_of_day)
-  end
-
-  def total_price
-    cart_items.includes(:product).sum("cart_items.quantity * products.prices")
+  # Returns formatted data for cart
+  def formatted_data
+    {
+      id: id,
+      username: account&.username || 'N/A',
+      total: ActionController::Base.helpers.number_to_currency(total_price),
+      address: address.presence || 'N/A',
+      status: status.presence || 'N/A',
+      actions: %(
+        <div class="d-flex gap-2 justify-content-center">
+          <button type="button" onclick="window.location='#{Rails.application.routes.url_helpers.cart_path(self)}'" class="btn btn-outline-primary btn-sm" title="View Details">👁</button>
+          <button type="button" onclick="window.location='#{Rails.application.routes.url_helpers.edit_cart_path(self)}'" class="btn btn-primary btn-sm" title="Edit Cart">✎</button>
+        </div>
+      )
+    }
   end
 end

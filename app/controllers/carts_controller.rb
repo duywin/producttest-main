@@ -1,18 +1,17 @@
 class CartsController < ApplicationController
   def index
     @weeks = Cart.fetch_weeks_with_checkouts
-    es_results = Cart.search_carts(params)
-    cart_ids = es_results.map(&:id)
-    @carts = Cart.includes(:account).where(id: cart_ids, check_out: true)
-
-    # Apply filters
-    @carts = Cart.apply_week_filter(@carts, params[:week])
-    @carts = Cart.apply_day_filter(@carts, params[:day], params[:week])
-
-    # Apply sorting
-    @carts = @carts.order("#{sort_column} #{sort_direction}")
   end
 
+  def render_cart_datatable
+    search_params = params.permit(:week, :day, :sort_order, :status)
+    es_results = Cart.search_carts(search_params)
+    cart_ids = es_results.map(&:id)
+    @carts = Cart.includes(:account).checked_out.where(id: cart_ids)
+
+    data = @carts.map(&:formatted_data)
+    render json: { data: data, status: 200 }
+  end
   def edit
     @cart = Cart.find(params[:id])
   end
@@ -92,13 +91,6 @@ class CartsController < ApplicationController
 
   private
 
-  def sort_column
-    Cart.column_names.include?(params[:sort]) ? params[:sort] : 'created_at'
-  end
-
-  def sort_direction
-    %w[asc desc].include?(params[:direction]) ? params[:direction] : 'desc'
-  end
   def apply_cart_discount(promotion, cart)
     discount_rate = promotion.value / 100.0
     cart_items = cart.cart_items
@@ -123,3 +115,10 @@ class CartsController < ApplicationController
       :delivery_day)
   end
 end
+
+
+
+
+
+
+

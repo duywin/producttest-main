@@ -48,8 +48,6 @@ class AccountsController < ApplicationController
     render json: { data: data, status: 200 }
   end
 
-
-
   # Import accounts from an uploaded ODS file
   def import
     file = params[:file]

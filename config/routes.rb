@@ -71,6 +71,9 @@ Rails.application.routes.draw do
     end
   end
   resources :carts, only: [:index, :new, :create, :show, :edit, :update, :destroy] do
+    collection do
+      get "render_cart_datatable", to: "carts#render_cart_datatable", as: :render_cart_datatable
+    end
     member do
       patch "checkout"
       post "apply_cart_promotion"

@@ -1,42 +1,60 @@
-%html{:lang => "en"}
+%html{ lang: "en" }
   %head
-    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
-    %meta{:charset => "UTF-8"}/
-    %meta{:content => "width=device-width, initial-scale=1.0", :name => "viewport"}/
+    %meta{ "http-equiv" => "Content-Type", content: "text/html; charset=UTF-8" }/
+    %meta{ charset: "UTF-8" }/
+    %meta{ name: "viewport", content: "width=device-width, initial-scale=1.0" }/
     %title Sale Management
 
   %body
+    = hidden_field_tag 'api_cart_datatable', render_cart_datatable_carts_path
+    = hidden_field_tag 'selected_week', params[:week] || '' # Hidden field for selected week
+    = hidden_field_tag 'selected_day', params[:day] || ''   # Hidden field for selected day
+
     .jumbotron.text-center.app-color
-      %h1 Sales management
-    %nav.navbar.navbar-expand-lg.navbar-light.app-color.topnav{:style => "margin-top: -10px"}
+      %h1 Sales Management
+
+    %nav.navbar.navbar-expand-lg.navbar-light.app-color.topnav{ style: "margin-top: -10px" }
       .container-fluid
-        %button.navbar-toggler{"aria-controls" => "navbarNavDropdown", "aria-expanded" => "false", "aria-label" => "Toggle navigation", "data-bs-target" => "#navbarNavDropdown", "data-bs-toggle" => "collapse", :type => "button"}
+        %button.navbar-toggler{
+          type: "button",
+          "data-bs-toggle" => "collapse",
+          "data-bs-target" => "#navbarNavDropdown",
+          "aria-controls" => "navbarNavDropdown",
+          "aria-expanded" => "false",
+          "aria-label" => "Toggle navigation"
+        }
           %span.navbar-toggler-icon
         #navbarNavDropdown.collapse.navbar-collapse
           %ul.navbar-nav.w-100.justify-content-around
             %li.nav-item.flex-fill
-              %a.nav-link{:href => adminhomes_path} Home
+              %a.nav-link{ href: adminhomes_path } Home
             %li.nav-item.flex-fill
-              %a.nav-link{:href => products_path} Product
+              %a.nav-link{ href: products_path } Product
             %li.nav-item.flex-fill
-              %a.nav-link{:href => categories_path} Type
+              %a.nav-link{ href: categories_path } Type
             %li.nav-item.flex-fill
-              %a.nav-link{:href => accounts_path} Account
+              %a.nav-link{ href: accounts_path } Account
             %li.nav-item.active.flex-fill
-              %a.nav-link{:href => carts_path} Sales
+              %a.nav-link{ href: carts_path } Sales
+
     .container-layout
       .week-navigation
         - @weeks.each do |week|
           = link_to week.strftime('%d %b %Y'),
             carts_path(week: week.strftime('%d %b %Y')),
-            class: "week-selector #{params[:week] == week.strftime('%d %b %Y') ? 'active' : ''}"
+            class: "week-selector #{params[:week] == week.strftime('%d %b %Y') ? 'active' : ''}",
+            id: "week_selector_#{week.strftime('%d%b%Y')}",
+            onclick: "$('#selected_week').val('#{week.strftime('%d %b %Y')}'); return true;" # Update hidden week field
+
       .main-content
         .weekday-header
           - %w(monday tuesday wednesday thursday friday saturday sunday).each do |day|
             = link_to day.capitalize,
               carts_path(week: params[:week], day: day, sort: params[:sort], direction: params[:direction]),
               class: "weekday #{params[:day] == day ? 'active' : ''} #{params[:week].present? ? '' : 'disabled'}",
-              onclick: "return #{params[:week].present? ? 'true' : 'false'};"
+              id: "day_selector_#{day}",
+              data: { day: day },
+              onclick: "$('#selected_day').val('#{day}'); return #{params[:week].present? ? 'true' : 'false'};" # Update hidden day field
 
         .table-responsive
           %table#carts-table.table.table-bordered.table-hover.shadow-sm
@@ -48,28 +66,9 @@
                 %th Status
                 %th Actions
             %tbody
-              - @carts.each do |cart|
-                %tr
-                  %td= cart.account&.username || 'N/A'
-                  %td= number_to_currency(cart.total_price)
-                  %td= cart.address.presence || 'N/A'
-                  %td= cart.status.presence || 'N/A'
-                  %td
-                    .d-flex.gap-2.justify-content-center
-                      = button_to cart_path(cart.id),
-                        method: :get,
-                        class: 'btn btn-outline-primary btn-sm',
-                        title: 'View Details' do
-                        %span 👁
-                      = button_to edit_cart_path(cart),
-                        method: :get,
-                        class: 'btn btn-primary btn-sm',
-                        title: 'Edit cart' do
-                        %span ✎
+
     %footer.custom-footer.py-4.app-color
       %h1.text-center Admin Interface
 
-= javascript_include_tag 'views/cart/weekday_toggle'
-= javascript_include_tag 'views/cart/datatable_cart'
-
-
+    = javascript_include_tag 'views/cart/weekday_toggle'
+    = javascript_include_tag 'views/cart/datatable_cart'
