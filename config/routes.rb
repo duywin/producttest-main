@@ -45,6 +45,9 @@ Rails.application.routes.draw do
   resources :products, only: [:index, :show, :new, :create, :edit, :update, :destroy] do
     collection do
       post "import"  # Add this line to include the import action
+      get :render_product_datatable
+      get :render_merchandise_datatable
+      get :render_promotion_datatable
     end
   end
   resources :accounts, only: [:index, :show, :new, :create, :edit, :update, :destroy] do

@@ -1,3 +1,7 @@
+= hidden_field_tag 'api_product_datatable', render_product_datatable_products_path
+= hidden_field_tag 'api_promotion_datatable', render_promotion_datatable_products_path
+= hidden_field_tag 'api_merchandise_datatable', render_merchandise_datatable_products_path
+
 .jumbotron.text-center.app-color
   %h1 Product management
 %nav.navbar.navbar-expand-lg.navbar-light.app-color.topnav{:style => "margin-top: -10px"}
@@ -17,9 +21,10 @@
         %li.nav-item.flex-fill
           %a.nav-link{:href => carts_path} Sales
 
-/ Search Form
+
+/ Search Form for Products
 .d-flex.justify-content-center.mb-4
-  = form_with url: products_path, method: :get, local: true, class: 'd-flex' do |f|
+  = form_with url: products_path, method: :get, local: true, id: 'product_filter_form', class: 'd-flex' do |f|
     = f.text_field :query, placeholder: "Enter product name or type...", class: 'form-control me-2', style: 'width: 300px;'
     = f.submit "Search", class: 'btn btn-primary'
 
@@ -48,29 +53,6 @@
         %th{:scope => "col"} Type
         %th{:scope => "col"} Actions
     %tbody
-      - @products.each do |product|
-        %tr
-          %td= product.name
-          %td= number_to_currency(product.prices)
-          %td= product.product_type
-          %td
-            .d-flex.gap-2
-              = button_to product_path(product), method: :get,
-                class: 'btn btn-primary',
-                title: 'View Details',
-                style: 'background: none; border: none; color: blue; cursor: pointer; font-size: 20px;' do
-                %span 👁
-              = button_to edit_product_path(product), method: :get,
-                class: 'btn btn-primary',
-                title: 'Edit Product',
-                style: 'background: none; border: none; color: green; cursor: pointer; font-size: 20px;' do
-                %span ✎
-              = button_to product_path(product), method: :delete,
-                data: { turbo_confirm: "Are you sure?" },
-                class: 'btn btn-danger',
-                title: 'Delete Product',
-                style: 'background: none; border: none; color: red; cursor: pointer; font-size: 20px;' do
-                %span ❌
 
 / Promotions Table
 .table-responsive.mt-5.text-center
@@ -85,22 +67,8 @@
         %th{:scope => "col"} Min Quantity
         %th{:scope => "col"} Action
     %tbody
-      - @promotions.each do |promotion|
-        %tr
-          %td= promotion.promote_code
-          %td= promotion.promotion_type.humanize
-          %td= promotion.apply_field
-          %td= promotion.end_date
-          %td= promotion.min_quantity
-          %td
-            .d-flex.gap-2
-              = button_to promotion_path(promotion), method: :delete,
-                data: { turbo_confirm: "Are you sure?" },
-                class: 'btn btn-danger',
-                style: 'background: none; border: none; color: red; cursor: pointer; font-size: 20px;' do
-                %span ❌
 
-/ Merchandise Table
+/ Merchandise List
 .table-responsive.mt-5.text-center
   %h3 Merchandise List
   %table#merchandise-table.table.table-striped.table-hover
@@ -111,18 +79,6 @@
         %th{:scope => "col"} Promotion End
         %th{:scope => "col"} Action
     %tbody
-      - @merchandises.each do |merchandise|
-        %tr
-          %td= merchandise.product_id
-          %td= number_to_currency(merchandise.cut_off_value)
-          %td= merchandise.promotion_end.present? ? merchandise.promotion_end.strftime("%Y-%m-%d") : 'N/A'
-          %td
-            .d-flex.gap-2
-              = button_to merchandise_path(merchandise), method: :delete,
-                data: { turbo_confirm: "Are you sure?" },
-                class: 'btn btn-danger',
-                style: 'background: none; border: none; color: red; cursor: pointer; font-size: 20px;' do
-                %span ❌
 
 
 %footer.custom-footer.py-4.app-color
