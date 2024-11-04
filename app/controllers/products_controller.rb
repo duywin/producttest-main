@@ -148,16 +148,29 @@ class ProductsController < ApplicationController
   end
 
   def import
-    return redirect_to(categories_path, alert: 'Please upload an ODS file.') if params[:file].nil?
+    # Check if a file was uploaded and if it's of the correct type
+    uploaded_file = params[:file]
 
-    products = import_products_from_file(params[:file])
-    if products.is_a?(String)
-      redirect_to(products_path, alert: products)
-    else
-      Product.import(products)
-      redirect_to(products_path, notice: 'Products were successfully imported.')
+    unless uploaded_file
+      return redirect_to(products_path, alert: 'Please upload an ODS file.')
     end
+
+    unless uploaded_file.content_type == 'application/vnd.oasis.opendocument.spreadsheet'
+      return redirect_to(products_path, alert: 'Invalid file type. Please upload an ODS file.')
+    end
+
+    # Save the uploaded file temporarily
+    file_path = Rails.root.join('tmp', uploaded_file.original_filename)
+    File.open(file_path, 'wb') do |file|
+      file.write(uploaded_file.read)
+    end
+
+    # Enqueue the import job
+    ProductImportJob.perform_later(file_path.to_s)
+
+    redirect_to(products_path, notice: 'Product import has been started. You will be notified once it is complete.')
   end
+
 
   def create
     @product = Product.new(product_params)
@@ -216,39 +229,6 @@ class ProductsController < ApplicationController
     when 'monthly'
       PromotionReportExporter.export_monthly_report
     end
-  end
-
-  def import_products_from_file(file)
-    spreadsheet = Roo::OpenOffice.new(file.path)
-    header = spreadsheet.row(1)
-    products = []
-
-    (2..spreadsheet.last_row).each do |i|
-      row = spreadsheet.row(i)
-      product = create_product_from_row(row, header)
-      products << product if product.name.present?
-    end
-
-    products
-  rescue StandardError => e
-    "Error reading file: #{e.message}"
-  end
-
-  def create_product_from_row(row, header)
-    default_values = {
-      desc: 'No description available.',
-      stock: 0,
-      picture: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfCIpb4DjTLc26hfSl7YKW6bf07zz38YcyHQ&s'
-    }
-
-    Product.new(
-      name: row[header.index('name')] || default_values[:name],
-      product_type: row[header.index('product_type')] || 'Default Type',
-      prices: row[header.index('prices')] || 0.00,
-      desc: row[header.index('desc')] || default_values[:desc],
-      stock: row[header.index('stock')] || default_values[:stock],
-      picture: row[header.index('picture')] || default_values[:picture]
-    )
   end
 
   def set_default_values(product)
