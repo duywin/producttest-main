@@ -96,7 +96,7 @@ class ProductsController < ApplicationController
   end
   def export_report
     # Define a list of allowed report types
-    allowed_report_types = ['summary', 'detailed'] # Adjust based on actual report types
+    allowed_report_types = ['weekly', 'monthly'] # Adjusted to match report types in generate_report
 
     # Sanitize and validate the report_type parameter
     report_type = params[:report_type]
@@ -109,7 +109,10 @@ class ProductsController < ApplicationController
     filename = generate_report(report_type)
 
     # Check if the filename is valid
-    return redirect_to(products_path, alert: 'Invalid report type.') if filename.nil?
+    if filename.nil?
+      return redirect_to(products_path, alert: 'Failed to generate the report.')
+    end
+
     file_path = Rails.root.join('tmp', filename)
 
     # Check if the file exists before sending

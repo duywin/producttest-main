@@ -50,7 +50,7 @@ class CategoriesController < ApplicationController
     # Enqueue the import job
     ImportCategoriesJob.perform_later(file_path.to_s)
 
-    redirect_to categories_path, notice: "Categories import is processing in the background."
+    redirect_to categories_path, notice: "File read successfully. Please wait for the import"
   end
 
 
