@@ -56,36 +56,25 @@ class AccountsController < ApplicationController
       return
     end
 
-    accounts = []
-    begin
-      spreadsheet = Roo::OpenOffice.new(file.path)
-      header = spreadsheet.row(1) # Assuming the first row is the header
-
-      (2..spreadsheet.last_row).each do |i|
-        row = spreadsheet.row(i)
-        username = row[header.index("username")]
-        email = row[header.index("email")]
-        password = row[header.index("password")]
-        is_admin = row[header.index("isadmin")] == 1
-
-        # Only add valid accounts
-        if username.present? && email.present? && password.present?
-          accounts << Account.new(username: username, email: email, password: password, is_admin: is_admin)
-        end
-      end
-    rescue => e
-      redirect_to accounts_path, alert: "Error reading file: #{e.message}"
+    # Check if the file is of the right type
+    unless File.extname(file.path) == '.ods'
+      redirect_to accounts_path, alert: "Please upload a valid ODS file."
       return
     end
 
-    if accounts.all?(&:valid?)
-      accounts.each(&:save)
-      redirect_to accounts_path, notice: "Accounts were successfully imported."
-    else
-      error_messages = accounts.reject(&:valid?).map { |acc| acc.errors.full_messages.join(", ") }.join("; ")
-      redirect_to accounts_path, alert: "There were errors with some accounts: #{error_messages}"
+    # Move the file to a temporary location
+    temp_file_path = File.join(Dir.tmpdir, file.original_filename)
+    File.open(temp_file_path, 'wb') do |f|
+      f.write(file.read)
     end
+
+    # Enqueue the job with the path to the uploaded file
+    ImportAccountsJob.perform_later(temp_file_path)
+
+    redirect_to accounts_path, notice: "Importing accounts. You will be notified once the import is complete."
   end
+
+
 
   def show
   end
