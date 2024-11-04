@@ -18,9 +18,9 @@ class AccountsController < ApplicationController
     created_at_filter = params[:created_at_filter]
 
     @accounts = if query.present?
-                  Account.search(query, created_at_filter).records.page(params[:page])
+                  Account.search(query, created_at_filter).records
                 else
-                  Account.all.page(params[:page])
+                  Account.all
                 end
 
     data = @accounts.map do |account|
