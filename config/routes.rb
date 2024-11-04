@@ -1,4 +1,6 @@
+require 'sidekiq/web'
 Rails.application.routes.draw do
+  mount Sidekiq::Web => '/sidekiq'
   # Devise routes for accounts
   devise_for :accounts, controllers: {
     sessions: "accounts/sessions",
