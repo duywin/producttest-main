@@ -37,7 +37,7 @@ class AccountsController < ApplicationController
           <button type="button" onclick="window.location='#{edit_account_path(account)}'" class="btn btn-primary" style="color: blue; padding: 10px 20px; border-radius: 5px; border: none; cursor: pointer; background: none; font-size: 20px;" title="Edit Account">
             <span>✎</span>
           </button>
-          <button type="button" data-method="delete" data-confirm="Are you sure?" class="btn btn-danger" style="background: none; padding: 10px 20px; border-radius: 5px; border: none; color: red; cursor: pointer; font-size: 20px;" title="Delete Account" onclick="deleteAccount(#{account.id})">
+          <button type="button" data-method="delete" data-confirm="Are you sure?" class="btn btn-danger delete-account-btn" data-account-id="#{account.id}" style="background: none; padding: 10px 20px; border-radius: 5px; border: none; color: red; cursor: pointer; font-size: 20px;" title="Delete Account">
             <span>❌</span>
           </button>
         </div>

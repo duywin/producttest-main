@@ -116,3 +116,48 @@ $ ->
   load_product_datatable()
   load_promotion_datatable()
   load_merchandise_datatable()
+
+# Get the CSRF token from the meta tag
+csrfToken = $('meta[name="csrf-token"]').attr('content')
+
+$(document).on 'click', '.delete-product-btn', (e) ->
+  productId = $(e.target).data('product-id')  # Get the product ID from the button
+
+  if confirm('Are you sure you want to delete this product?')
+    $.ajax
+      url: "/products/#{productId}"  # URL to the delete action
+      type: 'DELETE'
+      headers:
+        'X-CSRF-Token': csrfToken  # Include the CSRF token in the headers
+      success: ->
+        $('#products-table').DataTable().ajax.reload()  # Refresh the products table or handle UI update
+      error: (xhr, status, error) ->
+        alert("An error occurred while deleting the product: #{xhr.responseText}")  # Handle any errors
+
+$(document).on 'click', '.delete-promotion-btn', (e) ->
+  promotionId = $(e.target).data('promotion-id')  # Get the promotion ID from the button
+
+  if confirm('Are you sure you want to delete this promotion?')
+    $.ajax
+      url: "/promotions/#{promotionId}"  # URL to the delete action
+      type: 'DELETE'
+      headers:
+        'X-CSRF-Token': csrfToken  # Include the CSRF token in the headers
+      success: ->
+        $('#promotions-table').DataTable().ajax.reload()  # Refresh the promotions table or handle UI update
+      error: (xhr, status, error) ->
+        alert("An error occurred while deleting the promotion: #{xhr.responseText}")  # Handle any errors
+
+$(document).on 'click', '.delete-merchandise-btn', (e) ->
+  merchandiseId = $(e.target).data('merchandise-id')  # Get the merchandise ID from the button
+
+  if confirm('Are you sure you want to delete this merchandise?')
+    $.ajax
+      url: "/merchandises/#{merchandiseId}"  # URL to the delete action
+      type: 'DELETE'
+      headers:
+        'X-CSRF-Token': csrfToken  # Include the CSRF token in the headers
+      success: ->
+        $('#merchandises-table').DataTable().ajax.reload()  # Refresh the merchandise table or handle UI update
+      error: (xhr, status, error) ->
+        alert("An error occurred while deleting the merchandise: #{xhr.responseText}")  # Handle any errors

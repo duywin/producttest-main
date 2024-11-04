@@ -44,3 +44,21 @@ $ ->
     load_datatable()
 
   load_datatable()
+
+# Get the CSRF token from the meta tag
+csrfToken = $('meta[name="csrf-token"]').attr('content')
+
+$(document).on 'click', '.delete-account-btn', (e) ->
+  accountId = $(e.target).data('account-id')  # Get the account ID from the button
+
+  if confirm('Are you sure you want to delete this account?')
+    $.ajax
+      url: "/accounts/#{accountId}"  # URL to the delete action
+      type: 'DELETE'
+      headers:
+        'X-CSRF-Token': csrfToken  # Include the CSRF token in the headers
+      success: ->
+        $('#accounts-table').DataTable().ajax.reload()  # Refresh the accounts table or handle UI update
+      error: (xhr, status, error) ->
+        alert("An error occurred while deleting the account: #{xhr.responseText}")  # Handle any errors
+

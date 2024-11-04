@@ -38,7 +38,7 @@ class ProductsController < ApplicationController
           <button type="button" onclick="window.location='#{edit_product_path(product)}'" class="btn btn-primary" style="color: blue; padding: 8px 16px; border-radius: 4px; border: none; cursor: pointer; background: none; font-size: 18px;" title="Edit Product">
             <span>✎</span>
           </button>
-          <button type="button" data-method="delete" data-confirm="Are you sure?" class="btn btn-danger" style="background: none; padding: 8px 16px; border-radius: 4px; border: none; color: red; cursor: pointer; font-size: 18px;" title="Delete Product" onclick="deleteProduct(#{product.id})">
+          <button type="button" data-method="delete" data-confirm="Are you sure?" class="btn btn-danger delete-product-btn" data-product-id="#{product.id}" style="background: none; padding: 8px 16px; border-radius: 4px; border: none; color: red; cursor: pointer; font-size: 18px;" title="Delete Product">
             <span>❌</span>
           </button>
         </div>
@@ -62,9 +62,9 @@ class ProductsController < ApplicationController
         min_quantity: promotion.min_quantity,
         actions: %(
           <div class="d-flex gap-2 align-items-center">
-          <button type="button" data-method="delete" data-confirm="Are you sure?" class="btn btn-danger" style="background: none; padding: 8px 16px; border-radius: 4px; border: none; color: red; cursor: pointer; font-size: 18px;" onclick="deletePromotion(#{promotion.id})">
-              <span>❌</span>
-            </button>
+          <button type="button" data-method="delete" data-confirm="Are you sure?" class="btn btn-danger delete-promotion-btn" data-promotion-id="#{promotion.id}" style="background: none; padding: 8px 16px; border-radius: 4px; border: none; color: red; cursor: pointer; font-size: 18px;">
+            <span>❌</span>
+          </button>
           </div>
         )
       }
@@ -84,9 +84,9 @@ class ProductsController < ApplicationController
         promotion_end: merchandise.promotion_end.present? ? merchandise.promotion_end.strftime("%Y-%m-%d") : 'N/A',
         actions: %(
           <div class="d-flex gap-2 align-items-center">
-          <button type="button" data-method="delete" data-confirm="Are you sure?" class="btn btn-danger" style="background: none; padding: 8px 16px; border-radius: 4px; border: none; color: red; cursor: pointer; font-size: 18px;"  onclick="deleteMerchandise(#{merchandise.id})">
-              <span>❌</span>
-            </button>
+          <button type="button" data-method="delete" data-confirm="Are you sure?" class="btn btn-danger delete-merchandise-btn" data-merchandise-id="#{merchandise.id}" style="background: none; padding: 8px 16px; border-radius: 4px; border: none; color: red; cursor: pointer; font-size: 18px;">
+            <span>❌</span>
+          </button>
           </div>
         )
       }
