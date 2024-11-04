@@ -9,6 +9,7 @@ Bundler.require(*Rails.groups)
 module Producttest
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
+    config.autoload_paths << Rails.root.join('app', 'sidekiq')
     config.load_defaults 7.0
     config.active_job.verbose_enqueue_logs = true
     config.active_record.query_log_tags_enabled = true

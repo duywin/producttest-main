@@ -138,6 +138,7 @@
     <orderEntry type="library" scope="PROVIDED" name="rake (v13.2.1, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="ransack (v4.2.1, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rdoc (v6.7.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="redis-client (v0.22.2, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="regexp_parser (v2.9.2, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="reline (v0.5.10, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="responders (v3.1.1, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
@@ -158,6 +159,7 @@
     <orderEntry type="library" scope="PROVIDED" name="sassc-rails (v2.1.2, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="selenium-webdriver (v4.25.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="sexp_processor (v4.17.2, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="sidekiq (v7.3.4, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="sinatra (v3.2.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="sprockets (v4.2.1, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="sprockets-rails (v3.5.2, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />

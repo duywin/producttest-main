@@ -16,8 +16,8 @@ class CategoriesController < ApplicationController
       end
     end
   end
+
   # Authenticates the admin by checking if the current account ID is present.
-  # Redirects to noindex_path if not authenticated, avoiding redirect loops.
   def authenticate_admin
     if session[:current_account_id].nil? && request.path != noindex_path
       redirect_to noindex_path
@@ -42,24 +42,15 @@ class CategoriesController < ApplicationController
       return
     end
 
-    categories = []
+    # Save the file temporarily
+    file_path = Rails.root.join("tmp", "uploads", file.original_filename)
+    FileUtils.mkdir_p(file_path.dirname)
+    File.open(file_path, "wb") { |f| f.write(file.read) }
 
-    begin
-      spreadsheet = Roo::OpenOffice.new(file.path)
-      header = spreadsheet.row(1)
+    # Enqueue the import job
+    ImportCategoriesJob.perform_later(file_path.to_s)
 
-      (2..spreadsheet.last_row).each do |i|
-        row = spreadsheet.row(i)
-        name = row[header.index("name")]
-        categories << Category.new(name: name, total: 0) if name.present?
-      end
-    rescue => e
-      redirect_to categories_path, alert: "Error reading file: #{e.message}"
-      return
-    end
-
-    Category.import(categories)
-    redirect_to categories_path, notice: "Categories were successfully imported."
+    redirect_to categories_path, notice: "Categories import is processing in the background."
   end
 
 
