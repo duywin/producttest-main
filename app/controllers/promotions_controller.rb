@@ -17,6 +17,7 @@ class PromotionsController < ApplicationController
     @promotion = Promotion.new(promotion_params)
     if @promotion.save
       apply_promotion_logic(@promotion)
+      month_logger.info("Promotion created: '#{@promotion.id}' with '#{@promotion.promotion_type}' type by user '#{session[:current_account_id]}'", session[:current_account_id])
       redirect_to products_path, notice: "Promotion created successfully!"
     else
       render :new
@@ -27,6 +28,7 @@ class PromotionsController < ApplicationController
   def destroy
     PromoteProduct.where(promotion_id: @promotion.id).destroy_all
     @promotion.destroy
+    month_logger.info("Promotion deleted : '#{@promotion.id}' by user '#{session[:current_account_id]}'", session[:current_account_id])
     redirect_to products_path, notice: "Promotion deleted successfully!"
   end
 
@@ -73,5 +75,9 @@ class PromotionsController < ApplicationController
   # Creates a promote product record.
   def create_promote_product(promotion_id, product_id, value)
     PromoteProduct.create!(promotion_id: promotion_id, product_id: product_id, amount: value)
+  end
+
+  def month_logger
+    @month_logger ||= MonthLogger.new(Promotion)
   end
 end

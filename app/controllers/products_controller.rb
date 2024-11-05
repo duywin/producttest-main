@@ -148,7 +148,6 @@ class ProductsController < ApplicationController
   end
 
   def import
-    # Check if a file was uploaded and if it's of the correct type
     uploaded_file = params[:file]
 
     unless uploaded_file
@@ -159,26 +158,25 @@ class ProductsController < ApplicationController
       return redirect_to(products_path, alert: 'Invalid file type. Please upload an ODS file.')
     end
 
-    # Save the uploaded file temporarily
     file_path = Rails.root.join('tmp', uploaded_file.original_filename)
-    File.open(file_path, 'wb') do |file|
-      file.write(uploaded_file.read)
-    end
+    File.open(file_path, 'wb') { |file| file.write(uploaded_file.read) }
 
-    # Enqueue the import job
+    # Enqueue the import job and log the import
     ProductImportJob.perform_later(file_path.to_s)
+    product_logger.info("Product import started for file '#{uploaded_file.original_filename}' by Account ID #{session[:current_account_id]}")
 
     redirect_to(products_path, notice: 'Product import has been started. You will be notified once it is complete.')
   end
-
 
   def create
     @product = Product.new(product_params)
     set_default_values(@product)
 
     if @product.save
+      product_logger.info("Product created: ID '#{@product.id}', Name '#{@product.name}', Prices '#{@product.prices}'", session[:current_account_id])
       redirect_to(@product, notice: 'Product was successfully created.')
     else
+      product_logger.error("Failed to create product: Errors '#{@product.errors.full_messages.join(', ')}'", session[:current_account_id])
       render(:new, status: :unprocessable_entity)
     end
   end
@@ -188,15 +186,23 @@ class ProductsController < ApplicationController
 
   def update
     if @product.update(product_params)
+      product_logger.info("Product updated: ID '#{@product.id}', Name '#{@product.name}'", session[:current_account_id])
       redirect_to(@product, notice: 'Product was successfully updated.')
     else
+      product_logger.error("Failed to update product ID '#{@product.id}': Errors '#{@product.errors.full_messages.join(', ')}'", session[:current_account_id])
       render(:edit, status: :unprocessable_entity)
     end
   end
 
   def destroy
-    @product.destroy
-    redirect_to(products_path, notice: 'Product was successfully destroyed.', status: :see_other)
+    product_name = @product.name
+    if @product.destroy
+      product_logger.info("Product destroyed: ID '#{@product.id}', Name '#{product_name}'", session[:current_account_id])
+      redirect_to(products_path, notice: 'Product was successfully destroyed.', status: :see_other)
+    else
+      product_logger.error("Failed to destroy product ID '#{@product.id}': Errors '#{@product.errors.full_messages.join(', ')}'", session[:current_account_id])
+      redirect_to(products_path, alert: 'Failed to destroy the product.', status: :unprocessable_entity)
+    end
   end
 
   private
@@ -235,5 +241,9 @@ class ProductsController < ApplicationController
     product.desc ||= 'No description available.'
     product.stock ||= 0
     product.picture ||= 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfCIpb4DjTLc26hfSl7YKW6bf07zz38YcyHQ&s'
+  end
+
+  def product_logger
+    @product_logger ||= MonthLogger.new(Product)
   end
 end

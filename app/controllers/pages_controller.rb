@@ -60,6 +60,7 @@ class PagesController < ApplicationController
   def update_account
     @account = Account.find(params[:id])
     if @account.update(account_params)
+      month_logger.info("Account update (ID: #{session[:current_account_id]})", session[:current_account_id])
       respond_to { |format| format.js }
     else
       respond_to { |format| format.js { render('update_failed') } }
