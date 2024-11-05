@@ -27,6 +27,13 @@
     margin-top: -10px;
 }
 
+.carousel-inner img {
+    width: 600px;
+    height: 300px;
+    object-fit: cover;
+    align-self: center;
+}
+
 /* Custom Footer */
 .custom-footer {
     background-color: lightblue;

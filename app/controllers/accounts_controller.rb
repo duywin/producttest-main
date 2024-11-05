@@ -68,13 +68,11 @@ class AccountsController < ApplicationController
       f.write(file.read)
     end
 
-    # Enqueue the job with the path to the uploaded file
     ImportAccountsJob.perform_later(temp_file_path)
+    month_logger.info("Account import started for file '#{file.original_filename}'", session[:current_account_id])
 
     redirect_to accounts_path, notice: "Importing accounts. You will be notified once the import is complete."
   end
-
-
 
   def show
   end
@@ -90,6 +88,7 @@ class AccountsController < ApplicationController
     @account.phonenumber ||= ""
 
     if @account.save
+      month_logger.info("Account '#{@account.username}' (ID: #{@account.id}) was created", session[:current_account_id])
       redirect_to @account, notice: "Account was successfully created."
     else
       render :new
@@ -101,6 +100,7 @@ class AccountsController < ApplicationController
 
   def update
     if @account.update(account_params)
+      month_logger.info("Account '#{@account.username}' (ID: #{@account.id}) was updated", session[:current_account_id])
       redirect_to @account, notice: "Account was successfully updated."
     else
       render :edit
@@ -109,6 +109,7 @@ class AccountsController < ApplicationController
 
   def destroy
     @account.destroy
+    month_logger.warn("Account '#{@account.username}' (ID: #{@account.id}) was destroyed", session[:current_account_id])
     redirect_to accounts_url, notice: "Account was successfully destroyed."
   end
 
@@ -130,5 +131,10 @@ class AccountsController < ApplicationController
       :address,
       :gender
     )
+  end
+
+  # Initializes the monthly logger for this controller.
+  def month_logger
+    @month_logger ||= MonthLogger.new(Account)
   end
 end

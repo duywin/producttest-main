@@ -1,7 +1,7 @@
+# app/controllers/categories_controller.rb
 class CategoriesController < ApplicationController
   before_action :set_category, only: [:destroy]
   before_action :authenticate_admin
-
 
   # Displays a paginated list of categories.
   def index
@@ -47,25 +47,24 @@ class CategoriesController < ApplicationController
     FileUtils.mkdir_p(file_path.dirname)
     File.open(file_path, "wb") { |f| f.write(file.read) }
 
-    # Enqueue the import job
     ImportCategoriesJob.perform_later(file_path.to_s)
+    month_logger.info("Import started for file '#{file.original_filename}'", session[:current_account_id])
 
     redirect_to categories_path, notice: "File read successfully. Please wait for the import"
   end
-
-
 
   # Initializes a new category.
   def new
     @category = Category.new
   end
 
-  # Creates a new category with the given parameters.
   def create
     @category = Category.new(category_params)
     @category.total ||= 0
 
     if @category.save
+      # Log the add action
+      month_logger.info("Category '#{@category.name}' (ID: #{@category.id}) was created", session[:current_account_id])
       redirect_to categories_path, notice: "Category was successfully created."
     else
       render :new, status: :unprocessable_entity
@@ -75,6 +74,7 @@ class CategoriesController < ApplicationController
   # Deletes the specified category.
   def destroy
     @category.destroy
+    month_logger.warn("Category '#{@category.name}' (ID: #{@category.id}) was deleted", session[:current_account_id])
     redirect_to categories_path, notice: "Category was successfully deleted."
   end
 
@@ -88,5 +88,10 @@ class CategoriesController < ApplicationController
   # Permits category parameters.
   def category_params
     params.require(:category).permit(:id, :name, :total)
+  end
+
+  # Initializes the monthly logger for this controller.
+  def month_logger
+    @month_logger ||= MonthLogger.new(Category)
   end
 end

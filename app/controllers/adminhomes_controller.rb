@@ -3,6 +3,7 @@ class AdminhomesController < ApplicationController
 
   # Logout the current admin by clearing the session
   def adminlogout
+    month_logger.info("Account logged out (ID: #{session[:current_account_id]})", session[:current_account_id])
     session.delete(:current_account_id) if session[:current_account_id]
     redirect_to new_account_session_path
   end
@@ -43,5 +44,9 @@ class AdminhomesController < ApplicationController
             .order("total_quantity DESC")
             .limit(1)
             .first
+  end
+
+  def month_logger
+    @month_logger ||= MonthLogger.new(Account)
   end
 end

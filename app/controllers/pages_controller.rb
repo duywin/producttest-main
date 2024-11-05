@@ -71,6 +71,7 @@ class PagesController < ApplicationController
   end
 
   def logout
+    month_logger.info("Account logged out (ID: #{session[:current_account_id]})", session[:current_account_id])
     session.delete(:current_account_id)
     redirect_to(users_home_path)
   end
@@ -118,5 +119,9 @@ class PagesController < ApplicationController
   def account_params
     # Add the necessary permitted parameters here
     params.require(:account).permit(:name, :email)
+  end
+
+  def month_logger
+    @month_logger ||= MonthLogger.new(Account)
   end
 end

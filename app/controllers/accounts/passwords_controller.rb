@@ -29,6 +29,7 @@ class Accounts::PasswordsController < Devise::PasswordsController
     self.resource = resource_class.reset_password_by_token(resource_params)
 
     if resource.errors.empty?
+      month_logger.info("Account '#{resource.username} has change its password' (ID: #{resource.id})", resource.id)
       flash[:notice] = "Your password has been successfully updated."
       redirect_to new_account_session_path
     else
@@ -42,4 +43,9 @@ class Accounts::PasswordsController < Devise::PasswordsController
   def resource_params
     params.require(:account).permit(:email, :reset_password_token, :password, :password_confirmation)
   end
+
+  def month_logger
+    @month_logger ||= MonthLogger.new(Account)
+  end
+
 end

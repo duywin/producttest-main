@@ -7,14 +7,6 @@
       = javascript_tag do
         alert('Welcome, #{@account.username if @account}!');
         - session.delete(:welcome_alert_shown)
-        / Clear the session variable
-    :css
-      .carousel-inner img {
-          width: 600px;
-          height: 300px;
-          object-fit: cover;
-          align-self: center;
-      }
   %body
     .jumbotron.text-center.app-color
       %h1 Shearwater
