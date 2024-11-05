@@ -24,6 +24,7 @@ Rails.application.routes.draw do
   get "myaccount", to: "pages#myaccount", as: :my_account
   get "shop_cart", to: "pages#shop_cart", as: :shop_cart
   get "delivery_form", to: "pages#delivery_form", as: :delivery_form
+  post 'update_delivery', to: 'pages#update_delivery', as: :update_delivery
   get "shop", to: "pages#shop", as: :shop
 
   # Delivery history and account management

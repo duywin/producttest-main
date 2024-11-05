@@ -30,6 +30,23 @@ class Cart < ApplicationRecord
   after_create :index_to_elasticsearch
   after_update :update_in_elasticsearch
 
+  # Define your conditions as instance variables or attributes
+  attr_accessor :function_check_out, :admin_update
+
+  def index_to_elasticsearch
+    if function_check_out
+      __elasticsearch__.index_document
+    end
+  end
+
+  # Method to update document in Elasticsearch after update
+  def update_in_elasticsearch
+    if admin_update
+      __elasticsearch__.update_document
+    end
+  end
+
+
   # Filter and helper methods
   scope :checked_out, -> { where(check_out: true) }
   scope :by_week, ->(week_start) { where(created_at: week_start.beginning_of_day..week_start.end_of_week.end_of_day) }

@@ -19,6 +19,7 @@ class CartsController < ApplicationController
   def update
     @cart = Cart.find(params[:id])
     if @cart.update(cart_params)
+      @cart.admin_update = true
       redirect_to carts_path, notice: "Cart was successfully updated."
     else
       render :edit, status: :unprocessable_entity
@@ -52,6 +53,7 @@ class CartsController < ApplicationController
     if @cart.cart_items.any?
       reduce_stock(@cart)
       @cart.update(check_out: true)
+      @cart.function_check_out = true
       flash[:notice] = "Checkout completed successfully."
 
       respond_to do |format|
