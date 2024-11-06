@@ -1,5 +1,5 @@
 # app/lib/month_logger.rb
-require 'logger'
+require 'log4r'
 require 'fileutils'
 
 class MonthLogger
@@ -8,12 +8,12 @@ class MonthLogger
   def initialize(model_class)
     @model_class = model_class
     FileUtils.mkdir_p(LOG_DIR) unless File.directory?(LOG_DIR)
-    @logger = Logger.new(log_file_path, 'monthly')
+    @logger = setup_logger
   end
 
   def log_file_path
     month = Time.now.strftime("%Y-%m")
-    LOG_DIR.join("#{@model_class.name}_#{month}.log")
+    LOG_DIR.join("#{@model_class.name}_#{month}.log").to_s  # Convert Pathname to String
   end
 
   def info(message, user_id = nil)
@@ -25,6 +25,18 @@ class MonthLogger
   end
 
   private
+
+  def setup_logger
+    logger = Log4r::Logger.new(@model_class.name)
+    logger.outputters = Log4r::Outputter.stdout # Log to STDOUT as well
+    logger.outputters << Log4r::FileOutputter.new(
+      'monthly_log',
+      filename: log_file_path,  # This is now a String
+      trunc: false,
+      formatter: Log4r::PatternFormatter.new(pattern: "%d [%l] %m")
+    )
+    logger
+  end
 
   def format_message(message, user_id)
     user_info = user_id ? "User ID: #{user_id} - " : ""

@@ -9,7 +9,7 @@ class Accounts::SessionsController < Devise::SessionsController
       session[:welcome_alert_shown] = true
 
       # Log successful login
-      month_logger.info("Account logged in: '#{@account.username}' (ID: #{@account.id})", @account.id)
+      # month_logger.info("Account logged in: '#{@account.username}' (ID: #{@account.id})", @account.id)
 
       if @account.is_admin
         redirect_to adminhomes_path

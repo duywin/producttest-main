@@ -13,6 +13,7 @@ gem "mini_racer"
 gem 'datatables-rails'
 gem 'jquery-datatables'
 gem 'ajax-datatables-rails'
+gem 'log4r', '1.0.6'
 
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem "sprockets-rails"

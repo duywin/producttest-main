@@ -20,12 +20,9 @@ class MerchandisesController < ApplicationController
   def destroy
     @merchandise = Merchandise.find(params[:id])
     product_id = @merchandise.product_id
-
     @merchandise.destroy
 
-    # Log merchandise deletion
     merch_logger.info("Merchandise deleted: Product ID '#{product_id}'", session[:current_account_id])
-
     redirect_to(products_path, notice: 'Merchandise deleted successfully!')
   end
 

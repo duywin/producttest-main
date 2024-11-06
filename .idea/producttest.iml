@@ -100,6 +100,7 @@
     <orderEntry type="library" scope="PROVIDED" name="kaminari-activerecord (v1.2.2, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="kaminari-core (v1.2.2, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="libv8-node (v18.19.0.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="log4r (v1.0.6, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="logger (v1.6.1, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="loofah (v2.22.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="mail (v2.8.1, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
