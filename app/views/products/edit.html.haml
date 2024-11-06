@@ -24,8 +24,19 @@
         %li.mb-3.d-flex.flex-wrap.align-items-start
           %strong.flex-shrink-0.me-3 Picture:
           .flex-grow-1
-            = form.text_field :picture, id: 'picture_url', class: 'form-control mb-2'
-            %button#show_picture.btn.btn-secondary{:type => "button"} Show Picture
+            %button#show_url_picture.btn.btn-secondary{:type => "button"} Show URL Image Form
+            %button#show_file_picture.btn.btn-secondary{:type => "button"} Show File Image Form
+
+            #url_picture_form{style: "display: none;"}
+              %label{for: 'product_picture'} URL Image:
+              = form.text_field :picture, id: 'picture_url', class: 'form-control mb-2', placeholder: 'Enter image URL'
+              %button#show_url_image.btn.btn-secondary{:type => "button"} Show URL Picture
+
+            #file_picture_form{style: "display: none;"}
+              %label{for: 'product_picture_file'} File Image:
+              = form.file_field :picture_file, id: 'picture_file', class: 'form-control mb-2'
+              %button#show_file_image.btn.btn-secondary{:type => "button"} Show File Picture
+
             #picture_container.mt-3{:style => "max-height: 200px; overflow: auto;"}
       .text-center
         = form.submit 'Save', class: 'btn btn-success'

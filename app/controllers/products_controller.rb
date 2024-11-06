@@ -185,11 +185,16 @@ class ProductsController < ApplicationController
   end
 
   def update
+    if params[:product][:picture].present?
+      @product.picture = params[:product][:picture]
+    elsif params[:product][:picture_file].present?
+      uploaded_file = params[:product][:picture_file]
+      @product.picture_file = uploaded_file # If you have a separate field for the picture file itself
+    end
+
     if @product.update(product_params)
-      product_logger.info("Product updated: ID '#{@product.id}', Name '#{@product.name}'", session[:current_account_id])
       redirect_to(@product, notice: 'Product was successfully updated.')
     else
-      product_logger.error("Failed to update product ID '#{@product.id}': Errors '#{@product.errors.full_messages.join(', ')}'", session[:current_account_id])
       render(:edit, status: :unprocessable_entity)
     end
   end
@@ -212,7 +217,7 @@ class ProductsController < ApplicationController
   end
 
   def product_params
-    params.require(:product).permit(:name, :prices, :product_type, :stock, :desc, :picture)
+    params.require(:product).permit(:name, :prices, :product_type, :stock, :desc, :picture, :picture_file)
   end
 
   def set_categories

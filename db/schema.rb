@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_10_11_023720) do
+ActiveRecord::Schema[7.1].define(version: 2024_11_06_092049) do
   create_table "accounts", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "email"
     t.string "username"
@@ -91,6 +91,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_11_023720) do
     t.text "picture"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "picture_file"
   end
 
   create_table "promote_products", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|

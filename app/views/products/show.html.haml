@@ -6,8 +6,10 @@
   %table.table.table-bordered.table-striped.app-color.text-start
     %tr
       %td.p-3{:rowspan => "3"}
-        - if @product.picture.present?
-          = image_tag(@product.picture, alt: 'Product Picture', class: 'img-fluid', style: 'max-width: 200px; max-height: 200px;')
+        - if @product.picture_file.present?
+          = image_tag(@product.picture_file.url, alt: 'Product Picture from File', class: 'img-fluid', style: 'max-width: 200px; max-height: 200px;')
+        - elsif @product.picture.present?
+          = image_tag(@product.picture, alt: 'Product Picture from URL', class: 'img-fluid', style: 'max-width: 200px; max-height: 200px;')
         - else
           %span No picture available
       %td.fw-bold.p-3 Name:

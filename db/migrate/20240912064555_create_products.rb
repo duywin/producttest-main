@@ -7,7 +7,7 @@ class CreateProducts < ActiveRecord::Migration[7.1]
       t.text :desc
       t.integer :stock
       t.text :picture
-
+      t.string :picture_file
       t.timestamps
     end
   end

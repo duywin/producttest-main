@@ -1,7 +1,7 @@
 class Product < ApplicationRecord
   validates :name, presence: true
   validates :prices, presence: true, numericality: { greater_than: 0.00 }
-
+  mount_uploader :picture_file, PictureUploader # mount uploader for file
   paginates_per 10
 
   has_many :merchandises
