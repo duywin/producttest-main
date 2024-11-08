@@ -3,8 +3,8 @@ class Accounts::SessionsController < Devise::SessionsController
   before_action :configure_sign_in_params, only: [:create]
 
   def create
-    @account = Account.find_by(username: params[:account][:username])
-    if @account && @account.valid_password?(params[:account][:password])
+    @account = Account.find_by(username: params[:username])
+    if @account && @account.valid_password?(params[:password])
       session[:current_account_id] = @account.id
       session[:welcome_alert_shown] = true
 
@@ -21,6 +21,7 @@ class Accounts::SessionsController < Devise::SessionsController
       render :new
     end
   end
+
 
   def destroy
     account_id = session[:current_account_id]

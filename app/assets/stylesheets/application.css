@@ -16,6 +16,11 @@
 
 
 /* Add your custom styles below */
+.top-product-picture{
+    height: 300px;
+    width: 300px;
+    align-self: center
+}
 
 .custom-header {
     background-color: lightblue;

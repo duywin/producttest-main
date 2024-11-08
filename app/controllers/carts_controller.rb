@@ -117,16 +117,11 @@ class CartsController < ApplicationController
       :check_out,
       :address,
       :status,
-      :delivery_day)
+      :deliver_day  # Changed from :delivery_day to :deliver_day to match the form
+    )
   end
+
   def month_logger
     @month_logger ||= MonthLogger.new(Cart)
   end
 end
-
-
-
-
-
-
-

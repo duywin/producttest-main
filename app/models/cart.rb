@@ -22,7 +22,7 @@ class Cart < ApplicationRecord
       indexes :id, type: :integer
       indexes :account_id, type: :integer
       indexes :status, type: :keyword, normalizer: "lowercase_normalizer"
-      indexes :deliver_day, type: :date
+      indexes :deliver_day, type: :date  # This is correct
       indexes :created_at, type: :date
     end
   end
