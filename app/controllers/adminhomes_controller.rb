@@ -1,15 +1,8 @@
+require 'concurrent'
 class AdminhomesController < ApplicationController
   before_action :authenticate_admin
 
-  # Logout the current admin by clearing the session
-  def adminlogout
-    month_logger.info("Account logged out (ID: #{session[:current_account_id]})", session[:current_account_id])
-    session.delete(:current_account_id) if session[:current_account_id]
-    redirect_to new_account_session_path
-  end
-
   # Admin dashboard displaying category totals and top product
-  # In AdminhomesController
   def index
     @account = Account.find_by(id: session[:current_account_id])
     @category_totals = Category.group(:name).sum(:total)
@@ -22,6 +15,50 @@ class AdminhomesController < ApplicationController
 
     @current_month_category_sales = fetch_current_month_category_sales
   end
+
+  # Logout the current admin by clearing the session
+  def adminlogout
+    month_logger.info("Account logged out (ID: #{session[:current_account_id]})", session[:current_account_id])
+    session.delete(:current_account_id) if session[:current_account_id]
+    redirect_to new_account_session_path
+  end
+
+  def export_report
+    # Extract chart data URLs from parameters
+    sales_chart = params[:salesChart]
+    category_sales_chart = params[:categorySalesChart]
+    donut_chart = params[:donutChart]
+    category_totals_chart = params[:categoryTotalsChart]
+
+    # Render HTML from the existing export_report view with embedded images
+    html = render_to_string(
+      template: 'adminhomes/export_report',  # Render the 'export_report.html.haml' view
+      layout: false,  # Don't use any layout, render just the content
+      locals: {
+        sales_chart: sales_chart,
+        category_sales_chart: category_sales_chart,
+        donut_chart: donut_chart,
+        category_totals_chart: category_totals_chart
+      }
+    )
+
+    # Generate PDF using WickedPDF
+    pdf = WickedPdf.new.pdf_from_string(html)
+
+    # Create file path for saving the PDF
+    file_path = Rails.root.join('public', 'downloads', 'admin_report.pdf')
+    FileUtils.mkdir_p(File.dirname(file_path))
+
+    # Write the binary PDF data to the file in binary mode
+    File.open(file_path, "wb") do |file|
+      file.write(pdf)
+    end
+
+    # Send the file as an attachment to the user
+    send_file file_path, filename: 'admin_report.pdf', type: 'application/pdf', disposition: 'attachment'
+  end
+
+
 
   # Render category totals as JSON
   def category_totals

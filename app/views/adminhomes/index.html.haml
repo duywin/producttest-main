@@ -6,21 +6,13 @@
       - session.delete(:welcome_alert_shown)
   = csrf_meta_tags
   = csp_meta_tag
+
 %body
   .jumbotron.text-center.app-color
-    %h1 Admin dashboard
+    %h1 Admin Dashboard
 
   %nav.navbar.navbar-expand-lg.navbar-light.app-color.topnav{ style: "margin-top: -10px" }
     .container-fluid
-      %button.navbar-toggler{
-        "aria-controls" => "navbarNavDropdown",
-        "aria-expanded" => "false",
-        "aria-label" => "Toggle navigation",
-        "data-bs-target" => "#navbarNavDropdown",
-        "data-bs-toggle" => "collapse",
-        type: "button"
-      }
-        %span.navbar-toggler-icon
       #navbarNavDropdown.collapse.navbar-collapse
         %ul.navbar-nav.w-100.justify-content-around
           %li.nav-item.active.flex-fill
@@ -36,14 +28,21 @@
 
   %main.content.py-4
     %h2.text-center Admin Dashboard
-    .text-end
-      = button_to 'Log out', adminlogout_path, method: :delete, class: 'btn btn-danger'
+    .d-flex.justify-content-between
+      .text-start
+        = button_to 'Export Report', export_report_adminhomes_path, class: 'btn btn-primary', target: '_blank', method: :post
+      .text-end
+        = button_to 'Log out', adminlogout_path, method: :delete, class: 'btn btn-danger'
 
-    #category-chart.my-4{ style: "width: 100%; height: 400px;" }
+    %h2.text-center Category Totals
+    #category-chart.my-4.d-flex.justify-content-center.align-items-center{ style: "width: 100%; height: 400px;" }
+
     %h2.text-center Sales Chart
     #sales-chart.my-4{ style: "width: 100%; height: 400px;" }
+
     %h2.text-center Monthly Category Sales
     #monthly-category-sales-chart.my-4{ style: "width: 100%; height: 400px;" }
+
     %h2.text-center Monthly Product Sales by Category
     #current-month-category-sales-chart.my-4{ style: "width: 100%; height: 400px;" }
 
@@ -63,85 +62,42 @@
   %footer.custom-footer.py-4.app-color
     %h1.text-center Admin Interface
 
-  %script{ src: "https://code.highcharts.com/highcharts.js" }
-  %script{ src: "https://code.highcharts.com/highcharts-3d.js" }
   %script{ src: "https://cdn.jsdelivr.net/npm/apexcharts@3.36.0/dist/apexcharts.min.js" }
 
 :javascript
   document.addEventListener('DOMContentLoaded', function () {
-    // Highcharts setup for Category Totals Pie Chart
-    function fetchCategoryData() {
-      fetch('#{adminhomes_category_totals_path}')
-        .then(response => response.json())
-        .then(data => {
-          Highcharts.chart('category-chart', {
-            chart: {
-              type: 'pie',
-              options3d: {
-                enabled: true,
-                alpha: 45,
-                beta: 0
-              }
-            },
-            title: { text: 'Category Totals' },
-            tooltip: { pointFormat: '{series.name}: {point.percentage:.1f}%' },
-            plotOptions: {
-              pie: {
-                allowPointSelect: true,
-                cursor: 'pointer',
-                depth: 35,
-                dataLabels: {
-                  enabled: true,
-                  format: '{point.name}',
-                  style: {
-                    color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'red'
-                  },
-                  connectorColor: 'silver'
-                }
-              }
-            },
-            series: [{ name: 'Total', data: data }]
-          });
-        });
-    }
-    fetchCategoryData();
-    setInterval(fetchCategoryData, 60000); // Refresh category data every minute
-
-    // ApexCharts setup for Monthly Sales Line Chart
+    // Set up event listener for Export Report button
+    // Sale line chart
     const salesData = JSON.parse('#{@monthly_sales_js}');
     const sortedSalesData = Object.keys(salesData)
-      .sort()  // Ensures months are in ascending order (e.g., Jan, Feb, Mar)
+      .sort()
       .reduce((acc, key) => {
         acc[key] = salesData[key];
         return acc;
       }, {});
 
-    const monthsForSales = Object.keys(sortedSalesData); // Unique variable name
+    const monthsForSales = Object.keys(sortedSalesData);
     const quantities = Object.values(sortedSalesData);
 
-    const options = {
-      chart: { height: 350, type: 'line', stacked: false },
+    const salesChartOptions = {
+      chart: { height: 350, type: 'line' },
       dataLabels: { enabled: false },
       colors: ['#FF1654'],
       series: [{ name: 'Products Sold', data: quantities }],
       stroke: { width: 4 },
-      xaxis: {
-        categories: monthsForSales,
-        title: { text: 'Month' },
-        axisBorder: { show: true },
-        axisTicks: { show: true }
-      },
+      xaxis: { categories: monthsForSales, title: { text: 'Month' } },
       yaxis: { title: { text: 'Quantity Sold' } },
       tooltip: { shared: true, intersect: false },
-      legend: { horizontalAlign: 'left', offsetX: 40 }
+      legend: { horizontalAlign: 'left', offsetX: 40 },
+      toolbar: { show: true, tools: { download: true } } // Export option added here
     };
 
-    var chart = new ApexCharts(document.querySelector("#sales-chart"), options);
-    chart.render();
+    var salesChart = new ApexCharts(document.querySelector("#sales-chart"), salesChartOptions);
+    salesChart.render();
 
-    // Highcharts setup for Monthly Category Sales Bar Chart
+    // ApexCharts setup for Monthly Category Sales Bar Chart
     const categorySalesData = JSON.parse('#{@monthly_category_sales_js}');
-    const monthsForCategorySales = Object.keys(categorySalesData); // Unique variable name
+    const monthsForCategorySales = Object.keys(categorySalesData);
     const seriesData = {};
 
     monthsForCategorySales.forEach(month => {
@@ -153,43 +109,99 @@
       });
     });
 
-    Highcharts.chart('monthly-category-sales-chart', {
-      chart: { type: 'column' },
+    const categorySalesOptions = {
+      chart: { type: 'bar', height: 350 },
       title: { text: 'Monthly Sales by Product Category' },
-      xAxis: { categories: monthsForCategorySales, crosshair: true },
-      yAxis: { min: 0, title: { text: 'Products Sold' } },
-      tooltip: {
-        headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-          '<td style="padding:0"><b>{point.y} units</b></td></tr>',
-        footerFormat: '</table>',
-        shared: true,
-        useHTML: true
-      },
-      plotOptions: { column: { pointPadding: 0.2, borderWidth: 0 } },
-      series: Object.entries(seriesData).map(([name, data]) => ({ name, data }))
-    });
+      xaxis: { categories: monthsForCategorySales, crosshairs: { width: 1 } },
+      yaxis: { min: 0, title: { text: 'Products Sold' } },
+      plotOptions: { bar: { horizontal: false, columnWidth: '55%', endingShape: 'rounded' } },
+      tooltip: { shared: true, intersect: false },
+      series: Object.entries(seriesData).map(([name, data]) => ({ name, data })),
+      toolbar: { show: true, tools: { download: true } } // Export option added here
+    };
+
+    var categorySalesChart = new ApexCharts(document.querySelector("#monthly-category-sales-chart"), categorySalesOptions);
+    categorySalesChart.render();
+
+    // ApexCharts setup for Current Month Category Sales Donut Chart
+    const currentMonthCategorySalesData = JSON.parse('#{@current_month_category_sales.to_json}');
+    const donutChartOptions = {
+      chart: { type: 'donut', height: 350 },
+      series: currentMonthCategorySalesData.map(item => item.y),
+      labels: currentMonthCategorySalesData.map(item => item.name),
+      colors: ['#1E90FF', '#FF7F50', '#3CB371', '#FFD700', '#FF69B4', '#BA55D3', '#87CEEB'],
+      title: { text: 'This Month' },
+      plotOptions: { pie: { donut: { size: '65%' } } },
+      tooltip: { y: { formatter: value => `${value} units` } },
+      toolbar: { show: true, tools: { download: true } } // Export option added here
+    };
+
+    var donutChart = new ApexCharts(document.querySelector("#current-month-category-sales-chart"), donutChartOptions);
+    donutChart.render();
+
+    // ApexCharts setup for Category Totals Pie Chart
+    function fetchCategoryData() {
+      fetch('#{adminhomes_category_totals_path}')
+        .then(response => response.json())
+        .then(data => {
+          const categories = data.map(item => item[0]);
+          const totals = data.map(item => item[1]);
+
+          var options = {
+            series: totals,
+            chart: {
+              width: '45%',
+              type: 'pie'
+            },
+            labels: categories,
+            colors: ['#1E90FF', '#FF7F50', '#3CB371', '#FFD700', '#FF69B4', '#BA55D3', '#87CEEB'],
+            responsive: [{
+              breakpoint: 480,
+              options: {
+                chart: {
+                  width: 200
+                },
+                legend: {
+                  position: 'bottom'
+                }
+              }
+            }],
+            toolbar: { show: true, tools: { download: true } }
+          };
+
+          var chart = new ApexCharts(document.querySelector("#category-chart"), options);
+          chart.render();
+        });
+    }
+    fetchCategoryData();
   });
 
-  const categorySalesData = JSON.parse('#{@current_month_category_sales.to_json}');
+  document.querySelector('#export-report-button').addEventListener('click', function () {
+    const chartElements = [salesChart, categorySalesChart, donutChart, categoryTotalsChart];
 
-  const donutOptions = {
-    chart: { type: 'donut', height: 350 },
-    series: categorySalesData.map(item => item.y),
-    labels: categorySalesData.map(item => item.name),
-    colors: ['#1E90FF', '#FF7F50', '#3CB371', '#FFD700', '#FF69B4', '#BA55D3', '#87CEEB'],
-    title: { text: 'This Month' },
-    plotOptions: {
-      pie: {
-        donut: {
-          size: '65%'
+    const chartImages = Promise.all(chartElements.map(chart => chart.dataURI()));
+
+    chartImages.then(images => {
+      fetch('/adminhomes/export_report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          salesChart: images[0].imgURI,
+          categorySalesChart: images[1].imgURI,
+          donutChart: images[2].imgURI,
+          categoryTotalsChart: images[3].imgURI
+        })
+      }).then(response => {
+        if (response.ok) {
+          response.json().then(data => {
+            const link = document.createElement('a');
+            link.href = data.file_path;
+            link.download = 'admin_report.pdf';
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+          });
         }
-      }
-    },
-    tooltip: {
-      y: { formatter: value => `${value} units` }
-    }
-  };
-
-  const donutChart = new ApexCharts(document.querySelector("#current-month-category-sales-chart"), donutOptions);
-  donutChart.render();
+      });
+    });
+  });

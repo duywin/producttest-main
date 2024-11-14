@@ -58,6 +58,7 @@
     <orderEntry type="library" scope="PROVIDED" name="chronic (v0.10.2, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="coffee-script (v2.4.1, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="coffee-script-source (v1.12.2, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="combine_pdf (v1.0.26, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="concurrent-ruby (v1.3.4, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="connection_pool (v2.4.1, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="crass (v1.0.6, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
@@ -81,6 +82,7 @@
     <orderEntry type="library" scope="PROVIDED" name="ffi (v1.17.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="font-awesome-rails (v4.7.0.8, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="globalid (v1.2.1, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="grover (v1.1.11, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="haml (v6.3.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="haml-rails (v2.1.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="hashie (v5.0.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
@@ -124,6 +126,7 @@
     <orderEntry type="library" scope="PROVIDED" name="nio4r (v2.7.3, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="nokogiri (v1.16.7, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="orm_adapter (v0.5.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="ostruct (v0.6.1, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="psych (v5.1.2, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="public_suffix (v6.0.1, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="puma (v6.4.3, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
@@ -152,6 +155,7 @@
     <orderEntry type="library" scope="PROVIDED" name="rspec-mocks (v3.13.2, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rspec-rails (v7.0.1, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rspec-support (v3.13.1, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="ruby-rc4 (v0.1.5, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="ruby-vips (v2.2.2, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="ruby2_keywords (v0.0.5, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="ruby_parser (v3.21.1, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
@@ -182,6 +186,7 @@
     <orderEntry type="library" scope="PROVIDED" name="websocket-driver (v0.7.6, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="websocket-extensions (v0.1.5, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="whenever (v1.0.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="wicked_pdf (v2.8.2, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="xpath (v3.2.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="zeitwerk (v2.7.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
   </component>

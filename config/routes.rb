@@ -65,7 +65,13 @@ Rails.application.routes.draw do
       post :import
     end
   end
-  resources :adminhomes, only: [:index]
+
+  resources :adminhomes, only: [:index] do
+    collection do
+      post 'export_report'
+    end
+  end
+
   resources :cart_items, only: [:create, :update, :destroy] do
     collection do
       post "apply_promotion"

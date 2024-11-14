@@ -1,6 +1,7 @@
 require_relative "boot"
 require "rails/all"
 require "sprockets/railtie"
+require 'grover'
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -12,6 +13,7 @@ module Producttest
     config.autoload_paths << Rails.root.join('app', 'sidekiq')
     config.autoload_paths << Rails.root.join('app', 'lib')
     config.autoload_paths << Rails.root.join('app', 'uploaders')
+    config.middleware.use Grover::Middleware
     config.load_defaults 7.0
     config.active_job.verbose_enqueue_logs = true
     config.active_record.query_log_tags_enabled = true

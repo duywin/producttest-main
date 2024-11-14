@@ -15,6 +15,7 @@ gem 'jquery-datatables'
 gem 'ajax-datatables-rails'
 gem 'log4r', '1.0.6'
 
+
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem "sprockets-rails"
 
@@ -71,8 +72,13 @@ gem "carmen"
 gem "activerecord-import", "~> 1.4"
 gem "roo"
 gem "caxlsx", "~> 3.2"
-gem "caxlsx_rails", "~> 0.6.3"  # This is optional if you plan to render Excel files in Rails views
+gem "caxlsx_rails", "~> 0.6.3"  
 gem "whenever", require: false
+gem 'grover'
+gem 'wicked_pdf', '~> 2.1'
+gem 'concurrent-ruby'
+
+
 
 group :development, :test do
   gem "debug", platforms: %i[mri mswin mswin64 mingw x64_mingw]
