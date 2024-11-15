@@ -2,7 +2,6 @@ require 'concurrent'
 class AdminhomesController < ApplicationController
   before_action :authenticate_admin
 
-  # Admin dashboard displaying category totals and top product
   def index
     @account = Account.find_by(id: session[:current_account_id])
     @category_totals = Category.group(:name).sum(:total)
@@ -24,28 +23,25 @@ class AdminhomesController < ApplicationController
   end
 
   def export_report
-    # Extract chart data URLs from parameters
-    sales_chart = params[:salesChart]
-    category_sales_chart = params[:categorySalesChart]
-    donut_chart = params[:donutChart]
-    category_totals_chart = params[:categoryTotalsChart]
+    # Fetch data from `index`
+    index # Ensures the required data is available for the PDF
 
-    # Render HTML from the existing export_report view with embedded images
+    # Render the HTML for the charts
     html = render_to_string(
-      template: 'adminhomes/export_report',  # Render the 'export_report.html.haml' view
-      layout: false,  # Don't use any layout, render just the content
+      template: "adminhomes/export_report",
+      layout: "layouts/application",
       locals: {
-        sales_chart: sales_chart,
-        category_sales_chart: category_sales_chart,
-        donut_chart: donut_chart,
-        category_totals_chart: category_totals_chart
+        monthly_sales_js: @monthly_sales_js,
+        monthly_category_sales_js: @monthly_category_sales_js,
+        current_month_category_sales: @current_month_category_sales,
+        highest_category: @highest_category,
+        top_product: @top_product,
+        category_totals: @category_totals
       }
     )
 
-    # Generate PDF using WickedPDF
-    pdf = WickedPdf.new.pdf_from_string(html)
-
-    # Create file path for saving the PDF
+    # Generate and save PDF with Grover
+    pdf = Grover.new(html, format: 'A4').to_pdf
     file_path = Rails.root.join('public', 'downloads', 'admin_report.pdf')
     FileUtils.mkdir_p(File.dirname(file_path))
 
@@ -57,7 +53,6 @@ class AdminhomesController < ApplicationController
     # Send the file as an attachment to the user
     send_file file_path, filename: 'admin_report.pdf', type: 'application/pdf', disposition: 'attachment'
   end
-
 
 
   # Render category totals as JSON

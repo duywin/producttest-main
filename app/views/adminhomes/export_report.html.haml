@@ -1,13 +1,119 @@
-%h1{ style: "text-align: center;" } Admin Report
+%main.content.py-4
+  %h2.text-center Admin Report
 
-%h2{ style: "text-align: center;" } Sales Chart
-%img{ src: sales_chart, alt: "Sales Chart", style: "width:100%; height:auto;" }
+  %h2.text-center Category Totals
+  #category-chart.my-4.d-flex.justify-content-center.align-items-center{ style: "width: 100%; height: 400px;" }
 
-%h2{ style: "text-align: center;" } Monthly Category Sales
-%img{ src: category_sales_chart, alt: "Monthly Category Sales", style: "width:100%; height:auto;" }
+  %h2.text-center Sales Chart
+  #sales-chart.my-4{ style: "width: 100%; height: 400px;" }
 
-%h2{ style: "text-align: center;" } Current Month Category Sales
-%img{ src: donut_chart, alt: "Current Month Category Sales", style: "width:100%; height:auto;" }
+  %h2.text-center Monthly Category Sales
+  #monthly-category-sales-chart.my-4{ style: "width: 100%; height: 400px;" }
 
-%h2{ style: "text-align: center;" } Category Totals
-%img{ src: category_totals_chart, alt: "Category Totals", style: "width:100%; height:auto;" }
+  %h2.text-center Monthly Product Sales by Category
+  #current-month-category-sales-chart.my-4{ style: "width: 100%; height: 400px;" }
+
+%section.top-product.text-center.py-4
+  - if @top_product
+    %h4 Top Product
+    %p
+      The most sold product is
+      = succeed "." do
+        %strong= @top_product.name
+      %strong= @top_product.total_quantity
+      units. Below is a preview of the product:
+    = image_tag(@top_product.picture, alt: @top_product.name, class: 'top-product-picture') if @top_product.picture.present?
+  - else
+    %p No product has been sold.
+
+%footer.custom-footer.py-4.app-color
+  %h1.text-center Admin Interface
+
+%script{ src: "https://cdn.jsdelivr.net/npm/apexcharts@3.36.0/dist/apexcharts.min.js" }
+
+:javascript
+  document.addEventListener('DOMContentLoaded', function () {
+    // Sales line chart setup
+    const salesData = JSON.parse('#{@monthly_sales_js}');
+    const sortedSalesData = Object.keys(salesData).sort().reduce((acc, key) => {
+      acc[key] = salesData[key];
+      return acc;
+    }, {});
+    const monthsForSales = Object.keys(sortedSalesData);
+    const quantities = Object.values(sortedSalesData);
+
+    const salesChartOptions = {
+      chart: { height: 350, type: 'line' },
+      dataLabels: { enabled: false },
+      colors: ['#FF1654'],
+      series: [{ name: 'Products Sold', data: quantities }],
+      stroke: { width: 4 },
+      xaxis: { categories: monthsForSales, title: { text: 'Month' } },
+      yaxis: { title: { text: 'Quantity Sold' } },
+      tooltip: { shared: true, intersect: false },
+      legend: { horizontalAlign: 'left', offsetX: 40 },
+      toolbar: { show: true, tools: { download: true } }
+    };
+    var salesChart = new ApexCharts(document.querySelector("#sales-chart"), salesChartOptions);
+    salesChart.render();
+
+    // Monthly Category Sales Bar Chart
+    const categorySalesData = JSON.parse('#{@monthly_category_sales_js}');
+    const monthsForCategorySales = Object.keys(categorySalesData);
+    const seriesData = {};
+    monthsForCategorySales.forEach(month => {
+      Object.entries(categorySalesData[month]).forEach(([category, quantity]) => {
+        if (!seriesData[category]) {
+          seriesData[category] = [];
+        }
+        seriesData[category].push(quantity);
+      });
+    });
+
+    const categorySalesOptions = {
+      chart: { type: 'bar', height: 350 },
+      title: { text: 'Monthly Sales by Product Category' },
+      xaxis: { categories: monthsForCategorySales, crosshairs: { width: 1 } },
+      yaxis: { min: 0, title: { text: 'Products Sold' } },
+      plotOptions: { bar: { horizontal: false, columnWidth: '55%', endingShape: 'rounded' } },
+      tooltip: { shared: true, intersect: false },
+      series: Object.entries(seriesData).map(([name, data]) => ({ name, data })),
+      toolbar: { show: true, tools: { download: true } }
+    };
+    var categorySalesChart = new ApexCharts(document.querySelector("#monthly-category-sales-chart"), categorySalesOptions);
+    categorySalesChart.render();
+
+    // Current Month Category Sales Donut Chart
+    const currentMonthCategorySalesData = JSON.parse('#{@current_month_category_sales.to_json}');
+    const donutChartOptions = {
+      chart: { type: 'donut', height: 350 },
+      series: currentMonthCategorySalesData.map(item => item.y),
+      labels: currentMonthCategorySalesData.map(item => item.name),
+      colors: ['#1E90FF', '#FF7F50', '#3CB371', '#FFD700', '#FF69B4', '#BA55D3', '#87CEEB'],
+      title: { text: 'This Month' },
+      plotOptions: { pie: { donut: { size: '65%' } } },
+      tooltip: { y: { formatter: value => `${value} units` } },
+      toolbar: { show: true, tools: { download: true } }
+    };
+    var donutChart = new ApexCharts(document.querySelector("#current-month-category-sales-chart"), donutChartOptions);
+    donutChart.render();
+
+    // Category Totals Pie Chart
+    const categoryTotalsData = JSON.parse('#{@category_totals.to_json}');
+    const categories = categoryTotalsData.map(item => item[0]);
+    const totals = categoryTotalsData.map(item => item[1]);
+
+    const categoryTotalsOptions = {
+      chart: { width: '45%', type: 'pie' },
+      labels: categories,
+      series: totals,
+      colors: ['#1E90FF', '#FF7F50', '#3CB371', '#FFD700', '#FF69B4', '#BA55D3', '#87CEEB'],
+      responsive: [{
+        breakpoint: 480,
+        options: { chart: { width: 200 }, legend: { position: 'bottom' } }
+      }],
+      toolbar: { show: true, tools: { download: true } }
+    };
+    var categoryTotalsChart = new ApexCharts(document.querySelector("#category-chart"), categoryTotalsOptions);
+    categoryTotalsChart.render();
+  });

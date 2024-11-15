@@ -66,16 +66,9 @@
 
 :javascript
   document.addEventListener('DOMContentLoaded', function () {
-    // Set up event listener for Export Report button
-    // Sale line chart
+    // Sales line chart setup
     const salesData = JSON.parse('#{@monthly_sales_js}');
-    const sortedSalesData = Object.keys(salesData)
-      .sort()
-      .reduce((acc, key) => {
-        acc[key] = salesData[key];
-        return acc;
-      }, {});
-
+    const sortedSalesData = Object.keys(salesData).sort().reduce((acc, key) => { acc[key] = salesData[key]; return acc; }, {});
     const monthsForSales = Object.keys(sortedSalesData);
     const quantities = Object.values(sortedSalesData);
 
@@ -89,22 +82,18 @@
       yaxis: { title: { text: 'Quantity Sold' } },
       tooltip: { shared: true, intersect: false },
       legend: { horizontalAlign: 'left', offsetX: 40 },
-      toolbar: { show: true, tools: { download: true } } // Export option added here
+      toolbar: { show: true, tools: { download: true } }
     };
-
     var salesChart = new ApexCharts(document.querySelector("#sales-chart"), salesChartOptions);
     salesChart.render();
 
-    // ApexCharts setup for Monthly Category Sales Bar Chart
+    // Monthly Category Sales Bar Chart
     const categorySalesData = JSON.parse('#{@monthly_category_sales_js}');
     const monthsForCategorySales = Object.keys(categorySalesData);
     const seriesData = {};
-
     monthsForCategorySales.forEach(month => {
       Object.entries(categorySalesData[month]).forEach(([category, quantity]) => {
-        if (!seriesData[category]) {
-          seriesData[category] = [];
-        }
+        if (!seriesData[category]) { seriesData[category] = []; }
         seriesData[category].push(quantity);
       });
     });
@@ -117,13 +106,12 @@
       plotOptions: { bar: { horizontal: false, columnWidth: '55%', endingShape: 'rounded' } },
       tooltip: { shared: true, intersect: false },
       series: Object.entries(seriesData).map(([name, data]) => ({ name, data })),
-      toolbar: { show: true, tools: { download: true } } // Export option added here
+      toolbar: { show: true, tools: { download: true } }
     };
-
     var categorySalesChart = new ApexCharts(document.querySelector("#monthly-category-sales-chart"), categorySalesOptions);
     categorySalesChart.render();
 
-    // ApexCharts setup for Current Month Category Sales Donut Chart
+    // Current Month Category Sales Donut Chart
     const currentMonthCategorySalesData = JSON.parse('#{@current_month_category_sales.to_json}');
     const donutChartOptions = {
       chart: { type: 'donut', height: 350 },
@@ -133,75 +121,30 @@
       title: { text: 'This Month' },
       plotOptions: { pie: { donut: { size: '65%' } } },
       tooltip: { y: { formatter: value => `${value} units` } },
-      toolbar: { show: true, tools: { download: true } } // Export option added here
+      toolbar: { show: true, tools: { download: true } }
     };
-
     var donutChart = new ApexCharts(document.querySelector("#current-month-category-sales-chart"), donutChartOptions);
     donutChart.render();
 
-    // ApexCharts setup for Category Totals Pie Chart
+    // Category Totals Pie Chart
     function fetchCategoryData() {
       fetch('#{adminhomes_category_totals_path}')
         .then(response => response.json())
         .then(data => {
           const categories = data.map(item => item[0]);
           const totals = data.map(item => item[1]);
-
           var options = {
             series: totals,
-            chart: {
-              width: '45%',
-              type: 'pie'
-            },
+            chart: { width: '45%', type: 'pie' },
             labels: categories,
             colors: ['#1E90FF', '#FF7F50', '#3CB371', '#FFD700', '#FF69B4', '#BA55D3', '#87CEEB'],
-            responsive: [{
-              breakpoint: 480,
-              options: {
-                chart: {
-                  width: 200
-                },
-                legend: {
-                  position: 'bottom'
-                }
-              }
-            }],
+            responsive: [{ breakpoint: 480, options: { chart: { width: 200 }, legend: { position: 'bottom' }}}],
             toolbar: { show: true, tools: { download: true } }
           };
-
-          var chart = new ApexCharts(document.querySelector("#category-chart"), options);
-          chart.render();
+          var categoryTotalsChart = new ApexCharts(document.querySelector("#category-chart"), options);
+          categoryTotalsChart.render();
         });
     }
     fetchCategoryData();
-  });
-
-  document.querySelector('#export-report-button').addEventListener('click', function () {
-    const chartElements = [salesChart, categorySalesChart, donutChart, categoryTotalsChart];
-
-    const chartImages = Promise.all(chartElements.map(chart => chart.dataURI()));
-
-    chartImages.then(images => {
-      fetch('/adminhomes/export_report', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          salesChart: images[0].imgURI,
-          categorySalesChart: images[1].imgURI,
-          donutChart: images[2].imgURI,
-          categoryTotalsChart: images[3].imgURI
-        })
-      }).then(response => {
-        if (response.ok) {
-          response.json().then(data => {
-            const link = document.createElement('a');
-            link.href = data.file_path;
-            link.download = 'admin_report.pdf';
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-          });
-        }
-      });
     });
-  });
+
