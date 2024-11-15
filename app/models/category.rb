@@ -3,4 +3,7 @@ class Category < ApplicationRecord
   def self.ransackable_attributes(auth_object = nil)
     ["name"]
   end
+  def self.category_totals
+    group(:name).sum(:total)
+  end
 end

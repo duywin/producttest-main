@@ -64,6 +64,15 @@ class Product < ApplicationRecord
     ["name", "prices", "product_type"]
   end
 
+  def self.find_top_product
+    CartItem.joins(:product)
+            .group("products.id")
+            .select("products.name, products.picture, SUM(cart_items.quantity) AS total_quantity")
+            .order("total_quantity DESC")
+            .limit(1)
+            .first
+  end
+
   # Method to search products using Elasticsearch with query and optional filters
   def self.search(query, filters = {})
     __elasticsearch__.search(

@@ -98,4 +98,23 @@ class Cart < ApplicationRecord
       )
     }
   end
+
+  def self.monthly_sales_data
+    where.not(deliver_day: nil)
+         .group("DATE_FORMAT(deliver_day, '%Y-%m')")
+         .sum(:quantity)
+         .transform_keys { |date| Date.strptime(date, "%Y-%m").strftime("%B %Y") }
+  end
+
+  def self.monthly_category_sales_data
+    CartItem.joins(:product)
+            .group("DATE_FORMAT(cart_items.created_at, '%Y-%m')", "products.product_type")
+            .sum(:quantity)
+            .each_with_object({}) do |((month, category), quantity), hash|
+      formatted_month = Date.strptime(month, "%Y-%m").strftime("%B %Y")
+      hash[formatted_month] ||= {}
+      hash[formatted_month][category] = quantity
+    end
+  end
+
 end
