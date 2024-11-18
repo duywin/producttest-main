@@ -14,10 +14,8 @@ class AdminhomesController < ApplicationController
 
   #Export the report and trigger asynchronous PDF generation
   def export_report
-    # Create a list to hold promises
     promises = []
 
-    # Fetch data concurrently using promises
     promises << Concurrent::Promise.execute do
       @account = Account.find_by(id: session[:current_account_id])
     end
@@ -42,7 +40,6 @@ class AdminhomesController < ApplicationController
 
     promises << Concurrent::Promise.execute do
       @current_month_category_sales = CartItem.current_month_category_sales
-       # Sleep for 2 seconds after fetching current month's category sales
     end
 
     # Wait for all promises to resolve
