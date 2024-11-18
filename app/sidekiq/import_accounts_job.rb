@@ -1,6 +1,5 @@
 # app/jobs/import_accounts_job.rb
-class ImportAccountsJob < ApplicationJob
-  include Sidekiq::Worker
+class ImportAccountsJob < SidekiqWorker
   sidekiq_options queue: :default
 
   def perform(file_path)
@@ -21,21 +20,21 @@ class ImportAccountsJob < ApplicationJob
         if username.present? && email.present? && password.present?
           accounts << Account.new(username: username, email: email, password: password, is_admin: is_admin)
         else
-          Rails.logger.error("Invalid account data at row #{i}: username=#{username}, email=#{email}, password=#{password}")
+          logger.error("Invalid account data at row #{i}: username=#{username}, email=#{email}, password=#{password}")
         end
       end
     rescue => e
-      Rails.logger.error("Error reading file: #{e.message}")
+      logger.error("Error reading file: #{e.message}")
       return
     end
 
     # Handle account saving in bulk for better performance
     if accounts.all?(&:valid?)
       Account.import accounts
-      Rails.logger.info("Accounts were successfully imported: #{accounts.count} accounts")
+      logger.info("Accounts were successfully imported: #{accounts.count} accounts")
     else
       error_messages = accounts.reject(&:valid?).map { |acc| acc.errors.full_messages.join(", ") }.join("; ")
-      Rails.logger.error("There were errors with some accounts: #{error_messages}")
+      logger.error("There were errors with some accounts: #{error_messages}")
     end
   end
 end

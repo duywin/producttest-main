@@ -1,14 +1,15 @@
-class ProductImportJob < ApplicationJob
-  include Sidekiq::Worker
+# app/jobs/product_import_job.rb
+class ProductImportJob < SidekiqWorker
   sidekiq_options queue: :default
 
   def perform(file_path)
     products = import_products_from_file(file_path)
+
     if products.is_a?(String)
-      Rails.logger.error("Product import error: #{products}")
+      logger.error("Product import error: #{products}")
     else
       Product.import(products)
-      Rails.logger.info("#{products.size} products were successfully imported.")
+      logger.info("#{products.size} products were successfully imported.")
     end
   end
 
@@ -21,22 +22,21 @@ class ProductImportJob < ApplicationJob
 
     (2..spreadsheet.last_row).each do |i|
       row = spreadsheet.row(i)
-      Rails.logger.info("Processing row: #{row.inspect}")  # Log the row being processed
+      logger.info("Processing row: #{row.inspect}")  # Log the row being processed
       product = create_product_from_row(row, header)
 
       if product.valid? # Ensure the product is valid before adding
         products << product
       else
-        Rails.logger.error("Invalid product: #{product.errors.full_messages.join(', ')}") # Log any errors
+        logger.error("Invalid product: #{product.errors.full_messages.join(', ')}") # Log any errors
       end
     end
 
     products
   rescue StandardError => e
-    Rails.logger.error("Error reading file: #{e.message}")  # Log errors while reading the file
+    logger.error("Error reading file: #{e.message}")  # Log errors while reading the file
     "Error reading file: #{e.message}"
   end
-
 
   def create_product_from_row(row, header)
     default_values = {
