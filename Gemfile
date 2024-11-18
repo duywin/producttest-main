@@ -75,7 +75,6 @@ gem "caxlsx", "~> 3.2"
 gem "caxlsx_rails", "~> 0.6.3"  
 gem "whenever", require: false
 gem 'grover'
-gem 'wicked_pdf', '~> 2.1'
 gem 'concurrent-ruby'
 
 

@@ -4,6 +4,6 @@ class Category < ApplicationRecord
     ["name"]
   end
   def self.category_totals
-    group(:name).sum(:total)
+    group(:name).sum(:total).map { |name, total| { name: name, total: total } }
   end
 end

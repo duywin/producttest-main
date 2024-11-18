@@ -26,9 +26,6 @@
   - else
     %p No product has been sold.
 
-%footer.custom-footer.py-4.app-color
-  %h1.text-center Admin Interface
-
 %script{ src: "https://cdn.jsdelivr.net/npm/apexcharts@3.36.0/dist/apexcharts.min.js" }
 
 :javascript
@@ -100,8 +97,8 @@
 
     // Category Totals Pie Chart
     const categoryTotalsData = JSON.parse('#{@category_totals.to_json}');
-    const categories = categoryTotalsData.map(item => item[0]);
-    const totals = categoryTotalsData.map(item => item[1]);
+    const categories = categoryTotalsData.map(item => item.name);
+    const totals = categoryTotalsData.map(item => item.total);
 
     const categoryTotalsOptions = {
       chart: { width: '45%', type: 'pie' },

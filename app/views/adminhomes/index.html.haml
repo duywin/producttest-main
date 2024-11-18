@@ -127,24 +127,22 @@
     donutChart.render();
 
     // Category Totals Pie Chart
-    function fetchCategoryData() {
-      fetch('#{adminhomes_category_totals_path}')
-        .then(response => response.json())
-        .then(data => {
-          const categories = data.map(item => item[0]);
-          const totals = data.map(item => item[1]);
-          var options = {
-            series: totals,
-            chart: { width: '45%', type: 'pie' },
-            labels: categories,
-            colors: ['#1E90FF', '#FF7F50', '#3CB371', '#FFD700', '#FF69B4', '#BA55D3', '#87CEEB'],
-            responsive: [{ breakpoint: 480, options: { chart: { width: 200 }, legend: { position: 'bottom' }}}],
-            toolbar: { show: true, tools: { download: true } }
-          };
-          var categoryTotalsChart = new ApexCharts(document.querySelector("#category-chart"), options);
-          categoryTotalsChart.render();
-        });
-    }
-    fetchCategoryData();
+    const categoryTotalsData = JSON.parse('#{@category_totals.to_json}');
+    const categories = categoryTotalsData.map(item => item.name);
+    const totals = categoryTotalsData.map(item => item.total);
+
+    const categoryTotalsOptions = {
+      chart: { width: '45%', type: 'pie' },
+      labels: categories,
+      series: totals,
+      colors: ['#1E90FF', '#FF7F50', '#3CB371', '#FFD700', '#FF69B4', '#BA55D3', '#87CEEB'],
+      responsive: [{
+        breakpoint: 480,
+        options: { chart: { width: 200 }, legend: { position: 'bottom' } }
+      }],
+      toolbar: { show: true, tools: { download: true } }
+    };
+    var categoryTotalsChart = new ApexCharts(document.querySelector("#category-chart"), categoryTotalsOptions);
+    categoryTotalsChart.render();
     });
 

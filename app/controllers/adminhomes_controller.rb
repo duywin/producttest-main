@@ -1,3 +1,4 @@
+require 'concurrent'
 class AdminhomesController < ApplicationController
   before_action :authenticate_admin
 
@@ -22,8 +23,8 @@ class AdminhomesController < ApplicationController
   end
 
   def export_report
-    # Fetch data from `index`
-    index # Ensures the required data is available for the PDF
+    # Ensure the data required for the report is loaded
+    index
 
     # Render the HTML for the charts
     html = render_to_string(
@@ -33,21 +34,19 @@ class AdminhomesController < ApplicationController
         monthly_sales_js: @monthly_sales_js,
         monthly_category_sales_js: @monthly_category_sales_js,
         current_month_category_sales: @current_month_category_sales,
-        highest_category: @highest_category,
+        highest_category: @category_totals.max_by { |_category, total| total },
         top_product: @top_product,
         category_totals: @category_totals
       }
     )
 
-    # Generate and save PDF with Grover
+    # Generate PDF from the rendered HTML
     pdf = Grover.new(html, format: 'A4').to_pdf
-    file_path = Rails.root.join('public', 'downloads', 'admin_report.pdf')
-    FileUtils.mkdir_p(File.dirname(file_path))
 
-    # Write the binary PDF data to the file in binary mode
-    File.open(file_path, "wb") do |file|
-      file.write(pdf)
-    end
+    # Save the PDF file to a public directory
+    file_path = Rails.root.join('public', 'downloads', 'admin_report.pdf')
+    FileUtils.mkdir_p(File.dirname(file_path)) # Ensure the directory exists
+    File.open(file_path, "wb") { |file| file.write(pdf) } # Write the file in binary mode
 
     # Send the file as an attachment to the user
     send_file file_path, filename: 'admin_report.pdf', type: 'application/pdf', disposition: 'attachment'
