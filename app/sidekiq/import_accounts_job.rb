@@ -1,6 +1,7 @@
 # app/jobs/import_accounts_job.rb
 class ImportAccountsJob < ApplicationJob
-  queue_as :default
+  include Sidekiq::Worker
+  sidekiq_options queue: :default
 
   def perform(file_path)
     accounts = []

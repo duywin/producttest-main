@@ -47,7 +47,10 @@ class CategoriesController < ApplicationController
     FileUtils.mkdir_p(file_path.dirname)
     File.open(file_path, "wb") { |f| f.write(file.read) }
 
-    ImportCategoriesJob.perform_later(file_path.to_s)
+    ImportCategoriesJob.perform_async(file_path.to_s)
+
+    # ImportCategoriesJob.new.perform(file_path.to_s)
+
     month_logger.info("Import started for file '#{file.original_filename}'", session[:current_account_id])
 
     redirect_to categories_path, notice: "File read successfully. Please wait for the import"

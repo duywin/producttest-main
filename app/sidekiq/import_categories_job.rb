@@ -1,9 +1,11 @@
 # app/jobs/import_categories_job.rb
-class ImportCategoriesJob < ApplicationJob
-  queue_as :default
+class ImportCategoriesJob
+  include Sidekiq::Worker
+  sidekiq_options queue: :default
 
   def perform(file_path)
     categories = []
+
 
     begin
       spreadsheet = Roo::OpenOffice.new(file_path)

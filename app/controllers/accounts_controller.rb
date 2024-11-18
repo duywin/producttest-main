@@ -68,7 +68,7 @@ class AccountsController < ApplicationController
       f.write(file.read)
     end
 
-    ImportAccountsJob.perform_later(temp_file_path)
+    ImportAccountsJob.perform_async(temp_file_path)
     month_logger.info("Account import started for file '#{file.original_filename}'", session[:current_account_id])
 
     redirect_to accounts_path, notice: "Importing accounts. You will be notified once the import is complete."

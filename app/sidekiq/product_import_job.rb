@@ -1,5 +1,6 @@
 class ProductImportJob < ApplicationJob
-  queue_as :default
+  include Sidekiq::Worker
+  sidekiq_options queue: :default
 
   def perform(file_path)
     products = import_products_from_file(file_path)

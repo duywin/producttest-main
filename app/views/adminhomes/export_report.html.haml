@@ -1,17 +1,21 @@
 %main.content.py-4
   %h2.text-center Admin Report
 
-  %h2.text-center Category Totals
-  #category-chart.my-4.d-flex.justify-content-center.align-items-center{ style: "width: 100%; height: 400px;" }
+  .row
+    .col-md-6
+      %h4.text-center Category Totals
+      #category-chart.my-4.d-flex.justify-content-center.align-items-center{ style: "height: 400px;" }
+    .col-md-6
+      %h4.text-center Monthly Product Sales by Category
+      #current-month-category-sales-chart.my-4{ style: "height: 400px;" }
 
-  %h2.text-center Sales Chart
-  #sales-chart.my-4{ style: "width: 100%; height: 400px;" }
-
-  %h2.text-center Monthly Category Sales
-  #monthly-category-sales-chart.my-4{ style: "width: 100%; height: 400px;" }
-
-  %h2.text-center Monthly Product Sales by Category
-  #current-month-category-sales-chart.my-4{ style: "width: 100%; height: 400px;" }
+  .row
+    .col-md-6
+      %h4.text-center Monthly Category Sales
+      #monthly-category-sales-chart.my-4{ style: "height: 400px;" }
+    .col-md-6
+      %h4.text-center Sales Chart
+      #sales-chart.my-4{ style: "height: 400px;" }
 
 %section.top-product.text-center.py-4
   - if @top_product
@@ -22,7 +26,7 @@
         %strong= @top_product.name
       %strong= @top_product.total_quantity
       units. Below is a preview of the product:
-    = image_tag(@top_product.picture, alt: @top_product.name, class: 'top-product-picture') if @top_product.picture.present?
+    = image_tag(@top_product.picture, alt: @top_product.name, class: 'top-product-picture', style: "width: 30%; height: auto;") if @top_product.picture.present?
   - else
     %p No product has been sold.
 
@@ -101,7 +105,7 @@
     const totals = categoryTotalsData.map(item => item.total);
 
     const categoryTotalsOptions = {
-      chart: { width: '45%', type: 'pie' },
+      chart: { width: '100%', type: 'pie' },
       labels: categories,
       series: totals,
       colors: ['#1E90FF', '#FF7F50', '#3CB371', '#FFD700', '#FF69B4', '#BA55D3', '#87CEEB'],

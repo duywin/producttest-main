@@ -162,7 +162,7 @@ class ProductsController < ApplicationController
     File.open(file_path, 'wb') { |file| file.write(uploaded_file.read) }
 
     # Enqueue the import job and log the import
-    ProductImportJob.perform_later(file_path.to_s)
+    ProductImportJob.perform_async(file_path.to_s)
     product_logger.info("Product import started for file '#{uploaded_file.original_filename}' by Account ID #{session[:current_account_id]}")
 
     redirect_to(products_path, notice: 'Product import has been started. You will be notified once it is complete.')
