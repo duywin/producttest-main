@@ -1,15 +1,21 @@
 class Product < ApplicationRecord
+  # Validations
   validates :name, presence: true
   validates :prices, presence: true, numericality: { greater_than: 0.00 }
-  mount_uploader :picture_file, PictureUploader # mount uploader for file
+
+  # File uploader
+  mount_uploader :picture_file, PictureUploader
+
+  # Pagination
   paginates_per 10
 
+  # Associations
   has_many :merchandises
 
+  # Elasticsearch integration
   include Elasticsearch::Model
   include Elasticsearch::Model::Callbacks
 
-  # Elasticsearch settings for index normalization
   settings index: {
     analysis: {
       normalizer: {
@@ -21,7 +27,6 @@ class Product < ApplicationRecord
     }
   }
 
-  # Elasticsearch mappings
   mappings dynamic: false do
     indexes :id, type: :integer
     indexes :name, type: "keyword", normalizer: "lowercase_normalizer"
@@ -29,51 +34,18 @@ class Product < ApplicationRecord
     indexes :prices, type: :float
   end
 
-  # Elasticsearch callbacks
   after_create :index_to_elasticsearch
   after_update :update_in_elasticsearch
 
-  # Method to index document in Elasticsearch after creation
+  # Elasticsearch methods
   def index_to_elasticsearch
     __elasticsearch__.index_document
   end
 
-  # Method to update document in Elasticsearch after update
   def update_in_elasticsearch
     __elasticsearch__.update_document
   end
 
-  # Method to get the current price of a product, applying merchandise discount if active
-  def current_price
-    merchandise = merchandises.where("promotion_end >= ?", Date.today).first
-    if merchandise
-      prices * (1 - merchandise.cut_off_value / 100)
-    else
-      prices # Regular price
-    end
-  end
-
-  # Method to check price status (normal or anomaly)
-  def price_status
-    merchandise = merchandises.where("promotion_end >= ?", Date.today).first
-    merchandise ? "anomaly" : "normal"
-  end
-
-  # Define ransackable attributes for searching
-  def self.ransackable_attributes(auth_object = nil)
-    ["name", "prices", "product_type"]
-  end
-
-  def self.find_top_product
-    CartItem.joins(:product)
-            .group("products.id")
-            .select("products.name, products.picture, SUM(cart_items.quantity) AS total_quantity")
-            .order("total_quantity DESC")
-            .limit(1)
-            .first
-  end
-
-  # Method to search products using Elasticsearch with query and optional filters
   def self.search(query, filters = {})
     __elasticsearch__.search(
       {
@@ -83,17 +55,42 @@ class Product < ApplicationRecord
               {
                 wildcard: {
                   name: {
-                    value: "*#{query}*", # SQL-like `LIKE %query%` behavior for name
+                    value: "*#{query}*",
                     boost: 1.0,
                     rewrite: "constant_score"
                   }
                 }
               }
             ],
-            filter: filters.presence || [] # Apply filters if provided
+            filter: filters.presence || []
           }
         }
       }
     )
+  end
+
+  # Methods for pricing
+  def current_price
+    merchandise = merchandises.where("promotion_end >= ?", Date.today).first
+    merchandise ? prices * (1 - merchandise.cut_off_value / 100) : prices
+  end
+
+  def price_status
+    merchandises.where("promotion_end >= ?", Date.today).exists? ? "anomaly" : "normal"
+  end
+
+  # Top product finder
+  def self.find_top_product
+    CartItem.joins(:product)
+            .group("products.id")
+            .select("products.name, products.picture, SUM(cart_items.quantity) AS total_quantity")
+            .order("total_quantity DESC")
+            .limit(1)
+            .first
+  end
+
+  # Ransack integration
+  def self.ransackable_attributes(auth_object = nil)
+    %w[name prices product_type]
   end
 end

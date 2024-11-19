@@ -1,10 +1,13 @@
 class Cart < ApplicationRecord
+  # Associations
+  belongs_to :account
   has_many :cart_items, dependent: :destroy
   has_many :products, through: :cart_items
-  belongs_to :account
 
+  # Pagination
   paginates_per 10
 
+  # Elasticsearch integration
   include Elasticsearch::Model
   include Elasticsearch::Model::Callbacks
 
@@ -22,35 +25,32 @@ class Cart < ApplicationRecord
       indexes :id, type: :integer
       indexes :account_id, type: :integer
       indexes :status, type: :keyword, normalizer: "lowercase_normalizer"
-      indexes :deliver_day, type: :date  # This is correct
+      indexes :deliver_day, type: :date
       indexes :created_at, type: :date
     end
   end
 
+  # Callbacks
   after_create :index_to_elasticsearch
   after_update :update_in_elasticsearch
 
-  # Define your conditions as instance variables or attributes
+  # Elasticsearch indexing and updating
   attr_accessor :function_check_out, :admin_update
 
   def index_to_elasticsearch
-    if function_check_out
-      __elasticsearch__.index_document
-    end
+    __elasticsearch__.index_document if function_check_out
   end
 
-  # Method to update document in Elasticsearch after update
   def update_in_elasticsearch
-    if admin_update
-      __elasticsearch__.update_document
-    end
+    __elasticsearch__.update_document if admin_update
   end
 
-
-  # Filter and helper methods
+  # Scopes
   scope :checked_out, -> { where(check_out: true) }
   scope :by_week, ->(week_start) { where(created_at: week_start.beginning_of_day..week_start.end_of_week.end_of_day) }
   scope :by_day, ->(date) { where(created_at: date.beginning_of_day..date.end_of_day) }
+
+  # Class Methods
 
   def self.apply_filters(carts, week_param, day_param)
     return carts unless week_param.present?
@@ -66,23 +66,34 @@ class Cart < ApplicationRecord
   end
 
   def self.search_carts(params)
-    search_definition = { query: { bool: { filter: [] } } }
+    search_definition = {
+      query: {
+        bool: {
+          filter: []
+        }
+      }
+    }
     search_definition[:query][:bool][:filter] << { term: { status: params[:status] } } if params[:status].present?
 
     if params[:week].present?
       week_start = Date.strptime(params[:week], '%d %b %Y').beginning_of_week
-      search_definition[:query][:bool][:filter] << { range: { created_at: { gte: week_start, lte: week_start.end_of_week } } }
+      search_definition[:query][:bool][:filter] << {
+        range: { created_at: { gte: week_start, lte: week_start.end_of_week } }
+      }
 
       if params[:day].present?
         day_of_week = Date::DAYNAMES.index(params[:day].capitalize)
-        search_definition[:query][:bool][:filter] << { script: { script: "doc['created_at'].value.dayOfWeek == #{day_of_week}" } }
+        search_definition[:query][:bool][:filter] << {
+          script: { script: "doc['created_at'].value.dayOfWeek == #{day_of_week}" }
+        }
       end
     end
 
     __elasticsearch__.search(search_definition)
   end
 
-  # Returns formatted data for cart
+  # Instance Methods
+
   def formatted_data
     {
       id: id,
@@ -98,6 +109,8 @@ class Cart < ApplicationRecord
       )
     }
   end
+
+  # Sales Data Methods
 
   def self.monthly_sales_data
     where.not(deliver_day: nil)
@@ -116,5 +129,4 @@ class Cart < ApplicationRecord
       hash[formatted_month][category] = quantity
     end
   end
-
 end
