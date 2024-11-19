@@ -49,6 +49,7 @@ gem "devise-otp"
 gem "rotp", "6.3.0"
 gem 'brakeman', require: false
 gem 'sidekiq'
+gem 'sidekiq-cron'
 
 
 gem "rack", "2.2.4"
