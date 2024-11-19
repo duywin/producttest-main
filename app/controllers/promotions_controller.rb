@@ -28,7 +28,7 @@ class PromotionsController < ApplicationController
   def destroy
     PromoteProduct.where(promotion_id: @promotion.id).destroy_all
     @promotion.destroy
-    month_logger.info("Promotion deleted : '#{@promotion.id}' by user '#{session[:current_account_id]}'", session[:current_account_id])
+    month_logger.info("Promotion deleted: '#{@promotion.id}' by user '#{session[:current_account_id]}'", session[:current_account_id])
     redirect_to products_path, notice: "Promotion deleted successfully!"
   end
 
@@ -59,11 +59,7 @@ class PromotionsController < ApplicationController
     case promotion.promotion_type
     when "product"
       product = Product.find_by(id: params[:promotion][:apply_field])
-      if product
-        create_promote_product(promotion.id, product.id, 1000)
-      else
-        flash[:alert] = "Product not found"
-      end
+      create_promote_product(promotion.id, product.id, 1000) if product
     when "category"
       products = Product.where(product_type: params[:promotion][:apply_field])
       products.each { |product| create_promote_product(promotion.id, product.id, 300) }

@@ -1,4 +1,3 @@
-# app/controllers/categories_controller.rb
 class CategoriesController < ApplicationController
   before_action :set_category, only: [:destroy]
   before_action :authenticate_admin
@@ -11,49 +10,35 @@ class CategoriesController < ApplicationController
         @category = Category.new
       end
       format.json do
-        @categories = Category.all
-        render json: { data: @categories.as_json(only: [:name, :total, :id]) }
+        render json: { data: Category.all.as_json(only: [:name, :total, :id]) }
       end
     end
   end
 
   # Authenticates the admin by checking if the current account ID is present.
   def authenticate_admin
-    if session[:current_account_id].nil? && request.path != noindex_path
-      redirect_to noindex_path
-    end
+    redirect_to noindex_path if session[:current_account_id].nil? && request.path != noindex_path
   end
 
   # Refreshes the total count for each category.
   def refreshtotal
-    Category.find_each do |category|
-      total_count = Product.where(product_type: category.name).count
-      category.update(total: total_count)
-    end
+    Category.find_each { |category| category.update(total: Product.where(product_type: category.name).count) }
     redirect_to categories_path, notice: "Total counts refreshed successfully."
   end
 
   # Imports categories from an ODS file.
   def import
     file = params[:file]
-
     if file.nil?
       redirect_to categories_path, alert: "Please upload an ODS file."
       return
     end
 
-    # Save the file temporarily
-    file_path = Rails.root.join("tmp", "uploads", file.original_filename)
-    FileUtils.mkdir_p(file_path.dirname)
-    File.open(file_path, "wb") { |f| f.write(file.read) }
-
-    ImportCategoriesJob.perform_async(file_path.to_s)
-
-    # ImportCategoriesJob.new.perform(file_path.to_s)
+    file_path = save_temp_file(file)
+    ImportCategoriesJob.perform_async(file_path)
 
     month_logger.info("Import started for file '#{file.original_filename}'", session[:current_account_id])
-
-    redirect_to categories_path, notice: "File read successfully. Please wait for the import"
+    redirect_to categories_path, notice: "File read successfully. Please wait for the import."
   end
 
   # Initializes a new category.
@@ -66,7 +51,6 @@ class CategoriesController < ApplicationController
     @category.total ||= 0
 
     if @category.save
-      # Log the add action
       month_logger.info("Category '#{@category.name}' (ID: #{@category.id}) was created", session[:current_account_id])
       redirect_to categories_path, notice: "Category was successfully created."
     else
@@ -96,5 +80,13 @@ class CategoriesController < ApplicationController
   # Initializes the monthly logger for this controller.
   def month_logger
     @month_logger ||= MonthLogger.new(Category)
+  end
+
+  # Saves the uploaded file temporarily and returns the file path.
+  def save_temp_file(file)
+    file_path = Rails.root.join("tmp", "uploads", file.original_filename)
+    FileUtils.mkdir_p(file_path.dirname)
+    File.open(file_path, "wb") { |f| f.write(file.read) }
+    file_path.to_s
   end
 end

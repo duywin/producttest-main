@@ -1,27 +1,23 @@
 class AccountsController < ApplicationController
-  before_action :set_account, only: [:show, :edit, :update, :destroy]
+  before_action :set_account, only: %i[show edit update destroy]
   before_action :authenticate_admin, only: [:index]
 
-  # Ensure the user is an admin before allowing access to certain actions
+  # Ensures the user is an admin before accessing certain actions.
   def authenticate_admin
-    if session[:current_account_id].nil?
-      redirect_to noindex_path unless request.path == noindex_path # Prevent redirect loop
+    unless session[:current_account_id]
+      redirect_to noindex_path unless request.path == noindex_path # Prevent redirect loop.
     end
   end
 
-  # List accounts with search and filter options
-  def index
-  end
+  # Lists accounts with search and filter options.
+  def index; end
 
+  # Renders a datatable with account details.
   def render_account_datatable
     query = params[:username_cont].presence
     created_at_filter = params[:created_at_filter]
 
-    @accounts = if query.present?
-                  Account.search(query, created_at_filter).records
-                else
-                  Account.all
-                end
+    @accounts = query.present? ? Account.search(query, created_at_filter).records : Account.all
 
     data = @accounts.map do |account|
       {
@@ -29,78 +25,55 @@ class AccountsController < ApplicationController
         username: account.username,
         email: account.email,
         status: account.is_admin ? 'Admin' : 'User',
-        actions: %(
-        <div class="d-flex gap-3 align-items-center">
-          <button type="button" onclick="window.location='#{account_path(account)}'" class="btn btn-primary" style="color: white; padding: 10px 20px; border-radius: 5px; border: none; cursor: pointer; background: none; font-size: 20px;" title="View Details">
-            <span>👁</span>
-          </button>
-          <button type="button" onclick="window.location='#{edit_account_path(account)}'" class="btn btn-primary" style="color: blue; padding: 10px 20px; border-radius: 5px; border: none; cursor: pointer; background: none; font-size: 20px;" title="Edit Account">
-            <span>✎</span>
-          </button>
-          <button type="button" data-method="delete" data-confirm="Are you sure?" class="btn btn-danger delete-account-btn" data-account-id="#{account.id}" style="background: none; padding: 10px 20px; border-radius: 5px; border: none; color: red; cursor: pointer; font-size: 20px;" title="Delete Account">
-            <span>❌</span>
-          </button>
-        </div>
-      )
+        actions: render_action_buttons(account)
       }
     end
 
     render json: { data: data, status: 200 }
   end
 
-  # Import accounts from an uploaded ODS file
+  # Imports accounts from an uploaded ODS file.
   def import
     file = params[:file]
-    if file.nil?
+    if file.blank?
       redirect_to accounts_path, alert: "Please upload an ODS file."
       return
     end
 
-    # Check if the file is of the right type
-    unless File.extname(file.path) == '.ods'
+    unless valid_file?(file)
       redirect_to accounts_path, alert: "Please upload a valid ODS file."
       return
     end
 
-    # Move the file to a temporary location
-    temp_file_path = File.join(Dir.tmpdir, file.original_filename)
-    File.open(temp_file_path, 'wb') do |f|
-      f.write(file.read)
-    end
-
+    temp_file_path = save_temp_file(file)
     ImportAccountsJob.perform_async(temp_file_path)
-    month_logger.info("Account import started for file '#{file.original_filename}'", session[:current_account_id])
+    log_action("Account import started for file '#{file.original_filename}'")
 
     redirect_to accounts_path, notice: "Importing accounts. You will be notified once the import is complete."
   end
 
-  def show
-  end
+  def show; end
 
   def new
     @account = Account.new
   end
 
   def create
-    @account = Account.new(account_params)
-    @account.gender ||= "none"
-    @account.address ||= ""
-    @account.phonenumber ||= ""
+    @account = Account.new(account_params_with_defaults)
 
     if @account.save
-      month_logger.info("Account '#{@account.username}' (ID: #{@account.id}) was created", session[:current_account_id])
+      log_action("Account '#{@account.username}' (ID: #{@account.id}) was created")
       redirect_to @account, notice: "Account was successfully created."
     else
       render :new
     end
   end
 
-  def edit
-  end
+  def edit; end
 
   def update
     if @account.update(account_params)
-      month_logger.info("Account '#{@account.username}' (ID: #{@account.id}) was updated", session[:current_account_id])
+      log_action("Account '#{@account.username}' (ID: #{@account.id}) was updated")
       redirect_to @account, notice: "Account was successfully updated."
     else
       render :edit
@@ -109,28 +82,59 @@ class AccountsController < ApplicationController
 
   def destroy
     @account.destroy
-    month_logger.warn("Account '#{@account.username}' (ID: #{@account.id}) was destroyed", session[:current_account_id])
+    log_action("Account '#{@account.username}' (ID: #{@account.id}) was destroyed", :warn)
     redirect_to accounts_url, notice: "Account was successfully destroyed."
   end
 
   private
 
-  # Set the current account based on the ID from the params
+  # Renders action buttons for accounts in the datatable.
+  def render_action_buttons(account)
+    <<~HTML.squish
+      <div class="d-flex gap-3 align-items-center">
+        <button onclick="window.location='#{account_path(account)}'" class="btn btn-primary" title="View Details">
+          👁
+        </button>
+        <button onclick="window.location='#{edit_account_path(account)}'" class="btn btn-primary" title="Edit Account">
+          ✎
+        </button>
+        <button data-method="delete" data-confirm="Are you sure?" class="btn btn-danger delete-account-btn" data-account-id="#{account.id}" title="Delete Account">
+          ❌
+        </button>
+      </div>
+    HTML
+  end
+
+  # Validates the uploaded file.
+  def valid_file?(file)
+    File.extname(file.path) == '.ods'
+  end
+
+  # Saves the uploaded file to a temporary location.
+  def save_temp_file(file)
+    temp_file_path = File.join(Dir.tmpdir, file.original_filename)
+    File.open(temp_file_path, 'wb') { |f| f.write(file.read) }
+    temp_file_path
+  end
+
+  # Sets default attributes for account creation.
+  def account_params_with_defaults
+    account_params.merge(gender: account_params[:gender].presence || "none", address: account_params[:address].presence || "", phonenumber: account_params[:phonenumber].presence || "")
+  end
+
+  # Logs actions with an optional severity level.
+  def log_action(message, severity = :info)
+    month_logger.public_send(severity, message, session[:current_account_id])
+  end
+
+  # Finds the account based on the ID from the params.
   def set_account
     @account = Account.find(params[:id])
   end
 
-  # Permit only the allowed parameters for account creation or update
+  # Permits only allowed parameters for account creation or update.
   def account_params
-    params.require(:account).permit(
-      :username,
-      :password,
-      :is_admin,
-      :email,
-      :phonenumber,
-      :address,
-      :gender
-    )
+    params.require(:account).permit(:username, :password, :is_admin, :email, :phonenumber, :address, :gender)
   end
 
   # Initializes the monthly logger for this controller.

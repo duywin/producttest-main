@@ -1,13 +1,15 @@
-# Controller for handling various pages and user actions
 class PagesController < ApplicationController
+  include UserCart
+  include UserDelivery
+  include UserAccount
+
   before_action :set_account, only: %i[userhome aboutus delivery_form myaccount shop shop_cart]
 
   def userhome
     @random_products = Product.order('RAND()').limit(5)
   end
 
-  def aboutus;
-  end
+  def aboutus; end
 
   def shop
     @products = Product.all
@@ -25,7 +27,6 @@ class PagesController < ApplicationController
       @cart = Cart.find_by(id: session[:cart_id])
       @cart_items = @cart ? CartItem.includes(:product).where(cart_id: @cart.id) : []
       update_cart if @cart_items.present?
-      @cart_id = @cart&.id
     else
       @cart_items = []
       @cart_id = nil
@@ -78,49 +79,6 @@ class PagesController < ApplicationController
   end
 
   private
-
-  def update_stock(cart_id)
-    cart_items = CartItem.where(cart_id: cart_id)
-    cart_items.each do |item|
-      product = item.product
-      next unless product.stock
-      product.stock -= item.quantity
-      product.save
-    end
-  end
-
-  def set_account
-    @account = Account.find_by(id: session[:current_account_id])
-  end
-
-  def setup_cart
-    @cart = Cart.where(account_id: @account.id, check_out: false).first_or_create
-    session[:cart_id] = @cart.id
-    @cart_item_count = @cart.cart_items.count
-  end
-
-  def filter_products
-    @products = @products.where('name LIKE ?', "%#{params[:search]}%") if params[:search].present?
-    @products = @products.where(product_type: params[:product_type]) if params[:product_type].present?
-    @products = @products.where('prices >= ?', params[:price_min].to_f) if params[:price_min].present?
-    @products = @products.where('prices <= ?', params[:price_max].to_f) if params[:price_max].present?
-  end
-
-  def update_cart
-    @cart.total_price = @cart_items.sum { |item| item.product.prices.to_f * item.quantity }
-    @cart.quantity = @cart_items.sum(&:quantity)
-    @cart.check_out = false
-    @cart.save
-  end
-
-  def build_address
-    "#{params[:cart][:street]}, #{params[:cart][:district]}, #{params[:cart][:city]}, #{params[:cart][:country]}"
-  end
-
-  def account_params
-    # Add the necessary permitted parameters here
-    params.require(:account).permit(:name, :email)
-  end
 
   def month_logger
     @month_logger ||= MonthLogger.new(Account)
