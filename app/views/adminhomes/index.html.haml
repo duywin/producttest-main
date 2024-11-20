@@ -1,12 +1,13 @@
 %head
   %title Admin Dashboard
+
   - if session[:welcome_alert_shown]
     = javascript_tag do
       alert("Welcome, #{@account.username if @account}!")
       - session.delete(:welcome_alert_shown)
+
   = csrf_meta_tags
   = csp_meta_tag
-
 %body
   .jumbotron.text-center.app-color
     %h1 Admin Dashboard
@@ -15,7 +16,7 @@
     .container-fluid
       #navbarNavDropdown.collapse.navbar-collapse
         %ul.navbar-nav.w-100.justify-content-around
-          %li.nav-item.active.flex-fill
+          %li.nav-item.flex-fill
             %a.nav-link{ href: adminhomes_path } Home
           %li.nav-item.flex-fill
             %a.nav-link{ href: products_path } Product
@@ -27,7 +28,20 @@
             %a.nav-link{ href: carts_path } Sales
 
   %main.content.py-4
-    %h2.text-center Admin Dashboard
+    .notification-bell
+      %button.btn{ id: "notification-toggle", title: "Notifications" }
+        %span{ "aria-hidden" => "true" } 🔔
+        - unread_count = @notifications.unread.count
+        %span.badge.badge-danger= unread_count if unread_count.positive?
+
+      #notification-dropdown.dropdown-menu.hidden
+        - @notifications.each do |notification|
+          .notification
+            %p
+              = link_to notification.message, notification.link, target: "_blank"
+            - unless notification.read?
+              %span.badge.badge-primary New
+
     .d-flex.justify-content-between
       .text-start
         = button_to 'Export Report', export_report_adminhomes_path, class: 'btn btn-primary', target: '_blank', method: :post
@@ -144,5 +158,12 @@
     };
     var categoryTotalsChart = new ApexCharts(document.querySelector("#category-chart"), categoryTotalsOptions);
     categoryTotalsChart.render();
-    });
 
+    const bellButton = document.getElementById("notification-toggle");
+    const notificationDropdown = document.getElementById("notification-dropdown");
+
+    bellButton.addEventListener("click", () => {
+      notificationDropdown.classList.toggle('show');  // Toggle the 'show' class
+      notificationDropdown.classList.toggle('hidden'); // Toggle the 'hidden' class
+    });
+  });

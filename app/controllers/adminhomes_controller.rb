@@ -3,6 +3,7 @@ class AdminhomesController < ApplicationController
 
   def index
     load_dashboard_data
+    @notifications = Notification.where(admin_id: session[:current_account_id]).order(created_at: :desc).limit(10)
   end
 
   # Logout the current admin
@@ -30,6 +31,14 @@ class AdminhomesController < ApplicationController
   def category_totals
     render json: Category.category_totals.to_a
   end
+
+  def notify_report_export
+    # Ensure the account ID is passed correctly as an array
+    NotifyReportExportWorker.perform_async(session [:current_account_id])  # Pass the admin's ID as an array
+    flash[:notice] = 'Report generation initiated. You will be notified when the report is ready.'
+    redirect_to adminhomes_path
+  end
+
 
   private
 

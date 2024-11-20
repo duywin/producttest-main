@@ -27,22 +27,23 @@ class PromotionReportExporter
 
       promotions.each do |promotion|
         sheet.add_row [
-          promotion.promote_code,
-          promotion.promotion_type,
-          promotion.apply_field,
-          promotion.value,
-          promotion.end_date,
-          promotion.min_quantity,
-          promotion.created_at
-        ]
+                        promotion.promote_code,
+                        promotion.promotion_type,
+                        promotion.apply_field,
+                        promotion.value,
+                        promotion.end_date,
+                        promotion.min_quantity,
+                        promotion.created_at
+                      ]
       end
     end
 
-    # Save the file to a temporary directory
-    file_path = Rails.root.join("tmp", filename)
+    # Save the file to the tmp directory
+    file_path = Rails.root.join('tmp', filename)
     p.serialize(file_path.to_s)
     file_path.to_s
   end
+
 
   def self.week_of_month(date)
     (date.day - 1) / 7 + 1

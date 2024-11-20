@@ -318,6 +318,51 @@ button:active {
         grid-template-columns: repeat(2, 1fr);
     }
 }
+.notification-bell {
+    position: relative;
+    cursor: pointer;
+    font-size: 30px;  /* Adjust size of the bell emoji */
+}
 
+#notification-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 300px;
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 1000;
+}
 
+.notification {
+    border-bottom: 1px solid #eee;
+    padding: 10px;
+    background-color: #f9f9f9;
+    transition: background-color 0.3s;
+}
+
+.notification:hover {
+    background-color: #f1f1f1;
+}
+
+.notification p {
+    margin: 0;
+}
+
+.notification a {
+    text-decoration: none;
+    color: #333;
+}
+
+.notification a:hover {
+    color: #007bff;
+}
+
+.notification .badge {
+    float: right;
+    font-size: 0.8em;
+}
 

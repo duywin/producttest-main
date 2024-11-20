@@ -1,18 +1,15 @@
-# app/workers/sidekiq_worker.rb
 class SidekiqWorker
   include Sidekiq::Worker
   sidekiq_options retry: 5 # Default retry options
 
   # Initialize the logger for this worker
   def logger
-    @logger ||= MonthLogger.new('sidekiq')
+    @logger ||= MonthLogger.new(SidekiqWorker)  # Pass the class itself, not a string
   end
 
   # Common method for all jobs to be performed
   def perform(*args)
     logger.info("Job started with arguments: #{args}")
-
-    # Call the actual job logic that subclasses will define
     do_some_work(args)
 
     logger.info("Job completed successfully.")
