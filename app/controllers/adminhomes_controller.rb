@@ -33,11 +33,20 @@ class AdminhomesController < ApplicationController
   end
 
   def notify_report_export
-    # Ensure the account ID is passed correctly as an array
-    NotifyReportExportWorker.perform_async(session [:current_account_id])  # Pass the admin's ID as an array
-    flash[:notice] = 'Report generation initiated. You will be notified when the report is ready.'
-    redirect_to adminhomes_path
+    promises = build_export_promises
+    Concurrent::Promise.zip(*promises).value!
+
+    # Generate the report HTML
+    html = render_to_string(
+      template: "adminhomes/export_report",
+      layout: "layouts/application",
+      locals: report_locals
+    )
+
+    # Enqueue the Sidekiq worker
+    NotifyReportExportWorker.perform_async(session[:current_account_id], html)
   end
+
 
 
   private

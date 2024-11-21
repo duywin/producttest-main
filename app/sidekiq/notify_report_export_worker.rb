@@ -1,37 +1,20 @@
 # app/workers/notify_report_export_worker.rb
-class NotifyReportExportWorker < SidekiqWorker
-  private
+class NotifyReportExportWorker
+  include Sidekiq::Worker
 
-  def do_some_work(args)
-    if args.present?
-      admin_id = args.first
-    else
-      admin_id = 8
-    end
+  def perform(admin_id = nil, html = nil)
+    # Default admin ID if none provided
+    admin_id ||= 8
     admin = Account.find(admin_id)
 
-    @account = Account.find(admin_id)
-    @category_totals = Category.category_totals
-    @highest_category = @category_totals.max_by { |_category, total| total }
-    @top_product = Product.find_top_product
-    @monthly_sales_js = Cart.monthly_sales_data.to_json
-    @monthly_category_sales_js = Cart.monthly_category_sales_data.to_json
-    @current_month_category_sales = CartItem.current_month_category_sales
-
-    # Generate HTML with locals
-    html = ApplicationController.render(
-      template: "adminhomes/export_report",
-      layout: "layouts/application",
-      locals:{
-        account: @account,
-        monthly_sales_js: @monthly_sales_js,
-        monthly_category_sales_js: @monthly_category_sales_js,
-        current_month_category_sales: @current_month_category_sales,
-        highest_category: @highest_category,
-        top_product: @top_product,
-        category_totals: @category_totals
-      }
-    )
+    # If HTML is not provided, fetch it using the controller method
+    if html.nil?
+      html = AdminhomesController.render(
+        template: "adminhomes/export_report",
+        layout: "layouts/application",
+        assigns: fetch_report_data(admin_id)
+      )
+    end
 
     # Generate the PDF file
     file_name = "admin_report_#{Time.now.strftime('%Y%m%d')}.pdf"
@@ -48,4 +31,27 @@ class NotifyReportExportWorker < SidekiqWorker
     )
   end
 
+  private
+
+  # Fetch report data for rendering
+  def fetch_report_data(admin_id)
+    # Simulate the data gathering process for the report
+    account = Account.find_by(id: admin_id)
+    category_totals = Category.category_totals
+    highest_category = category_totals.max_by { |_category, total| total }
+    top_product = Product.find_top_product
+    monthly_sales_js = Cart.monthly_sales_data.to_json
+    monthly_category_sales_js = Cart.monthly_category_sales_data.to_json
+    current_month_category_sales = CartItem.current_month_category_sales
+
+    {
+      monthly_sales_js: monthly_sales_js,
+      monthly_category_sales_js: monthly_category_sales_js,
+      current_month_category_sales: current_month_category_sales,
+      highest_category: highest_category,
+      top_product: top_product,
+      category_totals: category_totals
+    }
+  end
 end
+
