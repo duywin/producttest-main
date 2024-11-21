@@ -8,7 +8,7 @@ class WeeklyReportJob < SidekiqWorker
     month_name = Date.today.strftime("%B")
 
     # Generate the weekly report and get the filename
-    filename = PromotionReportExporter.export_weekly_report(week_number, month_name)
+    filename = PromotionReportExporter.export_weekly_report
     file_path = Rails.root.join('tmp', filename)
 
     unless File.exist?(file_path)

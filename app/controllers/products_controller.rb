@@ -62,6 +62,7 @@ class ProductsController < ApplicationController
         id: merchandise.id,
         product_id: merchandise.product_id,
         cut_off_value: merchandise.cut_off_value,
+        promotion_start: merchandise.promotion_start.present? ? merchandise.promotion_start.strftime("%Y-%m-%d") : 'N/A',
         promotion_end: merchandise.promotion_end.present? ? merchandise.promotion_end.strftime("%Y-%m-%d") : 'N/A',
         actions: render_merchandise_actions(merchandise)
       }

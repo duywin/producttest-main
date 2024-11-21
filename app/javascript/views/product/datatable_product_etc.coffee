@@ -68,8 +68,9 @@ $ ->
         dataSrc: (json) -> json.data
 
       columns: [
-        { data: 'product_id', width: '40%' }
-        { data: 'cut_off_value', width: '40%' }
+        { data: 'product_id', width: '30%' }
+        { data: 'cut_off_value', width: '35%' }
+        { data: 'promotion_start', width: '15%' }
         { data: 'promotion_end', width: '15%' }
         { data: 'actions', orderable: false, width: '5%' }
       ]

@@ -113,7 +113,7 @@ class Cart < ApplicationRecord
   # Sales Data Methods
 
   def self.monthly_sales_data
-    where.not(deliver_day: nil)
+    self.where.not(deliver_day: nil)
          .group("DATE_FORMAT(deliver_day, '%Y-%m')")
          .sum(:quantity)
          .transform_keys { |date| Date.strptime(date, "%Y-%m").strftime("%B %Y") }

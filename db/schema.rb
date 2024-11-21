@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_11_20_025100) do
+ActiveRecord::Schema[7.1].define(version: 2024_11_21_085601) do
   create_table "accounts", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "email"
     t.string "username"
@@ -79,6 +79,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_11_20_025100) do
     t.date "promotion_end"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.date "promotion_start"
     t.index ["product_id"], name: "index_merchandises_on_product_id"
   end
 

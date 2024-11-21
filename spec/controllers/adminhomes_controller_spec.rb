@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe AdminhomesController, type: :controller do
   let(:account) {
-    Account.create!(
+    FakeAccount.create!(
       id: 8,
       email: "ad@example.com",
       username: "admin1",

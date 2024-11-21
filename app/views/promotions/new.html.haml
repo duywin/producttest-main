@@ -36,6 +36,9 @@
       = form.label :cut_off_value, "Cut Off Value"
       = form.number_field :cut_off_value, class: "form-input"
     .mb-3
+      = form.label :promotion_end, "Promotion Start Date"
+      = form.date_field :promotion_start, class: "form-input"
+    .mb-3
       = form.label :promotion_end, "Promotion End Date"
       = form.date_field :promotion_end, class: "form-input"
     = form.submit 'Create Merchandise', class: 'btn btn-primary form-submit'

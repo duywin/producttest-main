@@ -34,7 +34,7 @@ class MerchandisesController < ApplicationController
 
   # Strong parameters for Merchandise.
   def merchandise_params
-    params.require(:merchandise).permit(:product_id, :cut_off_value, :promotion_end)
+    params.require(:merchandise).permit(:product_id, :cut_off_value, :promotion_end, :promotion_start)
   end
 
   # Logs merchandise creation.
