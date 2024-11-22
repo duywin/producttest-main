@@ -1,11 +1,6 @@
 class PromotionsController < ApplicationController
   before_action :set_promotion, only: [:destroy]
 
-  # Displays all promotions.
-  def index
-    @promotions = Promotion.all
-  end
-
   # Initializes a new promotion and merchandise.
   def new
     @promotion = Promotion.new
@@ -20,9 +15,10 @@ class PromotionsController < ApplicationController
       month_logger.info("Promotion created: '#{@promotion.id}' with '#{@promotion.promotion_type}' type by user '#{session[:current_account_id]}'", session[:current_account_id])
       redirect_to products_path, notice: "Promotion created successfully!"
     else
-      render :new
+      redirect_to new_promotion_path, notice: 'Unable to create promotion, please check the input'
     end
   end
+
 
   # Destroys a promotion and associated promote products.
   def destroy

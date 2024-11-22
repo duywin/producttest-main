@@ -2,9 +2,6 @@ class MerchandisesController < ApplicationController
   before_action :set_merchandise, only: [:destroy]
 
   # GET /merchandises
-  def index
-    @merchandises = Merchandise.all
-  end
 
   # Creates a new merchandise record.
   def create
@@ -13,7 +10,7 @@ class MerchandisesController < ApplicationController
       log_merchandise_creation(@merchandise)
       redirect_to(products_path, notice: 'Merchandise created successfully!')
     else
-      render :new, status: :unprocessable_entity
+      redirect_to(new_promotion_path, notice: 'Unable to create merchandise, please check the input')
     end
   end
 
