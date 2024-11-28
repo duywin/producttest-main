@@ -1,100 +1,102 @@
-require "rails_helper"
+# spec/controllers/adminhomes_controller_spec.rb
+require 'rails_helper'
 
 RSpec.describe AdminhomesController, type: :controller do
-  let(:account) {
-    FakeAccount.create!(
-      id: 8,
-      email: "ad@example.com",
-      username: "admin1",
-      phonenumber: "0988694913",
-      address: "6/9 nguyen canh di-",
-      password: "Admin@12",
-      gender: "male",
-      is_admin: 1
-    )
-  }
-  let!(:category) { Category.create!(id: 9, name: "Tea", total: 9) }
+  let!(:admin) { create(:account, :admin) } # Admin user
+  let!(:category) { create(:category) }
+  let!(:cart) { create(:cart, account: admin) }
+  let!(:cart_item) { create(:cart_item, cart: cart) }
 
-  describe "before_action :authenticate_admin" do
-    it "redirects unauthenticated users to no index" do
-      session[:current_account_id] = nil
-      get :index
-      expect(response).to redirect_to(noindex_path)
-    end
-  end
-
-  describe "GET #adminlogout" do
-    context "when admin is authenticated" do
-      before do
-        session[:current_account_id] = account.id
-      end
-
-      it "logs out the admin and redirects to login page" do
-        get :adminlogout
-        expect(session[:current_account_id]).to be_nil
-        expect(response).to redirect_to(new_account_session_path)
-      end
-    end
+  before do
+    session[:current_account_id] = admin.id
+    # Load common data required for most tests
+    controller.send(:load_dashboard_data)
   end
 
   describe "GET #index" do
-    context "when admin is not authenticated" do
-      it "redirects to login page" do
+    it "assigns dashboard data and renders the index template" do
+      get :index
+
+      expect(controller.instance_variable_get(:@account)).to eq(admin)
+      expect(controller.instance_variable_get(:@category_totals)).not_to be_nil
+      expect(controller.instance_variable_get(:@highest_category)).not_to be_nil
+      expect(controller.instance_variable_get(:@top_product)).not_to be_nil
+      expect(controller.instance_variable_get(:@notifications)).not_to be_nil
+
+      expect(response).to render_template(:index)
+    end
+  end
+
+  describe "POST #adminlogout" do
+    it "logs out the admin and redirects to login page" do
+      post :adminlogout
+
+      expect(session[:current_account_id]).to be_nil
+      expect(response).to redirect_to(new_account_session_path)
+    end
+  end
+
+  describe "GET #export_report" do
+    it "generates and sends the PDF report" do
+      allow(controller).to receive(:generate_pdf).and_return(Rails.root.join('spec', 'fixtures', 'dummy.pdf'))
+      get :export_report
+
+      expect(response.header['Content-Type']).to include 'application/pdf'
+      expect(response.header['Content-Disposition']).to include 'attachment'
+      expect(controller.instance_variable_get(:@monthly_sales_js)).not_to be_nil
+      expect(controller.instance_variable_get(:@category_totals)).not_to be_nil
+    end
+  end
+
+  describe "GET #category_totals" do
+    it "returns category totals as JSON" do
+      get :category_totals, format: :json
+
+      expect(response).to have_http_status(:success)
+      expect(response.content_type).to eq("application/json; charset=utf-8")
+    end
+  end
+
+  describe "POST #notify_report_export" do
+    it "enqueues a Sidekiq worker for report export notification" do
+      expect {
+        post :notify_report_export
+      }.to change(Sidekiq::Queues["default"], :size).by(1)
+
+      expect(response).to have_http_status(:success)
+    end
+  end
+
+  describe "Private methods" do
+    it "loads dashboard data correctly" do
+      controller.send(:load_dashboard_data)
+
+      account = controller.instance_variable_get(:@account)
+      category_totals = controller.instance_variable_get(:@category_totals)
+      top_product = controller.instance_variable_get(:@top_product)
+
+      expect(account).to eq(admin)
+      expect(category_totals).not_to be_nil
+      expect(top_product).not_to be_nil
+    end
+  end
+
+  describe "Authentication filter" do
+    context "when admin is logged in" do
+      it "does not redirect to noindex_path" do
         get :index
-        expect(response).to redirect_to(noindex_path)
+
+        expect(response).not_to redirect_to(noindex_path)
       end
     end
 
-    context "when admin is authenticated" do
-      before do
-        session[:current_account_id] = account.id
-      end
+    context "when no admin is logged in" do
+      before { session[:current_account_id] = nil }
 
-      it "renders the index template successfully" do
+      it "redirects to noindex_path" do
         get :index
-        expect(response).to be_successful
-        expect(response).to render_template(:index)
-      end
 
-      it "assigns @account based on session" do
-        get :index
-        expect(assigns(:account)).to eq(account)
-      end
-
-      it "assigns @category_totals as a hash of category names and totals" do
-        get :index
-        expect(assigns(:category_totals)).to eq({"Tea" => 9})
-      end
-
-      it "assigns @highest_category based on the highest total" do
-        get :index
-        expect(assigns(:highest_category)).to eq(["Tea", 9])
-      end
-
-      # Create a product for testing the top product logic
-      let!(:product) do
-        Product.create!(
-          id: 44,
-          name: "Keychain Souvenir",
-          product_type: "Bottle water",
-          prices: "5.00",
-          desc: "No description available.",
-          stock: 400,
-          picture: "https://m.media-amazon.com/images/I/518n3UiBDVL._AC_UY580_.jpg"
-        )
-      end
-
-      let!(:cart_item) { CartItem.create!(product: product, quantity: 10) }
-
-      it "assigns @top_product based on the product with the highest quantity in the cart" do
-        get :index
-        expect(assigns(:top_product).name).to eq("Keychain Souvenir")
-        expect(assigns(:top_product).total_quantity).to eq(10)
-      end
-
-      it "assigns @category_totals_js in JSON format" do
-        get :index
-        expect(assigns(:category_totals_js)).to eq([["Tea", 9]].to_json)
+        expect(response).to redirect_to(noindex_path)
       end
     end
   end

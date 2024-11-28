@@ -54,7 +54,7 @@ class CategoriesController < ApplicationController
       month_logger.info("Category '#{@category.name}' (ID: #{@category.id}) was created", session[:current_account_id])
       redirect_to categories_path, notice: "Category was successfully created."
     else
-      render :new, status: :unprocessable_entity
+      redirect_to categories_path, alert: "Unable to create category"
     end
   end
 

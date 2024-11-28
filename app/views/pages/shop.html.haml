@@ -80,7 +80,8 @@
 
   %body
     .jumbotron.text-center.app-color.py-4
-      %h1 Shearwater
+      %h1 SWE-Commerce
+
 
     %nav.navbar.navbar-expand-lg.navbar-light.app-color.topnav{style: "margin-top: -10px"}
       .container-fluid
@@ -101,7 +102,7 @@
                 = link_to "Sign In", new_account_session_path, class: "nav-link"
 
     .container.my-5
-      %h2.text-center.text-primary.fw-bold Shearwater Shop
+      %h2.text-center.text-primary.fw-bold Shop
 
       .d-flex.justify-content-center.align-items-center.my-3
         = form_with url: shop_path, method: :get, local: true, html: { id: "filter-form", class: "d-flex" } do

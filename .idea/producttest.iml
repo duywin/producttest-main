@@ -143,6 +143,7 @@
     <orderEntry type="library" scope="PROVIDED" name="rack-test (v2.1.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rackup (v1.0.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rails (v7.1.4, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="rails-controller-testing (v1.0.5, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rails-dom-testing (v2.2.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rails-html-sanitizer (v1.6.0, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="railties (v7.1.4, RVM: ruby-3.2.2 [shearwater]) [gem]" level="application" />
@@ -561,6 +562,11 @@
               <RakeTaskImpl description="Index all Product records in Elasticsearch, skipping duplicates" fullCommand="elasticsearch:index_products" id="index_products" />
             </subtasks>
           </RakeTaskImpl>
+          <RakeTaskImpl id="factory_bot">
+            <subtasks>
+              <RakeTaskImpl description="Generate factories for all models" fullCommand="factory_bot:generate_all" id="generate_all" />
+            </subtasks>
+          </RakeTaskImpl>
           <RakeTaskImpl id="haml">
             <subtasks>
               <RakeTaskImpl description="Convert html.erb to html.haml each file in app/views" fullCommand="haml:erb2haml" id="erb2haml" />
@@ -576,10 +582,17 @@
               <RakeTaskImpl description="Truncate all/specified *.log files in log/ to zero bytes (specify which logs with LOGS=test,development)" fullCommand="log:clear" id="clear" />
             </subtasks>
           </RakeTaskImpl>
+          <RakeTaskImpl id="merchandises">
+            <subtasks>
+              <RakeTaskImpl description="Update promotion_start column for all merchandises" fullCommand="merchandises:update_promotion_start" id="update_promotion_start" />
+            </subtasks>
+          </RakeTaskImpl>
           <RakeTaskImpl description="Run all specs in spec directory (excluding plugin specs)" fullCommand="spec" id="spec" />
           <RakeTaskImpl id="spec">
             <subtasks>
               <RakeTaskImpl description="Run the code examples in spec/controllers" fullCommand="spec:controllers" id="controllers" />
+              <RakeTaskImpl description="Run the code examples in spec/models" fullCommand="spec:models" id="models" />
+              <RakeTaskImpl description="Run the code examples in spec/sidekiq" fullCommand="spec:sidekiq" id="sidekiq" />
               <RakeTaskImpl description="" fullCommand="spec:prepare" id="prepare" />
               <RakeTaskImpl description="" fullCommand="spec:statsetup" id="statsetup" />
             </subtasks>
