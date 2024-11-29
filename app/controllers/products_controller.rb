@@ -140,7 +140,6 @@ class ProductsController < ApplicationController
       product_logger.info("Product created: ID '#{@product.id}', Name '#{@product.name}'", session[:current_account_id])
       redirect_to(@product, notice: 'Product was successfully created.')
     else
-      product_logger.error("Failed to create product: #{@product.errors.full_messages.join(', ')}", session[:current_account_id])
       redirect_to new_product_path, alert: 'Something went wrong. Please try again.'
     end
   end

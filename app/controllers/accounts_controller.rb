@@ -1,12 +1,11 @@
 class AccountsController < ApplicationController
+  before_action :authenticate_admin
   before_action :set_account, only: %i[show edit update destroy]
-  before_action :authenticate_admin, only: [:index]
 
-  # Ensures the user is an admin before accessing certain actions.
+
+  # Redirects non-admin users to noindex_path
   def authenticate_admin
-    unless session[:current_account_id]
-      redirect_to noindex_path unless request.path == noindex_path # Prevent redirect loop.
-    end
+    redirect_to(noindex_path) if session[:current_account_id].nil? && request.path != noindex_path
   end
 
   # Lists accounts with search and filter options.

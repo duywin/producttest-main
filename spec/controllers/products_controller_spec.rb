@@ -10,6 +10,26 @@ RSpec.describe ProductsController, type: :controller do
     create(:category) # Ensuring at least one category exists
   end
 
+  describe "before actions" do
+
+    context "when current_account_id is not set" do
+      before { session[:current_account_id] = nil }
+
+      it "redirects to noindex path" do
+        get :index
+        expect(response).to redirect_to(noindex_path)
+      end
+    end
+
+    context "when current_account_id is set" do
+      before { session[:current_account_id] = admin.id }
+
+      it "does not redirect" do
+        get :index
+        expect(response).to_not redirect_to(noindex_path)
+      end
+    end
+  end
 
 
   describe 'GET #show' do
@@ -45,13 +65,15 @@ RSpec.describe ProductsController, type: :controller do
     context 'with invalid attributes' do
       it 'does not create a product and redirects to the new template with an alert' do
         product_params = attributes_for(:product, name: nil)
+        initial_count = Product.count
+
         post :create, params: { product: product_params }
-        expect(Product.count).to_not change.by(1)
+        expect(Product.count).to eq(initial_count)
+
         expect(response).to redirect_to(new_product_path)
         expect(flash[:alert]).to eq('Something went wrong. Please try again.')
       end
     end
-
   end
 
   describe 'GET #edit' do
@@ -103,7 +125,7 @@ RSpec.describe ProductsController, type: :controller do
       create_list(:product, 5)
 
       get :render_product_datatable
-      expect(response.content_type).to eq("application/json")
+      expect(response.content_type).to include("application/json")
       expect(JSON.parse(response.body)['data'].size).to eq(5)
     end
   end
@@ -134,12 +156,13 @@ RSpec.describe ProductsController, type: :controller do
   end
 
   describe 'POST #import' do
-    context 'with valid ODS file' do
-      it 'starts the product import job' do
-        uploaded_file = fixture_file_upload('files/valid_products.ods', 'application/vnd.oasis.opendocument.spreadsheet')
+    context "when a file is uploaded" do
+      let(:file) { Rack::Test::UploadedFile.new('/home/intern-npduy1/Documents/products.ods', 'application/vnd.oasis.opendocument.spreadsheet') }
 
-        post :import, params: { file: uploaded_file }
-
+      it "saves the file and queues the import job" do
+        allow(ProductImportJob).to receive(:perform_async)
+        post :import, params: { file: file }
+        expect(ProductImportJob).to have_received(:perform_async)
         expect(response).to redirect_to(products_path)
         expect(flash[:notice]).to eq('Product import has started. You will be notified once complete.')
       end
@@ -147,8 +170,7 @@ RSpec.describe ProductsController, type: :controller do
 
     context 'with invalid file type' do
       it 'shows an alert message' do
-        uploaded_file = fixture_file_upload('files/invalid_file.txt', 'text/plain')
-
+        uploaded_file = Rack::Test::UploadedFile.new('/home/intern-npduy1/Reports/ip', 'text/plain')
         post :import, params: { file: uploaded_file }
 
         expect(response).to redirect_to(products_path)

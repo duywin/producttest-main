@@ -8,6 +8,29 @@ RSpec.describe AccountsController, type: :controller do
     allow(controller).to receive(:authenticate_admin).and_return(true)
   end
 
+  describe "before actions" do
+
+    context "when current_account_id is not set" do
+      before do
+        session[:current_account_id] = nil  # Simulate no user being logged in
+      end
+
+      it "redirects to the noindex path" do
+        get :index
+        expect(response).to redirect_to(noindex_path)
+      end
+    end
+
+    context "when current_account_id is set" do
+      before { session[:current_account_id] = admin.id }
+
+      it "does not redirect" do
+        get :index
+        expect(response).to_not redirect_to(noindex_path)
+      end
+    end
+  end
+
   describe "GET #index" do
     context "as an admin" do
       it "renders the index template" do
@@ -19,12 +42,15 @@ RSpec.describe AccountsController, type: :controller do
   end
 
   describe "POST #import" do
-    context "with valid file" do
-      it "starts the import job and redirects with a success notice" do
-        file = fixture_file_upload('spec/fixtures/accounts.ods', 'application/vnd.oasis.opendocument.spreadsheet')
+    context "when a file is uploaded" do
+      let(:file) { Rack::Test::UploadedFile.new('/home/intern-npduy1/Documents/user.ods', 'application/vnd.oasis.opendocument.spreadsheet') }
+
+      it "saves the file and queues the import job" do
+        allow(ImportAccountsJob).to receive(:perform_async)
         post :import, params: { file: file }
+        expect(ImportAccountsJob).to have_received(:perform_async)
         expect(response).to redirect_to(accounts_path)
-        expect(flash[:notice]).to eq("Importing accounts. You will be notified once the import is complete.")
+        expect(flash[:notice]).to eq('Importing accounts. You will be notified once the import is complete.')
       end
     end
 
@@ -38,7 +64,7 @@ RSpec.describe AccountsController, type: :controller do
 
     context "with invalid file" do
       it "redirects with an alert" do
-        file = fixture_file_upload('spec/fixtures/invalid_file.txt', 'text/plain')
+        file = Rack::Test::UploadedFile.new('/home/intern-npduy1/Reports/ip', 'text/plain')
         post :import, params: { file: file }
         expect(response).to redirect_to(accounts_path)
         expect(flash[:alert]).to eq("Please upload a valid ODS file.")
@@ -112,13 +138,5 @@ RSpec.describe AccountsController, type: :controller do
     end
   end
 
-  describe "Authentication" do
-    context "when user is not an admin" do
-      it "redirects to the noindex path" do
-        session[:current_account_id] = nil
-        get :index
-        expect(response).to redirect_to(noindex_path)
-      end
-    end
-  end
+
 end
