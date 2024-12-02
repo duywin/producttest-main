@@ -46,10 +46,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_11_21_085601) do
     t.bigint "cart_id", null: false
     t.bigint "product_id", null: false
     t.integer "quantity", default: 1
+    t.boolean "is_anomaly", default: false
+    t.decimal "price", precision: 10
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "is_anomaly"
-    t.decimal "price", precision: 10
     t.index ["cart_id"], name: "index_cart_items_on_cart_id"
     t.index ["product_id"], name: "index_cart_items_on_product_id"
   end
@@ -59,11 +59,11 @@ ActiveRecord::Schema[7.1].define(version: 2024_11_21_085601) do
     t.boolean "check_out"
     t.integer "total_price"
     t.integer "quantity"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.text "address"
     t.text "status"
     t.date "deliver_day"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "categories", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -95,13 +95,13 @@ ActiveRecord::Schema[7.1].define(version: 2024_11_21_085601) do
   create_table "products", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.text "name"
     t.text "product_type"
-    t.float "prices", limit: 53
+    t.text "prices"
     t.text "desc"
     t.integer "stock"
     t.text "picture"
+    t.string "picture_file"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "picture_file"
   end
 
   create_table "promote_products", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|

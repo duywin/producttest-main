@@ -1,8 +1,8 @@
 # spec/factories/accounts.rb
 FactoryBot.define do
   factory :account do
-    email { "a1@emapho.com" }
-    username { "auser12" }
+    email { Faker::Internet.unique.email }
+    username { Faker::Internet.unique.username }
     phonenumber { "01234567890" }
     address { "12 Finenish Street, Finland" }
     password { "Password@12" }
