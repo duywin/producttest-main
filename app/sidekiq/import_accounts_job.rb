@@ -14,13 +14,14 @@ class ImportAccountsJob < SidekiqWorker
         username = row[header.index("username")]
         email = row[header.index("email")]
         password = row[header.index("password")]
-        is_admin = row[header.index("isadmin")].to_i == 1 # Ensure comparison with an integer
+        is_admin = row[header.index("isadmin")].to_i == 1
 
-        # Only add valid accounts
-        if username.present? && email.present? && password.present?
-          accounts << Account.new(username: username, email: email, password: password, is_admin: is_admin)
+        # Build an account for validation
+        account = Account.new(username: username, email: email, password: password, is_admin: is_admin)
+        if account.valid?
+          accounts << account
         else
-          logger.error("Invalid account data at row #{i}: username=#{username}, email=#{email}, password=#{password}")
+          logger.error("Invalid account data at row #{i}: #{account.errors.full_messages.join(', ')}")
         end
       end
     rescue => e
@@ -28,13 +29,9 @@ class ImportAccountsJob < SidekiqWorker
       return
     end
 
-    # Handle account saving in bulk for better performance
-    if accounts.all?(&:valid?)
+    if accounts.present?
       Account.import accounts
       logger.info("Accounts were successfully imported: #{accounts.count} accounts")
-    else
-      error_messages = accounts.reject(&:valid?).map { |acc| acc.errors.full_messages.join(", ") }.join("; ")
-      logger.error("There were errors with some accounts: #{error_messages}")
     end
   end
 end

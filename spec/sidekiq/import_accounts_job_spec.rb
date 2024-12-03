@@ -19,51 +19,55 @@ RSpec.describe ImportAccountsJob, type: :job do
       end
     end
 
-    context "when the file has invalid rows" do
-      it "does not import invalid accounts and logs the error" do
-
-        # Prepare a mock row to simulate invalid data (missing username, email, or password)
-        invalid_row_data = ["", "invalid_email@", nil, "0"]  # Invalid row: empty username, invalid email, nil password
-
-        # Mock the file reading part and simulate the row processing with invalid data
+    context "when the file contains both valid and invalid rows" do
+      it "imports valid accounts, logs errors for invalid rows, and logs the success message" do
+        # Mock the spreadsheet and its data
+        valid_row_data = ["valid_user", "user@example.com", "Password123!", "1"]
+        invalid_row_data = ["invalid_user", "invalidemail.com", "password", "0"] # Invalid email and weak password
+        header = ["username", "email", "password", "isadmin"]
         spreadsheet = instance_double("Roo::OpenOffice")
-        allow(spreadsheet).to receive(:row).and_return(invalid_row_data)
 
-        # Mock the logger to test error handling
+        allow(Roo::OpenOffice).to receive(:new).and_return(spreadsheet)
+        allow(spreadsheet).to receive(:row).with(1).and_return(header)
+        allow(spreadsheet).to receive(:row).with(2).and_return(valid_row_data)
+        allow(spreadsheet).to receive(:row).with(3).and_return(invalid_row_data)
+        allow(spreadsheet).to receive(:last_row).and_return(3)
+
         logger = instance_double("Logger")
         allow(worker).to receive(:logger).and_return(logger)
-        expect(logger).to receive(:error).with(/Invalid account data at row/)
 
-        # Simulate the job's perform method
-        worker.perform(file_path)
+        # Expect error logging for the invalid row
+        expected_error_message = "Invalid account data at row 3: Email is invalid, Password must include at least one uppercase letter, Password must include at least one number, Password must include at least one symbol"
+
+        expect(logger).to receive(:error).with(expected_error_message)
+
+        # Expect info logging for the success message
+        expect(logger).to receive(:info).with("Accounts were successfully imported: 1 accounts")
+
+        # Expect only the valid account to be imported
+        expect {
+          worker.perform(file_path)
+        }.to change { Account.count }.by(1)
       end
     end
 
+
     context "when an error occurs during file processing" do
       it "logs the error" do
-        allow(worker).to receive(:perform).and_raise(StandardError, "Test error")
+        # Simulate an error in file processing
+        allow(Roo::OpenOffice).to receive(:new).and_raise(StandardError, "Test error")
 
         # Set up a logger spy
         logger = instance_double("Logger")
         allow(worker).to receive(:logger).and_return(logger)
+
+        # Expect the logger to receive the error message
         expect(logger).to receive(:error).with("Error reading file: Test error")
 
-        worker.perform(file_path)
+        # Execute the method
+        worker.perform("invalid_file_path")
       end
     end
   end
 
-  describe "bulk account import" do
-    it "performs bulk import with valid accounts" do
-      # You can test the import functionality here
-      accounts = [
-        build(:account, username: 'user45', email: 'user45@gmail.com', password: 'Admin@12')
-      ]
-
-      allow(Account).to receive(:import).with(accounts)
-
-      expect { worker.perform(file_path) }.to change { Account.count }.by(1)
-      expect(Account).to have_received(:import).with(accounts)
-    end
-  end
 end
