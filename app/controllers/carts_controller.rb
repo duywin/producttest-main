@@ -8,12 +8,19 @@ class CartsController < ApplicationController
 
   # Renders cart datatable with filtered search results.
   def render_cart_datatable
-    search_params = params.permit(:week, :day, :sort_order, :status)
-    cart_ids = Cart.search_carts(search_params).map(&:id)
-    @carts = Cart.includes(:account).checked_out.where(id: cart_ids)
+    search_params = params.permit(:week, :day, :status)
+
+    if search_params.values.all?(&:blank?)
+      @carts = Cart.includes(:account).checked_out
+    else
+      cart_ids = Cart.search_carts(search_params).map(&:id)
+      @carts = Cart.includes(:account).checked_out.where(id: cart_ids)
+    end
 
     render json: { data: @carts.map(&:formatted_data), status: 200 }
   end
+
+
 
   # Displays the cart edit form.
   def edit; end

@@ -47,50 +47,38 @@ class Cart < ApplicationRecord
 
   # Scopes
   scope :checked_out, -> { where(check_out: true) }
-  scope :by_week, ->(week_start) { where(created_at: week_start.beginning_of_day..week_start.end_of_week.end_of_day) }
+  scope :by_week, ->(week_start) { where(created_at: week_start.beginning_of_week..week_start.end_of_week) }
   scope :by_day, ->(date) { where(created_at: date.beginning_of_day..date.end_of_day) }
 
-  # Class Methods
-
   def self.apply_filters(carts, week_param, day_param)
-    return carts unless week_param.present?
+    return carts if week_param.blank? && day_param.blank?
 
-    week_start = Date.strptime(week_param, '%d %b %Y')
-    carts = carts.by_week(week_start)
-    carts = carts.by_day(week_start.beginning_of_week + day_of_week_number(day_param)) if day_param.present?
+    if week_param.present?
+      week_start = Date.strptime(week_param, '%d %b %Y').beginning_of_week
+      carts = carts.by_week(week_start)
+    end
+
+    if day_param.present? && week_param.present?
+      day_of_week = Date::DAYNAMES.index(day_param.capitalize)
+      specific_date = week_start + day_of_week
+      carts = carts.by_day(specific_date)
+    end
+
     carts
   end
+
 
   def self.fetch_weeks_with_checkouts
     checked_out.pluck(:created_at).map(&:beginning_of_week).uniq.sort.reverse
   end
 
   def self.search_carts(params)
-    search_definition = {
-      query: {
-        bool: {
-          filter: []
-        }
-      }
-    }
-    search_definition[:query][:bool][:filter] << { term: { status: params[:status] } } if params[:status].present?
-
-    if params[:week].present?
-      week_start = Date.strptime(params[:week], '%d %b %Y').beginning_of_week
-      search_definition[:query][:bool][:filter] << {
-        range: { created_at: { gte: week_start, lte: week_start.end_of_week } }
-      }
-
-      if params[:day].present?
-        day_of_week = Date::DAYNAMES.index(params[:day].capitalize)
-        search_definition[:query][:bool][:filter] << {
-          script: { script: "doc['created_at'].value.dayOfWeek == #{day_of_week}" }
-        }
-      end
-    end
-
-    __elasticsearch__.search(search_definition)
+    carts = checked_out
+    carts = apply_filters(carts, params[:week], params[:day])
+    carts = carts.where(status: params[:status]) if params[:status].present?
+    carts
   end
+
 
   # Instance Methods
 

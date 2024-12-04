@@ -1,4 +1,5 @@
 # spec/factories/products.rb
+require "faker"
 FactoryBot.define do
   factory :product do
     name { Faker::Commerce.product_name }
