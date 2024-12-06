@@ -73,7 +73,7 @@ class Cart < ApplicationRecord
   end
 
   def self.search_carts(params)
-    carts = checked_out
+    carts = checked_out # Assuming there's a scope or method `checked_out`
     carts = apply_filters(carts, params[:week], params[:day])
     carts = carts.where(status: params[:status]) if params[:status].present?
     carts

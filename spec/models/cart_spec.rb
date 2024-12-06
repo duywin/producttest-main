@@ -33,22 +33,49 @@ RSpec.describe Cart, type: :model do
     end
   end
 
-  # Class Methods
   describe '.apply_filters' do
-    let(:cart1) { create(:cart, created_at: 2.days.ago) }
-    let(:cart2) { create(:cart, created_at: 1.day.ago) }
+    let(:current_time) { Time.zone.now }
+    let(:cart1) { create(:cart, created_at: current_time.beginning_of_week + 1.day) } # Monday
+    let(:cart2) { create(:cart, created_at: current_time.beginning_of_week + 3.days) } # Wednesday
 
     it 'filters carts by week' do
-      filtered_carts = Cart.apply_filters(Cart.all, 2.days.ago.strftime('%d %b %Y'), nil)
-      expect(filtered_carts).to include(cart1)
+      week_start = current_time.beginning_of_week
+      week_param = week_start.strftime('%d %b %Y')
+
+      filtered_carts = Cart.apply_filters(Cart.all, week_param, nil)
+
+      expect(filtered_carts).to include(cart1, cart2) # Both carts in the same week
+    end
+
+    it 'filters carts by day within the week' do
+      week_start = current_time.beginning_of_week
+      week_param = week_start.strftime('%d %b %Y')
+      day_param = 'Monday'
+
+      filtered_carts = Cart.apply_filters(Cart.all, week_param, day_param)
+
+      expect(filtered_carts).to include(cart1) # Only cart1 is on Monday
       expect(filtered_carts).not_to include(cart2)
     end
 
-    it 'filters carts by day' do
-      filtered_carts = Cart.apply_filters(Cart.all, 2.days.ago.strftime('%d %b %Y'), 'Sunday')
-      expect(filtered_carts).to include(cart1)
+    it 'returns all carts if no filters are applied' do
+      filtered_carts = Cart.apply_filters(Cart.all, nil, nil)
+
+      expect(filtered_carts).to include(cart1, cart2)
+    end
+
+    it 'filters carts correctly with both week and day' do
+      week_start = current_time.beginning_of_week
+      week_param = week_start.strftime('%d %b %Y')
+      day_param = 'Wednesday'
+
+      filtered_carts = Cart.apply_filters(Cart.all, week_param, day_param)
+
+      expect(filtered_carts).to include(cart2) # Only cart2 is on Wednesday
+      expect(filtered_carts).not_to include(cart1)
     end
   end
+
 
   describe '.fetch_weeks_with_checkouts' do
     it 'returns unique weeks with checkouts' do
@@ -61,19 +88,22 @@ RSpec.describe Cart, type: :model do
   end
 
   describe '.search_carts' do
+    let(:current_time) { Time.zone.local(2024, 12, 2, 14, 0, 0) } # Monday, 2 Dec 2024
+    let(:cart) { create(:cart, created_at: current_time, status: 'pending') }
+
+    it 'returns carts filtered by week and day' do
+      week_start = '02 Dec 2024' # Start of the week
+      result = Cart.search_carts(week: week_start, day: 'Monday')
+
+      expect(result).to include(cart) # Matches the correct day and week
+    end
+
     it 'returns carts filtered by status' do
       cart1 = create(:cart, status: 'pending')
       cart2 = create(:cart, status: 'completed')
       result = Cart.search_carts(status: 'pending')
       expect(result.records).to include(cart1)
       expect(result.records).not_to include(cart2)
-    end
-
-    it 'returns carts filtered by week and day' do
-      cart = create(:cart, created_at: '2024-12-02 14:00:00', status: 'pending')
-      week_start = '02 Dec 2024'
-      result = Cart.search_carts(week: week_start, day: 'Monday')
-      expect(result.records).to include(cart)
     end
   end
 

@@ -39,6 +39,14 @@ class Account < ApplicationRecord
 
   # Class methods
   def self.search(query, created_at_filter = nil)
+    filter_conditions = []
+
+    # Apply created_at filters if present
+    if created_at_filter.present?
+      created_at_range = created_at_filter_range(created_at_filter)
+      filter_conditions << created_at_range if created_at_range
+    end
+
     search_definition = {
       query: {
         bool: {
@@ -46,15 +54,10 @@ class Account < ApplicationRecord
             { match: { username: query } },
             { match: { email: query } }
           ],
-          filter: []
+          filter: filter_conditions.presence || []
         }
       }
     }
-
-    # Apply created_at filters
-    if created_at_filter
-      search_definition[:query][:bool][:filter] << created_at_filter_range(created_at_filter)
-    end
 
     __elasticsearch__.search(search_definition)
   end
@@ -70,13 +73,6 @@ class Account < ApplicationRecord
     when "last_year"
       { range: { created_at: { gte: Time.current.last_year.beginning_of_year, lte: Time.current.last_year.end_of_year } } }
     end
-  end
-
-  # Instance methods
-  def generate_and_send_otp
-    otp = SecureRandom.hex(4)
-    update(otp_code: otp)
-    AccountMailer.with(account: self, otp: otp).otp_email.deliver_now
   end
 
   private
