@@ -1,24 +1,35 @@
 namespace :elasticsearch do
-  desc "Index all Product records in Elasticsearch, skipping duplicates"
-  task index_products: :environment do
-    Product.find_each do |product|
-      if product.__elasticsearch__.client.exists?(index: Product.index_name, id: product.id)
-        puts "Skipping Product ID: #{product.id} - #{product.name}, already indexed"
-      else
-        puts "Indexing Product ID: #{product.id} - #{product.name}"
+  desc "Purge shard and index all Product records in Elasticsearch"
+  task reindex_products: :environment do
+    client = Product.__elasticsearch__.client
+    index_name = Product.index_name
 
-        product.__elasticsearch__.index_document(
-          id: product.id,
-          body: {
-            id: product.id,
-            name: product.name,
-            product_type: product.product_type,
-            prices: product.prices
-          }
-        )
-      end
+    # Purge existing index
+    if client.indices.exists?(index: index_name)
+      puts "Deleting existing index: #{index_name}"
+      client.indices.delete(index: index_name)
+    else
+      puts "Index #{index_name} does not exist. No need to delete."
     end
 
-    puts "All Products processed successfully."
+    # Recreate the index with the correct mappings and settings
+    puts "Creating new index: #{index_name}"
+    Product.__elasticsearch__.create_index!(force: true)
+
+    # Index all Product records
+    Product.find_each do |product|
+      puts "Indexing Product ID: #{product.id} - #{product.name}"
+      product.__elasticsearch__.index_document(
+        id: product.id,
+        body: {
+          id: product.id,
+          name: product.name,
+          product_type: product.product_type,
+          prices: product.prices
+        }
+      )
+    end
+
+    puts "All Products indexed successfully."
   end
 end
